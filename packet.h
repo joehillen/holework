@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "packetfield.h"
+
 //Packet names
 enum
 {
@@ -64,20 +66,33 @@ enum
 };
 
 
+
+
 struct Packet
 {
     typedef boost::shared_ptr<Packet> pointer;
 
+    Packet(int id) : type(id) { }
+
     uint8_t type;
 };
 
-struct ClientHandshakePacket : public Packet
+struct KeepAlive : public Packet
 {
+    KeepAlive() : Packet(PACKET_KEEP_ALIVE) { }
+};
+
+struct ClientHandshake : public Packet
+{
+    ClientHandshake() : Packet(PACKET_HANDSHAKE) { }
+
     std::string username;
 };
 
-struct ClientLoginPacket : public Packet
+struct LoginRequest : public Packet
 {
+    LoginRequest() : Packet(PACKET_LOGIN_REQUEST) { }
+
     uint32_t protocolVersion;
     std::string username;
     std::string password;
@@ -85,5 +100,22 @@ struct ClientLoginPacket : public Packet
     uint8_t dimension;
 };
 
+struct ChatMessage : public Packet
+{
+    ChatMessage() : Packet(PACKET_CHAT_MESSAGE) { }
+    std::string message;
+};
 
+struct EntityEquipment : public Packet
+{
+    EntityEquipment() : Packet(PACKET_ENTITY_EQUIPMENT) { }
+  uint32_t entity;
+  uint16_t slot;
+  uint16_t item;
+  uint16_t damage; //Damage??
+};
+
+
+
+std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int id);
 

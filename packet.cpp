@@ -1,33 +1,37 @@
 // packet.cpp
 
-/* These are methods used to generate server response packets.*/
-sometype login(int playerID, long mapSeed, char dimension)
+#include "packet.h"
+
+std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int id)
 {
-  sometype buffer;
-  
-  buffer << (uint8_t)PACKET_LOGIN_RESPONSE;
-  buffer << (uint32_t)playerID;
-  buffer << (uint16_t)0; // size of first string (unused)
-  buffer << (uint16_t)0; // size of second string (unused)
-  buffer << (uint64_t)mapSeed;
-  buffer << (uint8_t)dimension;
-  
-  return buffer;
+    Packet::pointer ptr;
+    std::list<PacketField::pointer> list;
+
+    switch(id)
+    {
+        case PACKET_KEEP_ALIVE:
+            ptr.reset(new KeepAlive);
+            break;
+        case PACKET_LOGIN_REQUEST:
+            ptr.reset(new LoginRequest);
+            break;
+        case PACKET_HANDSHAKE:
+        {
+            ClientHandshake* packet = new ClientHandshake();
+            list.push_back(StringField::create(packet->username, 16));
+            ptr.reset(packet);
+            break;
+        }
+        case PACKET_CHAT_MESSAGE:
+            ptr.reset(new ChatMessage);
+            break;
+        case PACKET_ENTITY_EQUIPMENT:
+            ptr.reset(new EntityEquipment);
+            break; 
+        default:
+            throw std::runtime_error("Unrecognized PacketID");
+    }
+    return std::pair<Packet::pointer, std::list<PacketField::pointer> >(ptr, list);
 }
 
 
-
-readbuf(PacketBuf& packetBuf)
-{
-  if (packetBuf == null)
-  {
-    char* packet_type;
-    sync_read(socket, packet_type, 1)
-    async_read(bind(readbuf, new PacketBuf(packet_type)))
-  }
-  else
-  {
-    if (!packetBuf.done())
-      async_read(bind(readbuf, packetBuf))
-  }
-}

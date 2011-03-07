@@ -1,8 +1,9 @@
 // packetbuf.h
 
-#include "types.h"
+#include "packet.h"
+#include "packetfield.h"
 
-#include <vector>
+#include <list>
 #include <boost/system/error_code.hpp>
 #include <boost/asio.hpp>
 
@@ -15,19 +16,17 @@
 class PacketParser
 {
 public:
-  PacketParser();
-  
-  boost::asio::streambuf& buffer();
-  
-  /* This method is called when data is done 
-     being written to the feed buffer. */
-  size_t done(const boost::system::error_code& error, size_t bytes_read);
+    PacketParser();
+
+    boost::asio::streambuf& buffer();
+
+    size_t done(const boost::system::error_code& error, size_t bytes_read);
 
 private:
-  void parse();
+    void parse();
 
-  boost::asio::streambuf buffer_;
+    boost::asio::streambuf buffer_;
 
-  int  position_;   // Position within the current packet
-
+    Packet::pointer packet;
+    std::list<PacketField::pointer> fieldList;
 };

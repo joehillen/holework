@@ -1,9 +1,18 @@
 // packetfield.h
 
+#pragma once
+
 #include <sys/types.h>
 #include <boost/shared_ptr.hpp>
-
+#include <boost/asio.hpp>
+#include <string>
 #include <netinet/in.h>
+
+// TODO: move to implementation file
+
+#define MIN(a,b) ((a)>(b)?(b):(a))
+#define MAX(a,b) ((a)<(b)?(b):(a))
+
 
 /**
  * A PacketField represents a field in a packet during parsing. Supports
@@ -12,6 +21,7 @@
  */
 class PacketField
 {
+public:
     typedef boost::shared_ptr<PacketField> pointer;
 
     /**
@@ -19,19 +29,17 @@ class PacketField
      * bytes that still need to be read.
      */
     virtual int readFrom(boost::asio::streambuf& buf) = 0;
-
-
-    virtual bool done() = 0;
 };
 
 class IntField : public PacketField
 {
-    static Packet::pointer create(int32_t& out)
+public:
+    static PacketField::pointer create(uint32_t& out)
     {
-        return Packet::pointer(new IntField(out));
+        return PacketField::pointer(new IntField(out));
     }
 
-    IntField(int32_t& out)
+    IntField(uint32_t& out)
         : out_(out)
     {
     }
@@ -39,59 +47,137 @@ class IntField : public PacketField
     int readFrom(boost::asio::streambuf& buf)
     {
         // Consume at most 4 bytes
-        int available = min(4, buf.size());
+        int available = MIN(4, buf.size());
 
         if(available >= 4)
         {
-            out_ = ntohl(boost::asio::buffer_cast<const uint32_t*>(buf)[0]);
+            out_ = ntohl(boost::asio::buffer_cast<const uint32_t*>(buf.data())[0]);
             buf.consume(4);
         }
 
-        return max(0, 4 - available);
+        return MAX(0, 4 - available);
     }
 
 private:
-    int32_t& out_;
+    uint32_t& out_;
 };
 
 /*
  * TODO: move this to a separate header
  */
-uint64_t ntohll(uint64_t n)
+static uint64_t ntohll(uint64_t n)
 {
     // TODO: return n if host byte order is big-endian
     return (n>>56) | 
-        ((n<<40) & 0x00FF000000000000) |
-        ((n<<24) & 0x0000FF0000000000) |
-        ((n<<8)  & 0x000000FF00000000) |
-        ((n>>8)  & 0x00000000FF000000) |
-        ((n>>24) & 0x0000000000FF0000) |
-        ((n>>40) & 0x000000000000FF00) |
+        ((n<<40) & 0x00FF000000000000LLU) |
+        ((n<<24) & 0x0000FF0000000000LLU) |
+        ((n<<8)  & 0x000000FF00000000LLU) |
+        ((n>>8)  & 0x00000000FF000000LLU) |
+        ((n>>24) & 0x0000000000FF0000LLU) |
+        ((n>>40) & 0x000000000000FF00LLU) |
         (n<<56);
 }
 
 class LongField : public PacketField
 {
-    static Packet::pointer create(int64_t& out)
+public:
+    static PacketField::pointer create(uint64_t& out)
     {
-        return Packet::pointer(new LongField(out));
+        return PacketField::pointer(new LongField(out));
     }
 
-    LongField(int64_t& out)
+    LongField(uint64_t& out)
         : out_(out)
     {
     }
 
     int readFrom(boost::asio::streambuf& buf)
     {
-        int available = min(8, buf.size());
+        int available = MIN(8, buf.size());
 
         if (available >= 8)
         {
-            out_ = ntohll(boost::asio::buffer_cast<const uint64_t*>(buf)[0]);
+            out_ = ntohll(boost::asio::buffer_cast<const uint64_t*>(buf.data())[0]);
             buf.consume(8);
         }
 
-        return max(0, 8 - available);
+        return MAX(0, 8 - available);
     }
+
+private:
+    uint64_t& out_;
 };
+
+class StringField : public PacketField
+{
+public:
+    static PacketField::pointer create(std::string& out, int maxlen)
+    {
+        return PacketField::pointer(new StringField(out, maxlen));
+    }
+
+    StringField(std::string& out, int maxlen)
+        : out_(out), state_(NEED_LENGTH), length_(0)
+    {
+    }
+
+    int readFrom(boost::asio::streambuf& buf)
+    {
+        using namespace boost::asio;
+        /*
+         * StringField can be in three states:
+         *  - need length
+         *  - need rest of string
+         *  - done
+         */
+
+
+        //
+        if (state_ == DONE)
+        {
+            length_ = 0;
+            state_ = NEED_LENGTH;
+        }
+
+        if (state_ == NEED_LENGTH)
+        {
+            int available = MIN(2, buf.size());
+            if (available >= 2)
+            {
+                length_ = ntohs(buffer_cast<const uint16_t*>(buf.data())[0]);
+                out_.resize(length_);
+                buf.consume(2);
+                state_ = NEED_DATA;
+            }
+            else
+            {
+                return 2 - available;
+            }
+        }
+
+        if (state_ == NEED_DATA)
+        {
+            int available = MIN(length_, buf.size());
+            if (available >= length_)
+            {
+                out_.assign(buffer_cast<const char*>(buf.data()), length_);
+                buf.consume(length_);
+                state_ = DONE;
+            }
+
+            return MAX(0, length_ - available);
+        }
+    }
+
+private:
+    std::string& out_;
+
+    enum state {
+        NEED_LENGTH,
+        NEED_DATA,
+        DONE
+    } state_;
+    int length_;
+};
+
+
