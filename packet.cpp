@@ -23,14 +23,16 @@ std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int i
 {
     Packet::pointer ptr;
     std::list<PacketField::pointer> list;
-    //Packet* packet;
 
     switch(id)
     {
         case PACKET_KEEP_ALIVE:
+        {
             ptr.reset(new KeepAlive);
             break;
+        }
         case PACKET_LOGIN_REQUEST:
+        {
             LoginRequest* packet = new LoginRequest();
             list.push_back(IntField::create(packet->protocolVersion));
             list.push_back(StringField::create(packet->username, MAX_USERNAME_LENGTH));
@@ -39,35 +41,54 @@ std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int i
             list.push_back(ByteField::create(packet->dimension));
             ptr.reset(packet);
             break;
+        }
         case PACKET_HANDSHAKE:
+        {
             ClientHandshake* packet = new ClientHandshake();
             list.push_back(StringField::create(packet->username, MAX_USERNAME_LENGTH));
             ptr.reset(packet);
             break;
+        }
         case PACKET_CHAT_MESSAGE:
+        {
             ChatMessage* packet = new ChatMessage();
             list.push_back(StringField::create(packet->message));
             ptr.reset(packet);
             break;
+        }
         case PACKET_ENTITY_EQUIPMENT:
+        {
             EntityEquipment* packet = new EntityEquipment();
-            list.push_back(StringField::create(packet->message));
+            list.push_back(IntField::create(packet->entity));
+            list.push_back(ShortField::create(packet->slot));
+            list.push_back(ShortField::create(packet->item));
+            list.push_back(ShortField::create(packet->damage));
             ptr.reset(packet);
             break;
+        }
         case PACKET_USE_ENTITY:
+        {
             UseEntity* packet = new UseEntity();
-            list.push_back(StringField::create(packet->message));
+            list.push_back(IntField::create(packet->user));
+            list.push_back(IntField::create(packet->target));
+            list.push_back(BoolField::create(packet->left_click));
             ptr.reset(packet);
             break;
+        }
         case PACKET_RESPAWN:
+        {
             ptr.reset(new Respawn);
             break;
+        }
         case PACKET_PLAYER:
+        {
             Player* packet = new Player();
             list.push_back(BoolField::create(packet->on_ground));
             ptr.reset(packet);
             break;
+        }
         case PACKET_POSITION:
+        {
             Position* packet = new Position();
             list.push_back(DoubleField::create(packet->x));
             list.push_back(DoubleField::create(packet->y));
@@ -76,14 +97,18 @@ std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int i
             list.push_back(BoolField::create(packet->on_ground));
             ptr.reset(packet);
             break;
+        }
         case PACKET_LOOK:
+        {
             Look* packet = new Look();
             list.push_back(DoubleField::create(packet->yaw));
             list.push_back(DoubleField::create(packet->pitch));
             list.push_back(BoolField::create(packet->on_ground));
             ptr.reset(packet);
             break;
+        }
         case PACKET_POSITION_AND_LOOK:
+        {
             PositionLook* packet = new PositionLook();
             list.push_back(DoubleField::create(packet->x));
             list.push_back(DoubleField::create(packet->stance));
@@ -94,7 +119,9 @@ std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int i
             list.push_back(BoolField::create(packet->on_ground));
             ptr.reset(packet);
             break;
+        }
         case PACKET_DIG:
+        {
             Dig* packet = new Dig();
             list.push_back(ByteField::create(packet->status));
             list.push_back(IntField::create(packet->x));
@@ -103,7 +130,9 @@ std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int i
             list.push_back(ByteField::create(packet->face));
             ptr.reset(packet);
             break;
+        }
         case PACKET_PLACE_BLOCK:
+        {
             PlaceBlock* packet = new PlaceBlock();
             list.push_back(IntField::create(packet->x));
             list.push_back(ByteField::create(packet->y));
@@ -116,26 +145,36 @@ std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int i
             */
             ptr.reset(packet);
             break;
+        }
         case PACKET_HOLD_CHANGE:
+        {
             HoldChange* packet = new HoldChange();
             list.push_back(ShortField::create(packet->slot));
             ptr.reset(packet);
             break;
+        }
         case PACKET_ANIMATION:
+        {
             Animation* packet = new Animation();
             list.push_back(IntField::create(packet->player));
             list.push_back(ByteField::create(packet->animation));
             ptr.reset(packet);
+        }
         case PACKET_CROUCH:
+        {
             Crouch* packet = new Crouch();
             list.push_back(IntField::create(packet->player));
             list.push_back(ByteField::create(packet->crouch));
             ptr.reset(packet);
+        }
         case PACKET_INVENTORY_CLOSE:
+        {
             InvClose* packet = new InvClose();
             list.push_back(ByteField::create(packet->window));
             ptr.reset(packet);
+        }
         case PACKET_INVENTORY_CHANGE:
+        {
             InvChange* packet = new InvChange();
             list.push_back(ByteField::create(packet->window));
             list.push_back(ShortField::create(packet->slot));
@@ -145,7 +184,9 @@ std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int i
             list.push_back(ByteField::create(packet->count));
             list.push_back(ShortField::create(packet->uses));
             ptr.reset(packet);
+        }
         case PACKET_SIGN:
+        {
             Sign* packet = new Sign();
             list.push_back(IntField::create(packet->x));
             list.push_back(ShortField::create(packet->y));
@@ -154,6 +195,7 @@ std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int i
             list.push_back(StringField::create(packet->text2));
             list.push_back(StringField::create(packet->text3));
             list.push_back(StringField::create(packet->text4));
+        }
         default:
             throw std::runtime_error("Unrecognized PacketID");
     }

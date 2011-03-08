@@ -133,11 +133,12 @@ struct EntityEquipment : public Packet
     uint16_t damage; //Damage??
 };
 
+// http://mc.kev009.com/Protocol#Use_Entity.3F_.280x07.29
 struct UseEntity : public Packet
 {
     UseEntity() : Packet(PACKET_USE_ENTITY) { }
     uint32_t user; //ignored by server
-    uint16_t target; //entity the player is interacting with
+    uint32_t target; //entity the player is interacting with
     uint8_t left_click; // boolean, true is user left clicks, false otherwise
 };
 
