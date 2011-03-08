@@ -111,6 +111,11 @@ private:
 class StringField : public PacketField
 {
 public:
+    static PacketField::pointer create(std::string& out)
+    {
+        return PacketField::pointer(new StringField(out, DEFAULT_MAXLEN));
+    }
+
     static PacketField::pointer create(std::string& out, int maxlen)
     {
         return PacketField::pointer(new StringField(out, maxlen));

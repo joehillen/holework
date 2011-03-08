@@ -4,6 +4,8 @@
 
 #include "packetfield.h"
 
+#define MAX_USERNAME_LENGTH 16
+
 //Packet names
 enum
 {
@@ -65,16 +67,13 @@ enum
   PACKET_ATTACH_ENTITY   = 0x27
 };
 
-
-
-
 struct Packet
 {
     typedef boost::shared_ptr<Packet> pointer;
 
-    Packet(int id) : type(id) { }
-
     uint8_t type;
+    
+    Packet(int id) : type(id) { }
 };
 
 struct KeepAlive : public Packet
@@ -109,13 +108,30 @@ struct ChatMessage : public Packet
 struct EntityEquipment : public Packet
 {
     EntityEquipment() : Packet(PACKET_ENTITY_EQUIPMENT) { }
-  uint32_t entity;
-  uint16_t slot;
-  uint16_t item;
-  uint16_t damage; //Damage??
+    uint32_t entity;
+    uint16_t slot;
+    uint16_t item;
+    uint16_t damage; //Damage??
 };
 
+struct UseEntity : public Packet
+{
+    UseEntity() : Packet(PACKET_USE_ENTITY) { }
+    uint32_t user; //ignored by server
+    uint16_t target; //entity the player is interacting with
+    uint8_t left_click; // boolean, true is user left clicks, false otherwise
+};
 
+struct Respawn : public Packet
+{
+    Respawn() : Packet(PACKET_RESPAWN) { }
+};
+
+struct Player : public Packet
+{
+    Player() : Packet(PACKET_PLAYER) { }
+    uint8_t on_ground; // boolean, True if the client is on the ground, False otherwise
+};
 
 std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int id);
 

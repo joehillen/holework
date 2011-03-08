@@ -7,6 +7,8 @@
 #include <boost/system/error_code.hpp>
 #include <boost/asio.hpp>
 
+#define DEFAULT_MAXLEN 100
+
 /*
  * PacketParser facilitates the reading of Minecraft packets with boost::asio
  * read() or async_read(). A PacketParser's buffer and completion function can
