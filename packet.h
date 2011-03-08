@@ -33,14 +33,14 @@ enum
   PACKET_ENTITY_EQUIPMENT          = 0x05,
   PACKET_RESPAWN                   = 0x09,
   PACKET_PLAYER                    = 0x0a,
-  PACKET_PLAYER_POSITION           = 0x0b,
-  PACKET_PLAYER_LOOK               = 0x0c,
-  PACKET_PLAYER_POSITION_AND_LOOK  = 0x0d,
-  PACKET_PLAYER_DIGGING            = 0x0e,
-  PACKET_PLAYER_BLOCK_PLACEMENT    = 0x0f,
-  PACKET_HOLDING_CHANGE            = 0x10,
-  PACKET_ARM_ANIMATION             = 0x12,
-  PACKET_ENTITY_CROUCH             = 0x13,
+  PACKET_POSITION                  = 0x0b,
+  PACKET_LOOK                      = 0x0c,
+  PACKET_POSITION_AND_LOOK         = 0x0d,
+  PACKET_DIG                       = 0x0e,
+  PACKET_PLACE_BLOCK               = 0x0f,
+  PACKET_HOLD_CHANGE               = 0x10,
+  PACKET_ANIMATION                 = 0x12,
+  PACKET_CROUCH                    = 0x13,
   PACKET_INVENTORY_CLOSE           = 0x65,
   PACKET_INVENTORY_CHANGE          = 0x66,
   PACKET_SET_SLOT                  = 0x67,
@@ -92,6 +92,9 @@ struct Packet
     Packet(int id) : type(id) { }
 };
 
+/**********************************
+*      CLIENT ONLY PACKETS
+**********************************/
 struct KeepAlive : public Packet
 {
     KeepAlive() : Packet(PACKET_KEEP_ALIVE) { }
@@ -148,6 +151,123 @@ struct Player : public Packet
     Player() : Packet(PACKET_PLAYER) { }
     uint8_t on_ground; // boolean, True if the client is on the ground, False otherwise
 };
+
+struct Position : public Packet
+{
+    Position() : Packet(PACKET_POSITION) { }
+    double x; //TODO: These doubles might need to be a different type
+    double y;
+    double stance;
+    double z;
+    uint8_t on_ground; // boolean, True if the client is on the ground, False otherwise
+};
+
+struct Look : public Packet
+{
+    Look() : Packet(PACKET_LOOK) { }
+    float yaw; // TODO: These floats might need to be a different type 
+    float pitch;
+    uint8_t on_ground;
+};
+
+struct PositionLook : public Packet
+{
+    PositionLook() : Packet(PACKET_POSITION_AND_LOOK) { }
+    double x; // TODO: These doubles might need to be a different type
+    double stance;
+    double y;
+    double z;
+    float yaw; // TODO: These floats might need to be a different type 
+    float pitch;
+    uint8_t on_ground;
+};
+
+// http://mc.kev009.com/Protocol#Player_Digging_.280x0E.29
+struct Dig : public Packet
+{
+    Dig() : Packet(PACKET_DIG) { }
+    uint8_t status; //byte
+    uint32_t x; //int
+    uint8_t y; //byte
+    uint32_t z; //int
+    uint8_t face; //byte
+};
+
+// http://mc.kev009.com/Protocol#Player_Block_Placement_.280x0F.29
+struct PlaceBlock : Packet
+{
+    PlaceBlock() : Packet(PACKET_PLACE_BLOCK) { }
+    uint32_t x; //int
+    uint8_t y; //byte
+    uint32_t z; //int
+    uint8_t direction; //byte
+    uint16_t block; //short
+    uint8_t amount; //byte, optional
+    uint16_t damage; //short, optional
+};
+
+// http://mc.kev009.com/Protocol#Holding_Change_.280x10.29
+struct HoldChange : Packet
+{
+    HoldChange() : Packet(PACKET_HOLD_CHANGE) { }
+    uint16_t slot; //short
+};
+
+// http://mc.kev009.com/Protocol#Animation_.280x12.29
+struct Animation : Packet
+{
+    Animation() : Packet(PACKET_ANIMATION) { }
+    uint32_t player; // player id
+    uint8_t animation; 
+};
+
+// http://mc.kev009.com/Protocol#Entity_Action_.3F.3F.3F_.280x13.29
+struct Crouch : Packet
+{
+    Crouch() : Packet(PACKET_CROUCH) { }
+    uint32_t player; // player id
+    uint8_t crouch; 
+};
+
+// http://mc.kev009.com/Protocol#Close_window_.280x65.29
+struct InvClose : Packet
+{
+    InvClose() : Packet(PACKET_INVENTORY_CLOSE) { }
+    uint8_t window; //byte 
+};
+
+// http://mc.kev009.com/Protocol#Window_click_.280x66.29
+struct InvChange : Packet
+{
+    InvChange() : Packet(PACKET_INVENTORY_CHANGE) { }
+    uint8_t window; // byte 
+    uint16_t slot; // short 
+    uint8_t right_click; // boolean
+    uint16_t action; // short 
+    uint16_t item; // short 
+    uint8_t count; // byte
+    uint16_t uses; // short
+};
+
+
+struct Sign : Packet
+{
+    Sign() : Packet(PACKET_SIGN) { }
+    uint32_t x; // int
+    uint16_t y; // short
+    uint32_t z; // int
+    std::string text1;
+    std::string text2;
+    std::string text3;
+    std::string text4;
+};
+
+
+/**********************************
+*      SERVER ONLY PACKETS
+**********************************/
+
+
 
 std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int id);
 

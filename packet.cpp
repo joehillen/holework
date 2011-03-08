@@ -23,6 +23,7 @@ std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int i
 {
     Packet::pointer ptr;
     std::list<PacketField::pointer> list;
+    //Packet* packet;
 
     switch(id)
     {
@@ -61,6 +62,98 @@ std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int i
         case PACKET_RESPAWN:
             ptr.reset(new Respawn);
             break;
+        case PACKET_PLAYER:
+            Player* packet = new Player();
+            list.push_back(BoolField::create(packet->on_ground));
+            ptr.reset(packet);
+            break;
+        case PACKET_POSITION:
+            Position* packet = new Position();
+            list.push_back(DoubleField::create(packet->x));
+            list.push_back(DoubleField::create(packet->y));
+            list.push_back(DoubleField::create(packet->stance));
+            list.push_back(DoubleField::create(packet->z));
+            list.push_back(BoolField::create(packet->on_ground));
+            ptr.reset(packet);
+            break;
+        case PACKET_LOOK:
+            Look* packet = new Look();
+            list.push_back(DoubleField::create(packet->yaw));
+            list.push_back(DoubleField::create(packet->pitch));
+            list.push_back(BoolField::create(packet->on_ground));
+            ptr.reset(packet);
+            break;
+        case PACKET_POSITION_AND_LOOK:
+            PositionLook* packet = new PositionLook();
+            list.push_back(DoubleField::create(packet->x));
+            list.push_back(DoubleField::create(packet->stance));
+            list.push_back(DoubleField::create(packet->y));
+            list.push_back(DoubleField::create(packet->z));
+            list.push_back(DoubleField::create(packet->yaw));
+            list.push_back(DoubleField::create(packet->pitch));
+            list.push_back(BoolField::create(packet->on_ground));
+            ptr.reset(packet);
+            break;
+        case PACKET_DIG:
+            Dig* packet = new Dig();
+            list.push_back(ByteField::create(packet->status));
+            list.push_back(IntField::create(packet->x));
+            list.push_back(ByteField::create(packet->y));
+            list.push_back(IntField::create(packet->z));
+            list.push_back(ByteField::create(packet->face));
+            ptr.reset(packet);
+            break;
+        case PACKET_PLACE_BLOCK:
+            PlaceBlock* packet = new PlaceBlock();
+            list.push_back(IntField::create(packet->x));
+            list.push_back(ByteField::create(packet->y));
+            list.push_back(IntField::create(packet->z));
+            list.push_back(ByteField::create(packet->direction));
+            list.push_back(ShortField::create(packet->block));
+            /* We need a mechanic for handling optional fields
+            list.push_back(ByteField::create(packet->amount));
+            list.push_back(ShortField::create(packet->damage));
+            */
+            ptr.reset(packet);
+            break;
+        case PACKET_HOLD_CHANGE:
+            HoldChange* packet = new HoldChange();
+            list.push_back(ShortField::create(packet->slot));
+            ptr.reset(packet);
+            break;
+        case PACKET_ANIMATION:
+            Animation* packet = new Animation();
+            list.push_back(IntField::create(packet->player));
+            list.push_back(ByteField::create(packet->animation));
+            ptr.reset(packet);
+        case PACKET_CROUCH:
+            Crouch* packet = new Crouch();
+            list.push_back(IntField::create(packet->player));
+            list.push_back(ByteField::create(packet->crouch));
+            ptr.reset(packet);
+        case PACKET_INVENTORY_CLOSE:
+            InvClose* packet = new InvClose();
+            list.push_back(ByteField::create(packet->window));
+            ptr.reset(packet);
+        case PACKET_INVENTORY_CHANGE:
+            InvChange* packet = new InvChange();
+            list.push_back(ByteField::create(packet->window));
+            list.push_back(ShortField::create(packet->slot));
+            list.push_back(BoolField::create(packet->right_click));
+            list.push_back(ShortField::create(packet->action));
+            list.push_back(ShortField::create(packet->item));
+            list.push_back(ByteField::create(packet->count));
+            list.push_back(ShortField::create(packet->uses));
+            ptr.reset(packet);
+        case PACKET_SIGN:
+            Sign* packet = new Sign();
+            list.push_back(IntField::create(packet->x));
+            list.push_back(ShortField::create(packet->y));
+            list.push_back(IntField::create(packet->z));
+            list.push_back(StringField::create(packet->text1));
+            list.push_back(StringField::create(packet->text2));
+            list.push_back(StringField::create(packet->text3));
+            list.push_back(StringField::create(packet->text4));
         default:
             throw std::runtime_error("Unrecognized PacketID");
     }

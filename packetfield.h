@@ -30,6 +30,9 @@
 #define MAX(a,b) ((a)<(b)?(b):(a))
 
 
+// Magic Numbers
+#define DEFAULT_MAXLEN 100
+
 /**
  * A PacketField represents a field in a packet during parsing. Supports
  * reading from a streambuf and continuing the read later if the buffer
@@ -127,16 +130,16 @@ private:
 class StringField : public PacketField
 {
 public:
-    static PacketField::pointer create(std::string& out)
-    {
-        return PacketField::pointer(new StringField(out, DEFAULT_MAXLEN));
-    }
-
     static PacketField::pointer create(std::string& out, int maxlen)
     {
         return PacketField::pointer(new StringField(out, maxlen));
     }
-
+    
+    static PacketField::pointer create(std::string& out)
+    {
+        return PacketField::pointer(new StringField(out, DEFAULT_MAXLEN));
+    }
+    
     StringField(std::string& out, int maxlen)
         : out_(out), state_(NEED_LENGTH), length_(0)
     {
