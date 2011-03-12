@@ -26,7 +26,10 @@
 #include <boost/asio.hpp>
 
 PacketParser::PacketParser()
-  : buffer_(5)
+    // Hard-coded buffer size for now.
+    // NOTE: buffer size must be _at least_ 8 bytes to accomodate delayed reading
+    // of all primitive types.
+    : buffer_(512)
 {
 }
 

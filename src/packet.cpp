@@ -101,8 +101,8 @@ std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int i
         case PACKET_LOOK:
         {
             Look* packet = new Look();
-            list.push_back(DoubleField::create(packet->yaw));
-            list.push_back(DoubleField::create(packet->pitch));
+            list.push_back(FloatField::create(packet->yaw));
+            list.push_back(FloatField::create(packet->pitch));
             list.push_back(BoolField::create(packet->on_ground));
             ptr.reset(packet);
             break;
@@ -114,8 +114,8 @@ std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int i
             list.push_back(DoubleField::create(packet->stance));
             list.push_back(DoubleField::create(packet->y));
             list.push_back(DoubleField::create(packet->z));
-            list.push_back(DoubleField::create(packet->yaw));
-            list.push_back(DoubleField::create(packet->pitch));
+            list.push_back(FloatField::create(packet->yaw));
+            list.push_back(FloatField::create(packet->pitch));
             list.push_back(BoolField::create(packet->on_ground));
             ptr.reset(packet);
             break;
