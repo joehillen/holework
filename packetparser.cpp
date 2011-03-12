@@ -35,7 +35,8 @@ boost::asio::streambuf& PacketParser::buffer()
   return buffer_;
 }
 
-size_t PacketParser::done(const boost::system::error_code& error, size_t bytes_read)
+size_t PacketParser::done(const boost::system::error_code& error, 
+                          size_t bytes_read)
 {
     if (error) {
         return 0;
@@ -80,7 +81,7 @@ size_t PacketParser::done(const boost::system::error_code& error, size_t bytes_r
 
 
 
-
+/* Un-used
   std::cout << "Parsing Data..." << std::endl;
   std::cout << "Bytes read: " << std::dec << buffer_.size()  << std::endl;
 
@@ -92,4 +93,5 @@ size_t PacketParser::done(const boost::system::error_code& error, size_t bytes_r
   std::cout << std::endl;
   buffer_.consume(buffer_.size());
   return 50;
+*/
 }

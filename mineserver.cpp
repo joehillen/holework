@@ -26,71 +26,9 @@
 #include <boost/enable_shared_from_this.hpp>
 
 #include "packetparser.h"
+#include "connection.h"
 
 using boost::asio::ip::tcp;
-
-class Connection
-    : public boost::enable_shared_from_this<Connection>
-{
-public:
-    typedef boost::shared_ptr<Connection> pointer;
-
-    Connection(boost::asio::io_service& io)
-        : socket_(io)
-    {
-    }
-
-    static pointer create(boost::asio::io_service& io)
-    {
-        return pointer(new Connection(io));
-    }
-
-    tcp::socket& socket()
-    {
-        return socket_;
-    }
-
-    void startRead()
-    {
-        using namespace boost::asio;
-        using boost::bind;
-
-        async_read(socket_,
-            /* buffer */
-            reader.buffer(),
-            /* completion condition */
-            bind(&PacketParser::done, &reader,
-                boost::asio::placeholders::error,
-                boost::asio::placeholders::bytes_transferred),
-            /* read handler */
-            bind(&Connection::handleRead, shared_from_this(),
-                boost::asio::placeholders::error,
-                boost::asio::placeholders::bytes_transferred));
-    }
-
-    void start()
-    {
-        std::cout << "Listening for a client...\n";
-        startRead();
-    }
-
-    void handleRead(const boost::system::error_code& error, size_t bytes_read)
-    {
-        if (!error)
-        {
-            std::cout << "Got " << bytes_read << " bytes from the client.\n";
-//            reader.done(bytes_read);
-
-            startRead();
-        }
-        else
-            std::cout << "THERE WAS AN ONOS\n";
-    }
-
-private:
-    tcp::socket socket_;
-    PacketParser reader;
-};
 
 class TcpServer
 {
@@ -127,7 +65,6 @@ private:
     boost::asio::io_service& io_;
     tcp::acceptor acceptor_;
 };
-
 
 int main()
 {

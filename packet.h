@@ -86,7 +86,9 @@ enum
 struct Packet
 {
     typedef boost::shared_ptr<Packet> pointer;
-
+    
+    Connection::pointer connection;
+    
     uint8_t type;
     
     Packet(int id) : type(id) { }
