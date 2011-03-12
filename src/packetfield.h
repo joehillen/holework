@@ -50,6 +50,61 @@ public:
     virtual int readFrom(boost::asio::streambuf& buf) = 0;
 };
 
+class ByteField : public PacketField
+{
+public:
+    static PacketField::pointer create(uint8_t& out)
+    {
+        return PacketField::pointer(new ByteField(out));
+    }
+
+    ByteField(uint8_t& out)
+        : out_(out)
+    {
+    }
+
+    int readFrom(boost::asio::streambuf& buf)
+    {
+        int available = MIN(1, buf.size());
+        if (available >= 1)
+        {
+            out_ = boost::asio::buffer_cast<const uint8_t*>(buf.data())[0];
+            buf.consume(1);
+        }
+        return MAX(0, 1 - available);
+    }
+
+private:
+    uint8_t& out_;
+};
+
+class ShortField : public PacketField
+{
+public:
+    static PacketField::pointer create(uint16_t& out)
+    {
+        return PacketField::pointer(new ShortField(out));
+    }
+
+    ShortField(uint16_t& out)
+        : out_(out)
+    {
+    }
+
+    int readFrom(boost::asio::streambuf& buf)
+    {
+        int available = MIN(2, buf.size());
+        if (available >= 2)
+        {
+            out_ = ntohs(boost::asio::buffer_cast<const uint16_t*>(buf.data())[0]);
+        }
+        return MAX(0, 1 - available);
+    }
+
+private:
+    uint16_t& out_;
+};
+
 class IntField : public PacketField
 {
 public:
@@ -127,6 +182,91 @@ private:
     uint64_t& out_;
 };
 
+class BoolField : public PacketField
+{
+public:
+    static PacketField::pointer create(uint8_t& out)
+    {
+        return PacketField::pointer(new BoolField(out));
+    }
+
+    BoolField(uint8_t& out)
+        : out_(out)
+    {
+    }
+
+    int readFrom(boost::asio::streambuf& buf)
+    {
+        int available = MIN(1, buf.size());
+        if (available >= 1)
+        {
+            out_ = boost::asio::buffer_cast<const uint8_t*>(buf.data())[0];
+            buf.consume(1);
+        }
+        return MAX(0, 1 - available);
+    }
+
+private:
+    uint8_t& out_;
+};
+
+class FloatField : public PacketField
+{
+public:
+    static PacketField::pointer create(float& out)
+    {
+        return PacketField::pointer(new FloatField(out));
+    }
+
+    FloatField(float& out)
+        : out_(out)
+    {
+    }
+
+    int readFrom(boost::asio::streambuf& buf)
+    {
+        int available = MIN(4, buf.size());
+        if (available >= 4)
+        {
+            out_ = boost::asio::buffer_cast<const float*>(buf.data())[0];
+            buf.consume(4);
+        }
+        return MAX(0, 4 - available);
+    }
+
+private:
+    float& out_;
+};
+
+class DoubleField : public PacketField
+{
+public:
+    static PacketField::pointer create(double& out)
+    {
+        return PacketField::pointer(new DoubleField(out));
+    }
+
+    DoubleField(double& out)
+        : out_(out)
+    {
+    }
+
+    int readFrom(boost::asio::streambuf& buf)
+    {
+        int available = MIN(8, buf.size());
+        if (available >= 1)
+        {
+            out_ = boost::asio::buffer_cast<const double*>(buf.data())[0];
+            buf.consume(8);
+        }
+        return MAX(0, 8 - available);
+    }
+
+private:
+    double& out_;
+};
+
+
 class StringField : public PacketField
 {
 public:
@@ -145,6 +285,8 @@ public:
     {
     }
 
+    // TODO: this needs to be fixed to read the string in chunks;
+    // otherwise string read size is limited by buffer size. Oops! :)
     int readFrom(boost::asio::streambuf& buf)
     {
         using namespace boost::asio;
