@@ -95,3 +95,10 @@ size_t PacketParser::done(const boost::system::error_code& error,
   return 50;
 */
 }
+
+Packet::pointer PacketParser::consumePacket()
+{
+   Packet::ptr this_packet(this->packet);
+   this->packet.reset(NULL);
+   return this_packet;
+}
