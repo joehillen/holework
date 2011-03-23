@@ -28,65 +28,62 @@
 #include "packetparser.h"
 #include "connection.h"
 
-class Connection
-    : public boost::enable_shared_from_this<Connection>
+
+Connection(boost::asio::io_service& io)
+    : socket_(io)
 {
-public:
-    typedef boost::shared_ptr<Connection> pointer;
+}
 
-    Connection(boost::asio::io_service& io)
-        : socket_(io)
+static pointer create(boost::asio::io_service& io)
+{
+    return pointer(new Connection(io));
+}
+
+
+tcp::socket& Connection::socket()
+{
+    return socket_;
+}
+
+
+void Connection::startRead()
+{
+    using namespace boost::asio;
+    using boost::bind;
+
+    async_read(socket_,
+        /* buffer */
+        parser.buffer(),
+        /* completion condition */
+        bind(&PacketParser::done, &parser,
+            boost::asio::placeholders::error,
+            boost::asio::placeholders::bytes_transferred),
+        /* read handler */
+        bind(&Connection::handleRead, shared_from_this(),
+            boost::asio::placeholders::error,
+            boost::asio::placeholders::bytes_transferred));
+}
+
+void Connection::start()
+{
+    std::cout << "Listening for a client...\n";
+    startRead();
+}
+
+/*
+ * This is called when a full packet has been read, or when the connection was
+ * interrupted by some error.
+ */
+void Connection::handleRead(const boost::system::error_code& error, size_t bytes_read)
+{
+    if (!error)
     {
-    }
-
-    static pointer create(boost::asio::io_service& io)
-    {
-        return pointer(new Connection(io));
-    }
-
-    tcp::socket& socket()
-    {
-        return socket_;
-    }
-
-    void startRead()
-    {
-        using namespace boost::asio;
-        using boost::bind;
-
-        async_read(socket_,
-            /* buffer */
-            parser.buffer(),
-            /* completion condition */
-            bind(&PacketParser::done, &parser,
-                boost::asio::placeholders::error,
-                boost::asio::placeholders::bytes_transferred),
-            /* read handler */
-            bind(&Connection::handleRead, shared_from_this(),
-                boost::asio::placeholders::error,
-                boost::asio::placeholders::bytes_transferred));
-    }
-
-    void start()
-    {
-        std::cout << "Listening for a client...\n";
+        std::cout << "Got " << bytes_read << " bytes from the client.\n";
+        Packet::pointer packet = parser.consumePacket();
+        packet->connection = shared_from_this();
         startRead();
     }
+    else
+        std::cout << "THERE WAS AN ONOS\n";
+}
 
-    void handleRead(const boost::system::error_code& error, size_t bytes_read)
-    {
-        if (!error)
-        {
-            std::cout << "Got " << bytes_read << " bytes from the client.\n";
-            Packet::pointer packet = parser.consumePacket();
-            packet->connection = shared_from_this();
-            startRead();
-        }
-        else
-            std::cout << "THERE WAS AN ONOS\n";
-    }
-
-private:
-    tcp::socket socket_;
-    PacketParser parser;
-};
