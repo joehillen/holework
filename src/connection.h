@@ -29,20 +29,46 @@
 
 #include "packetparser.h"
 
+// Forward declarations
+class Packet;
+
+
 class Connection
     : public boost::enable_shared_from_this<Connection>
 {
 public:
     typedef boost::shared_ptr<Connection> pointer;
 
+    // TODO: maybe make private?
+    Connection(boost::asio::io_service& io);
+
+    /**
+     * Constructs a Connection on the specified io_service and returns a
+     * shared_ptr.
+     */
     static pointer create(boost::asio::io_service& io);
+
+    /**
+     * Returns the socket associated with this connection.
+     */
     tcp::socket& socket();
-    void startRead();
+
+    /**
+     * Begins asynchronous reading of packets from the connected client.
+     */
     void start();
 
-    void handleRead(const boost::system::error_code& error, size_t bytes_read);
+
+    /**
+     * Delivers a packet to the connected client.
+     */
+    void deliver(const Packet* packet);
+
 
 private:
+    void startRead();
+    void handleRead(const boost::system::error_code& error, size_t bytes_read);
+
     tcp::socket socket_;
     PacketParser reader;
 };
