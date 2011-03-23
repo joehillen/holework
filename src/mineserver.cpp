@@ -25,8 +25,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
-#include "packetparser.h"
-#include "connection.h"
+#include "network/connection.h"
 
 using boost::asio::ip::tcp;
 
