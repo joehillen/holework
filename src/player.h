@@ -25,6 +25,12 @@
 class Player
 {
 public:
+    Player();
+    Player(Connection::pointer connection);
+    
+    void connection(Connection::pointer connection);
+    Connection::pointer connection();
+    
     void handle(Packet& packet);
     
     void updatePosition(double x, double y, double z);
