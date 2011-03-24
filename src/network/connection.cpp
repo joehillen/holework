@@ -92,10 +92,10 @@ void Connection::handleWrite(const boost::system::error_code& error,
     writeQueue.pop();
     if (!error)
     {
-        if (writeQueue.empty())
+        if (!writeQueue.empty())
         {
             async_write(this->soc,
-                boost::asio::buffer(*(writeQueue.front().data)),
+                writeQueue.front().buffer(),
                 bind(&Connection::handleWrite, shared_from_this(),
                     boost::asio::placeholders::error,
                     boost::asio::placeholders::bytes_transferred));
@@ -114,7 +114,7 @@ void Connection::deliver(Response const& packet)
     if (empty)
     {
         async_write(this->soc,
-            boost::asio::buffer(*(writeQueue.front().data)),
+            writeQueue.front().buffer(),
             bind(&Connection::handleWrite, shared_from_this(),
                 boost::asio::placeholders::error,
                 boost::asio::placeholders::bytes_transferred));
