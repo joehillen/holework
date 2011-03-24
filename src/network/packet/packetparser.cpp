@@ -54,7 +54,7 @@ size_t PacketParser::done(const boost::system::error_code& error,
         uint8_t id = boost::asio::buffer_cast<const uint8_t*>(buffer_.data())[0];
         buffer_.consume(1);
 
-        std::pair<Packet::pointer, std::list<PacketField::pointer> > packet_pair = packetFactory(id);
+        std::pair<Request::pointer, std::list<PacketField::pointer> > packet_pair = packetFactory(id);
         
         packet = packet_pair.first;
         fieldList = packet_pair.second;
@@ -99,9 +99,9 @@ size_t PacketParser::done(const boost::system::error_code& error,
 */
 }
 
-Packet::pointer PacketParser::consumePacket()
+Request::pointer PacketParser::consumePacket()
 {
-   Packet::ptr this_packet(this->packet);
-   this->packet.reset(NULL);
+   Request::pointer this_packet(this->packet);
+   this->packet.reset();
    return this_packet;
 }

@@ -27,7 +27,6 @@
 
 #include "packet/packetparser.h"
 #include "connection.h"
-#include "serialize.h"
 
 Connection::Connection(boost::asio::io_service& io)
     : soc(io)
