@@ -29,6 +29,7 @@
 #include <boost/enable_shared_from_this.hpp>
 
 #include "packet/packetparser.h"
+#include "packet/response.h"
 
 // Forward declarations
 class Request;
@@ -73,6 +74,6 @@ private:
 
     boost::asio::ip::tcp::socket soc;
     PacketParser parser;
-    std::queue<boost::asio::buffer> writeQueue;
+    std::queue<Response> writeQueue;
 };
 

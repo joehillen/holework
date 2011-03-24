@@ -94,7 +94,7 @@ struct ChatRequest : public Request
     std::string message;
 };
 
-
+/* We aren't going to use classes for this anymore
 struct Response
 {
     uint8_t id;
@@ -134,6 +134,7 @@ struct ChatResponse : public Response
         : Response(RESPONSE_CHAT), message(msg) { }
     std::string message;
 };
+*/
 
 
 

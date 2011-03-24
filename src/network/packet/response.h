@@ -4,7 +4,7 @@ struct Response
 {
     boost::shared_ptr<std::vector<uint8_t> > data;
 };
-
+/*
 Response chatmessage(std::string const& msg)
 {
     Response r;
@@ -13,3 +13,4 @@ Response chatmessage(std::string const& msg)
     r << msg;
     return r;
 }
+*/

@@ -90,7 +90,19 @@ void Connection::handleRead(const boost::system::error_code& error, size_t bytes
 void Connection::handleWrite(const boost::system::error_code& error, 
         size_t bytes_written)
 {
-    if (error)
+    writeQueue.pop();
+    if (!error)
+    {
+        if (writeQueue.empty())
+        {
+            async_write(this->soc,
+                boost::asio::buffer(*(writeQueue.front().data)),
+                bind(&Connection::handleWrite, shared_from_this(),
+                    boost::asio::placeholders::error,
+                    boost::asio::placeholders::bytes_transferred));
+        }
+    }
+    else
     {
         std::cout << "ERROR WRITING! (we should probably do something)";
     }
@@ -98,10 +110,15 @@ void Connection::handleWrite(const boost::system::error_code& error,
 
 void Connection::deliver(Response const& packet)
 {
-    async_write(this->soc,
-        serialize(this->packet),
-        bind(&Connection:handleWrite, shared_from_this(),
-            boost::asio::placeholders::error,
-            boost::asio::placeholders::bytes_transferred));
+    bool empty = writeQueue.empty();
+    writeQueue.push(packet);
+    if (empty)
+    {
+        async_write(this->soc,
+            boost::asio::buffer(*(writeQueue.front().data)),
+            bind(&Connection::handleWrite, shared_from_this(),
+                boost::asio::placeholders::error,
+                boost::asio::placeholders::bytes_transferred));
+    }
 }
 
