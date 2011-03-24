@@ -1,4 +1,4 @@
-// player.h
+// player.cpp 
 
 /***********************************************************************
 * Copyright (C) 2011 Holework Project
@@ -15,48 +15,52 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *************************************************************************/
-#pragma once
 
-#include "network/connection.h"
+#include "player.h"
 #include "network/packet/packet.h"
+#include "network/connection.h"
 
-#include <boost/asio.hpp>
+#define MAX_DELTA 10000 //change this or make it configurable?
 
-class Player : private Connection,
-               public boost::enable_shared_from_this<Player>
+
+Player::Player(boost::asio::io_service& io)
+    : Connection(io)
 {
-public:
-    Player(boost::asio::io_service& io);
+    
+}
 
-    void updatePosition(double x, double y, double z);
-    void updateLook(float yaw, float pitch);
-    void updateHealth(short health);
+void Player::dispatch(Request::pointer packet)
+{
+    std::cout << "Dispatching a packet of type " << (int)packet->type << "\n";
+}
 
-private:
-    /**
-     * Called from network layer to dispatch a packet received
-     * from the attached client.
-     */
-    void dispatch(Request::pointer packet);
+void Player::updatePosition(double x, double y, double z)
+{
+    x_ = x;
+    x_ = y;
+    x_ = z;
+    /* TODO: Something that tells everyone the player position changed. */
+}
 
-    int id_;
+void Player::updateLook(float yaw, float pitch)
+{
+    yaw_ = yaw;
+    pitch_ = pitch;
+    /* TODO: Something that tells everyone the player look changed. */
+}
 
-    /* Position */
-    double x_;
-    double z_;
-    double y_;
-
-    /* Look */
-    float yaw_;
-    float pitch_;
-
-    /* State */
-    bool on_ground_;
-    bool digging_;
-    short health_;
-
-    /* Spawn */
-    double spawn_x_;
-    double spawn_z_;
-    double spawn_y_;
-};
+void Player::updateHealth(short health)
+{
+    if (health >= 20)
+    {
+        health_ = 20;
+    }
+    else if (health <= 0)
+    {
+        health = 0;
+    }
+    else
+    {
+        health_ = health;
+    }
+}

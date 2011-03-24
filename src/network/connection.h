@@ -41,14 +41,10 @@ class Connection
 public:
     typedef boost::shared_ptr<Connection> pointer;
 
+    friend class TcpServer;
+
     // TODO: maybe make private?
     Connection(boost::asio::io_service& io);
-
-    /**
-     * Constructs a Connection on the specified io_service and returns a
-     * shared_ptr.
-     */
-    static pointer create(boost::asio::io_service& io);
 
     /**
      * Returns the socket associated with this connection.
@@ -72,6 +68,8 @@ private:
     void handleRead(const boost::system::error_code& error, size_t bytes_read);
     void handleWrite(const boost::system::error_code& error, size_t bytes_written);
 
+    virtual void dispatch(Request::pointer packet) = 0;
+    
     boost::asio::ip::tcp::socket soc;
     PacketParser parser;
     std::queue<Response> writeQueue;

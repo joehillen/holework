@@ -33,11 +33,6 @@ Connection::Connection(boost::asio::io_service& io)
 {
 }
 
-/*static*/ Connection::pointer Connection::create(boost::asio::io_service& io)
-{
-    return pointer(new Connection(io));
-}
-
 
 boost::asio::ip::tcp::socket& Connection::socket()
 {
@@ -78,8 +73,10 @@ void Connection::handleRead(const boost::system::error_code& error, size_t bytes
     if (!error)
     {
         std::cout << "Got " << bytes_read << " bytes from the client.\n";
-        //Request::pointer packet = this->parser.consumePacket();
-        //this->packet->connection = shared_from_this();
+        Request::pointer packet = this->parser.consumePacket();
+
+        this->dispatch(packet);
+
         startRead();
     }
     else

@@ -26,6 +26,7 @@
 #include <boost/enable_shared_from_this.hpp>
 
 #include "network/connection.h"
+#include "player.h"
 
 using boost::asio::ip::tcp;
 
@@ -41,7 +42,9 @@ public:
     void startAccept()
     {
         std::cout << "Waiting for a connection...\n";
-        Connection::pointer new_connection = Connection::create(io_);
+
+        Connection::pointer new_connection((Connection*) new Player(io_));
+
         acceptor_.async_accept(new_connection->socket(),
             boost::bind(&TcpServer::handleAccept, this, 
                 new_connection,
