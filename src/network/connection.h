@@ -21,6 +21,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <queue>
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
@@ -30,7 +31,7 @@
 #include "packet/packetparser.h"
 
 // Forward declarations
-class Packet;
+class Request;
 
 
 class Connection
@@ -51,7 +52,7 @@ public:
     /**
      * Returns the socket associated with this connection.
      */
-    tcp::socket& socket();
+    boost::asio::ip::tcp::socket& socket();
 
     /**
      * Begins asynchronous reading of packets from the connected client.
@@ -62,14 +63,16 @@ public:
     /**
      * Delivers a packet to the connected client.
      */
-    void deliver(const Packet* packet);
+    void deliver(Response const&);
 
 
 private:
     void startRead();
     void handleRead(const boost::system::error_code& error, size_t bytes_read);
+    void handleWrite(const boost::system::error_code& error, size_t bytes_written);
 
-    tcp::socket socket_;
-    PacketParser reader;
+    boost::asio::ip::tcp::socket soc;
+    PacketParser parser;
+    std::queue<boost::asio::buffer> writeQueue;
 };
 

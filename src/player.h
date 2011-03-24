@@ -19,8 +19,6 @@
 
 #include "network/packet/packet.h"
 #include "network/connection.h"
-#include "inventory.h"
-#include "item.h"
 
 class Player
 {

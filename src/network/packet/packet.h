@@ -59,7 +59,7 @@ struct Request
     typedef boost::shared_ptr<Request> pointer;
 
     uint8_t type;
-    Packet(uint8_t id) : type(id) { }
+    Request(RequestType id) : type(id) { }
 };
 
 struct KeepAliveRequest : public Request
@@ -87,6 +87,12 @@ struct LoginRequest : public Request
     uint8_t dimension;
 };
 
+struct ChatRequest : public Request
+{
+    ChatRequest() : Request(REQUEST_CHAT) { }
+
+    std::string message;
+};
 
 
 struct Response
@@ -100,6 +106,20 @@ struct KeepAliveResponse : public Response
     KeepAliveResponse() : Response(RESPONSE_KEEP_ALIVE) { }
 };
 
+struct LoginResponse : public Response
+{
+    LoginResponse(uint32_t id, uint64_t seed, uint8_t dim)
+        : Response(RESPONSE_LOGIN), entityId(id), mapSeed(seed), dimension(dim)
+    {
+    }
+
+    uint32_t entityId;
+    std::string servername;
+    std::string motd;
+    uint64_t mapSeed;
+    uint8_t dimension;
+};
+
 struct HandshakeResponse : public Response
 {
     HandshakeResponse(std::string const& hash) 
@@ -108,7 +128,7 @@ struct HandshakeResponse : public Response
     std::string connectionHash;
 };
 
-struct ChatReponse : public Response
+struct ChatResponse : public Response
 {
     ChatResponse(std::string const& msg) 
         : Response(RESPONSE_CHAT), message(msg) { }
@@ -127,5 +147,5 @@ struct ChatReponse : public Response
 
 
 
-std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int id);
+std::pair<Request::pointer, std::list<PacketField::pointer> > packetFactory(int id);
 

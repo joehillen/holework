@@ -28,7 +28,7 @@ std::pair<Request::pointer, std::list<PacketField::pointer> > packetFactory(int 
     {
         case REQUEST_KEEP_ALIVE:
         {
-            ptr.reset(new KeepAlive);
+            ptr.reset(new KeepAliveRequest);
             break;
         }
         case REQUEST_LOGIN:
@@ -196,11 +196,11 @@ std::pair<Request::pointer, std::list<PacketField::pointer> > packetFactory(int 
             list.push_back(StringField::create(packet->text2));
             list.push_back(StringField::create(packet->text3));
             list.push_back(StringField::create(packet->text4));
-        }
+        }*/
         default:
             throw std::runtime_error("Unrecognized PacketID");
     }
-    */
+    
     return std::pair<Request::pointer, std::list<PacketField::pointer> >(ptr, list);
 }
 

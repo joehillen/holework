@@ -1,3 +1,3 @@
 
 all :
-	@echo "Your shit's all retarded."
+	g++ -o server -lboost_system src/*.cpp src/network/*.cpp src/network/packet/*.cpp
