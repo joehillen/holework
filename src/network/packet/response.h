@@ -36,7 +36,7 @@ struct Response
 
     boost::asio::streambuf& buffer()
     {
-        return *this->data;
+        return *(this->data);
     }
 };
 
