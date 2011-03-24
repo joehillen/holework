@@ -15,6 +15,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *************************************************************************/
+#pragma once
 
 #include "packet.h"
 #include "packetfield.h"
@@ -38,11 +39,11 @@ public:
 
     size_t done(const boost::system::error_code& error, size_t bytes_read);
 
-private:
-    void parse();
+    Request::pointer consumePacket();
 
+private:
     boost::asio::streambuf buffer_;
 
-    Packet::pointer packet;
+    Request::pointer packet;
     std::list<PacketField::pointer> fieldList;
 };

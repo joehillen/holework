@@ -19,19 +19,19 @@
 
 #include "packet.h"
 
-std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int id)
+std::pair<Request::pointer, std::list<PacketField::pointer> > packetFactory(int id)
 {
-    Packet::pointer ptr;
+    Request::pointer ptr;
     std::list<PacketField::pointer> list;
 
     switch(id)
     {
-        case PACKET_KEEP_ALIVE:
+        case REQUEST_KEEP_ALIVE:
         {
-            ptr.reset(new KeepAlive);
+            ptr.reset(new KeepAliveRequest);
             break;
         }
-        case PACKET_LOGIN_REQUEST:
+        case REQUEST_LOGIN:
         {
             LoginRequest* packet = new LoginRequest();
             list.push_back(IntField::create(packet->protocolVersion));
@@ -42,21 +42,22 @@ std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int i
             ptr.reset(packet);
             break;
         }
-        case PACKET_HANDSHAKE:
+        case REQUEST_HANDSHAKE:
         {
-            ClientHandshake* packet = new ClientHandshake();
+            HandshakeRequest* packet = new HandshakeRequest();
             list.push_back(StringField::create(packet->username, MAX_USERNAME_LENGTH));
             ptr.reset(packet);
             break;
         }
-        case PACKET_CHAT_MESSAGE:
+        case REQUEST_CHAT:
         {
-            ChatMessage* packet = new ChatMessage();
+            ChatRequest* packet = new ChatRequest();
             list.push_back(StringField::create(packet->message));
             ptr.reset(packet);
             break;
         }
-        case PACKET_ENTITY_EQUIPMENT:
+        /* TODO: FIX
+        case REQUEST_ENTITY_EQUIPMENT:
         {
             EntityEquipment* packet = new EntityEquipment();
             list.push_back(IntField::create(packet->entity));
@@ -66,7 +67,7 @@ std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int i
             ptr.reset(packet);
             break;
         }
-        case PACKET_USE_ENTITY:
+        case REQUEST_USE_ENTITY:
         {
             UseEntity* packet = new UseEntity();
             list.push_back(IntField::create(packet->user));
@@ -75,19 +76,19 @@ std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int i
             ptr.reset(packet);
             break;
         }
-        case PACKET_RESPAWN:
+        case REQUEST_RESPAWN:
         {
             ptr.reset(new Respawn);
             break;
         }
-        case PACKET_PLAYER:
+        case REQUEST_PLAYER:
         {
             Player* packet = new Player();
             list.push_back(BoolField::create(packet->on_ground));
             ptr.reset(packet);
             break;
         }
-        case PACKET_POSITION:
+        case REQUEST_POSITION:
         {
             Position* packet = new Position();
             list.push_back(DoubleField::create(packet->x));
@@ -98,7 +99,7 @@ std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int i
             ptr.reset(packet);
             break;
         }
-        case PACKET_LOOK:
+        case REQUEST_LOOK:
         {
             Look* packet = new Look();
             list.push_back(FloatField::create(packet->yaw));
@@ -107,7 +108,7 @@ std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int i
             ptr.reset(packet);
             break;
         }
-        case PACKET_POSITION_AND_LOOK:
+        case REQUEST_POSITION_AND_LOOK:
         {
             PositionLook* packet = new PositionLook();
             list.push_back(DoubleField::create(packet->x));
@@ -120,7 +121,7 @@ std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int i
             ptr.reset(packet);
             break;
         }
-        case PACKET_DIG:
+        case REQUEST_DIG:
         {
             Dig* packet = new Dig();
             list.push_back(ByteField::create(packet->status));
@@ -131,7 +132,7 @@ std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int i
             ptr.reset(packet);
             break;
         }
-        case PACKET_PLACE_BLOCK:
+        case REQUEST_PLACE_BLOCK:
         {
             PlaceBlock* packet = new PlaceBlock();
             list.push_back(IntField::create(packet->x));
@@ -139,41 +140,41 @@ std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int i
             list.push_back(IntField::create(packet->z));
             list.push_back(ByteField::create(packet->direction));
             list.push_back(ShortField::create(packet->block));
-            /* We need a mechanic for handling optional fields
-            list.push_back(ByteField::create(packet->amount));
-            list.push_back(ShortField::create(packet->damage));
-            */
+            // We need a mechanic for handling optional fields
+            // list.push_back(ByteField::create(packet->amount));
+            // list.push_back(ShortField::create(packet->damage));
+            
             ptr.reset(packet);
             break;
         }
-        case PACKET_HOLD_CHANGE:
+        case REQUEST_HOLD_CHANGE:
         {
             HoldChange* packet = new HoldChange();
             list.push_back(ShortField::create(packet->slot));
             ptr.reset(packet);
             break;
         }
-        case PACKET_ANIMATION:
+        case REQUEST_ANIMATION:
         {
             Animation* packet = new Animation();
             list.push_back(IntField::create(packet->player));
             list.push_back(ByteField::create(packet->animation));
             ptr.reset(packet);
         }
-        case PACKET_CROUCH:
+        case REQUEST_CROUCH:
         {
             Crouch* packet = new Crouch();
             list.push_back(IntField::create(packet->player));
             list.push_back(ByteField::create(packet->crouch));
             ptr.reset(packet);
         }
-        case PACKET_INVENTORY_CLOSE:
+        case REQUEST_INVENTORY_CLOSE:
         {
             InvClose* packet = new InvClose();
             list.push_back(ByteField::create(packet->window));
             ptr.reset(packet);
         }
-        case PACKET_INVENTORY_CHANGE:
+        case REQUEST_INVENTORY_CHANGE:
         {
             InvChange* packet = new InvChange();
             list.push_back(ByteField::create(packet->window));
@@ -185,7 +186,7 @@ std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int i
             list.push_back(ShortField::create(packet->uses));
             ptr.reset(packet);
         }
-        case PACKET_SIGN:
+        case REQUEST_SIGN:
         {
             Sign* packet = new Sign();
             list.push_back(IntField::create(packet->x));
@@ -195,11 +196,13 @@ std::pair<Packet::pointer, std::list<PacketField::pointer> > packetFactory(int i
             list.push_back(StringField::create(packet->text2));
             list.push_back(StringField::create(packet->text3));
             list.push_back(StringField::create(packet->text4));
-        }
+        }*/
         default:
             throw std::runtime_error("Unrecognized PacketID");
     }
-    return std::pair<Packet::pointer, std::list<PacketField::pointer> >(ptr, list);
+    
+    return std::pair<Request::pointer, std::list<PacketField::pointer> >(ptr, list);
 }
+
 
 

@@ -25,24 +25,24 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
-#include "packetparser.h"
+#include "packet/packetparser.h"
 #include "connection.h"
+#include "serialize.h"
 
-
-Connection(boost::asio::io_service& io)
-    : socket_(io)
+Connection::Connection(boost::asio::io_service& io)
+    : soc(io)
 {
 }
 
-static pointer create(boost::asio::io_service& io)
+/*static*/ Connection::pointer Connection::create(boost::asio::io_service& io)
 {
     return pointer(new Connection(io));
 }
 
 
-tcp::socket& Connection::socket()
+boost::asio::ip::tcp::socket& Connection::socket()
 {
-    return socket_;
+    return this->soc;
 }
 
 
@@ -51,11 +51,11 @@ void Connection::startRead()
     using namespace boost::asio;
     using boost::bind;
 
-    async_read(socket_,
+    async_read(this->soc,
         /* buffer */
-        parser.buffer(),
+        this->parser.buffer(),
         /* completion condition */
-        bind(&PacketParser::done, &parser,
+        bind(&PacketParser::done, &this->parser,
             boost::asio::placeholders::error,
             boost::asio::placeholders::bytes_transferred),
         /* read handler */
@@ -79,11 +79,29 @@ void Connection::handleRead(const boost::system::error_code& error, size_t bytes
     if (!error)
     {
         std::cout << "Got " << bytes_read << " bytes from the client.\n";
-        Packet::pointer packet = parser.consumePacket();
-        packet->connection = shared_from_this();
+        //Request::pointer packet = this->parser.consumePacket();
+        //this->packet->connection = shared_from_this();
         startRead();
     }
     else
         std::cout << "THERE WAS AN ONOS\n";
+}
+
+void Connection::handleWrite(const boost::system::error_code& error, 
+        size_t bytes_written)
+{
+    if (error)
+    {
+        std::cout << "ERROR WRITING! (we should probably do something)";
+    }
+}
+
+void Connection::deliver(Response const& packet)
+{
+    async_write(this->soc,
+        serialize(this->packet),
+        bind(&Connection:handleWrite, shared_from_this(),
+            boost::asio::placeholders::error,
+            boost::asio::placeholders::bytes_transferred));
 }
 

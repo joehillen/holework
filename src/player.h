@@ -17,10 +17,8 @@
 *************************************************************************/
 #pragma once
 
-#include "packet.h"
-#include "connection.h"
-#include "inventory.h"
-#include "item.h"
+#include "network/packet/packet.h"
+#include "network/connection.h"
 
 class Player
 {
