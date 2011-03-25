@@ -29,9 +29,36 @@ Player::Player(boost::asio::io_service& io)
     
 }
 
+void Player::deliver(Response const& packet)
+{
+    Connection::deliver(packet);
+}
+
 void Player::dispatch(Request::pointer packet)
 {
     std::cout << "Dispatching a packet of type " << (int)packet->type << "\n";
+
+    Request* p = packet.get();
+
+    switch(packet->type)
+    {
+    case REQUEST_KEEP_ALIVE:
+        this->deliver(keepalive());
+        break;
+    case REQUEST_HANDSHAKE:
+        this->username_ = ((HandshakeRequest*)p)->username;
+        std::cout << "Handshake request from "
+                  << this->username_
+                  << "!\n";
+        this->deliver(handshake("-"));
+        break;
+    case REQUEST_LOGIN:
+        std::cout << "Responding to login\n";
+        this->deliver(loginresponse(1337, 0, 0));
+        break;
+    default:
+        std::cout << "Unhandled packet!\n";
+    }
 }
 
 void Player::updatePosition(double x, double y, double z)

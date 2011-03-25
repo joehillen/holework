@@ -19,6 +19,7 @@
 
 #include "network/connection.h"
 #include "network/packet/packet.h"
+#include "network/packet/response.h"
 
 #include <boost/asio.hpp>
 
@@ -28,9 +29,13 @@ class Player : private Connection,
 public:
     Player(boost::asio::io_service& io);
 
+    void deliver(Response const& packet);
+
     void updatePosition(double x, double y, double z);
     void updateLook(float yaw, float pitch);
     void updateHealth(short health);
+
+    std::string username();
 
 private:
     /**
@@ -38,6 +43,8 @@ private:
      * from the attached client.
      */
     void dispatch(Request::pointer packet);
+
+    std::string username_;
 
     int id_;
 

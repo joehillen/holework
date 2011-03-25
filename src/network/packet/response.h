@@ -3,7 +3,8 @@
 
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
-
+#include <iomanip>
+#include <ostream>
 
 enum ResponseType
 {
@@ -40,6 +41,17 @@ struct Response
     }
 };
 
+static std::ostream& operator<<(std::ostream& os, Response const& r)
+{
+    const uint8_t* buf = boost::asio::buffer_cast<const uint8_t*>(r.data->data());
+
+    for(size_t i = 0; i < r.data->size(); ++i) {
+        os << std::hex << (int)buf[i] << " ";
+    }
+
+    return os;
+}
+
 Response& operator<<(Response& os, uint8_t n);
 Response& operator<<(Response& os, uint16_t n);
 Response& operator<<(Response& os, uint32_t n);
@@ -49,4 +61,8 @@ Response& operator<<(Response& os, std::string const& s);
 /*
  * Response construction functions
  */
+Response keepalive();
 Response chatmessage(std::string const& msg);
+Response handshake(std::string const& msg);
+Response loginresponse(uint32_t eid, uint64_t seed, uint8_t dim);
+

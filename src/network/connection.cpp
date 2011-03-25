@@ -106,6 +106,9 @@ void Connection::handleWrite(const boost::system::error_code& error,
 
 void Connection::deliver(Response const& packet)
 {
+    std::cout << "Connection> delivering a packet!\n";
+    std::cout << "Connection> " << packet << "\n";
+
     bool empty = writeQueue.empty();
     writeQueue.push(packet);
     if (empty)
