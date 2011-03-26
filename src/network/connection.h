@@ -28,8 +28,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
-#include "packet/packetparser.h"
-#include "packet/response.h"
+#include "packetparser.h"
+#include "response.h"
 
 namespace boostcraft { namespace network {
 

@@ -17,7 +17,7 @@
 *************************************************************************/
 
 #include "player.h"
-#include "network/packet/packet.h"
+#include "network/packet.h"
 #include "network/connection.h"
 #include "log.h"
 

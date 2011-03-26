@@ -18,8 +18,8 @@
 #pragma once
 
 #include "network/connection.h"
-#include "network/packet/packet.h"
-#include "network/packet/response.h"
+#include "network/packet.h"
+#include "network/response.h"
 
 #include <boost/asio.hpp>
 
