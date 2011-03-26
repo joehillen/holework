@@ -94,6 +94,9 @@ boost::function<void(EventType&)> wrapper(
 }
 
 
+/**
+ * Registers an event listener
+ */
 template<class EventType>
 void listen(boost::function<void(EventType&)> callback)
 {

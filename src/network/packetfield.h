@@ -325,7 +325,7 @@ public:
 
         if (state_ == NEED_DATA)
         {
-            int available = MIN(length_, buf.size());
+            unsigned int available = MIN(length_, buf.size());
             if (available >= length_)
             {
                 out_.assign(buffer_cast<const char*>(buf.data()), length_);
@@ -335,6 +335,7 @@ public:
 
             return MAX(0, length_ - available);
         }
+        return 0;
     }
 
 private:
@@ -345,7 +346,7 @@ private:
         NEED_DATA,
         DONE
     } state_;
-    int length_;
+    unsigned int length_;
 };
 
 
