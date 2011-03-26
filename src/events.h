@@ -25,7 +25,9 @@ namespace boostcraft
 
 // Forward declarations
 class Player;
+namespace network {
 class LoginRequest;
+}
 
 
 /**
@@ -55,23 +57,20 @@ struct LogEvent : public Event
     LogEvent(std::string const& msg) : message(msg) { }
 };
 
-
-
-
 struct LoginRequestEvent : public PlayerEvent
 {
     static boost::signals2::signal<void(LoginRequestEvent&)> signal;
 
-    LoginRequest& request;
+    network::LoginRequest& request;
 
-    LoginRequestEvent(Player& player, LoginRequest& request)
+    LoginRequestEvent(Player& player, network::LoginRequest& request)
         : PlayerEvent(player), request(request)
     {
     }
 };
 
 
-// Connection stuff
+// signal connection stuff
 
 
 template<class EventType>
@@ -99,6 +98,16 @@ template<class EventType>
 void listen(boost::function<void(EventType&)> callback)
 {
     EventType::signal.connect(wrapper<EventType>(callback));
+}
+
+
+/**
+ * Fires an event
+ */
+template<class EventType>
+void fire(EventType& e)
+{
+    EventType::signal(e);
 }
 
 

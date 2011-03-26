@@ -68,9 +68,11 @@ void Player::dispatch(network::Request::pointer packet)
         break;
     }
     case REQUEST_LOGIN:
-        std::cout << "Responding to login\n";
-        this->deliver(loginresponse(1337, 0, 0));
+    {
+        LoginRequestEvent event(*this, *((network::LoginRequest*)p));
+        LoginRequestEvent::signal(event);
         break;
+    }
     default:
         std::cout << "Unhandled packet!\n";
     }
@@ -107,4 +109,8 @@ void Player::updateHealth(short health)
     }
 }
 
+std::string Player::username()
+{
+    return this->username_;
+}
 } // end namespace

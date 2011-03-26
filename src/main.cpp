@@ -21,37 +21,48 @@
 #include <vector>
 
 #include <boost/asio.hpp>
+#include <boost/format.hpp>
 
+#include "log.h"
 #include "events.h"
 #include "network/tcpserver.h"
 
 using namespace boostcraft;
 
+static int newEntityID()
+{
+    static int id = 0;
+    return id++;
+}
+
 /*
  * Log event handler
  */
-void logMessage(LogEvent& event)
+void logHandler(LogEvent& event)
 {
     std::cout << "LOGGED: " << event.source_name << " "  << event.message << "\n";
     // Now we sneakily cancel the event!
 //    event.canceled = true;
 }
 
-
-void handler2(LogEvent& event)
+void loginHandler(LoginRequestEvent& e)
 {
-    std::cout << "This is the second handler!\n";
+    e.player.id = newEntityID();
+    e.player.deliver(boostcraft::network::loginresponse(e.player.id,0,0));
+    boostcraft::log("loginhandler:", 
+        boost::str(boost::format("Login request from %1%."
+                    " Given entity id %2%") 
+                    % e.player.username() 
+                    % e.player.id));
 }
-
-
 
 int main()
 {
     using namespace boost::asio::ip;
     using namespace boostcraft::network;
 
-    boostcraft::listen<LogEvent>(logMessage);
-    boostcraft::listen<LogEvent>(handler2);
+    boostcraft::listen<LogEvent>(logHandler);
+    boostcraft::listen<LoginRequestEvent>(loginHandler);
 
 
     LogEvent event("THIS IS A TEST");

@@ -39,6 +39,7 @@ public:
     void updateLook(float yaw, float pitch);
     void updateHealth(short health);
 
+    int id; // entity id
     std::string username();
 
 private:
@@ -50,7 +51,6 @@ private:
 
     std::string username_;
 
-    int id_;
 
     /* Position */
     double x_;
