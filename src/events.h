@@ -100,6 +100,12 @@ void listen(boost::function<void(EventType&)> callback)
     EventType::signal.connect(wrapper<EventType>(callback));
 }
 
+template<class EventType>
+void listen(void (*callback)(EventType&))
+{
+    EventType::signal.connect(wrapper<EventType>(callback));
+}
+
 
 /**
  * Fires an event

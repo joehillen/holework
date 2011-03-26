@@ -61,12 +61,11 @@ int main()
     using namespace boost::asio::ip;
     using namespace boostcraft::network;
 
-    boostcraft::listen<LogEvent>(logHandler);
-    boostcraft::listen<LoginRequestEvent>(loginHandler);
-
+    listen(logHandler);
+    listen(loginHandler);
 
     LogEvent event("THIS IS A TEST");
-    LogEvent::signal(event);
+    fire(event);
 
     try
     {
