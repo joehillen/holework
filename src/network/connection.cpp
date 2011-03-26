@@ -28,6 +28,8 @@
 #include "packet/packetparser.h"
 #include "connection.h"
 
+namespace boostcraft { namespace network {
+
 Connection::Connection(boost::asio::io_service& io)
     : soc(io)
 {
@@ -72,7 +74,6 @@ void Connection::handleRead(const boost::system::error_code& error, size_t bytes
 {
     if (!error)
     {
-        std::cout << "Got " << bytes_read << " bytes from the client.\n";
         Request::pointer packet = this->parser.consumePacket();
 
         this->dispatch(packet);
@@ -80,7 +81,7 @@ void Connection::handleRead(const boost::system::error_code& error, size_t bytes
         startRead();
     }
     else
-        std::cout << "THERE WAS AN ONOS\n";
+        std::cout << "CONNECTION CLOSED.\n";
 }
 
 void Connection::handleWrite(const boost::system::error_code& error, 
@@ -106,9 +107,6 @@ void Connection::handleWrite(const boost::system::error_code& error,
 
 void Connection::deliver(Response const& packet)
 {
-    std::cout << "Connection> delivering a packet!\n";
-    std::cout << "Connection> " << packet << "\n";
-
     bool empty = writeQueue.empty();
     writeQueue.push(packet);
     if (empty)
@@ -121,3 +119,4 @@ void Connection::deliver(Response const& packet)
     }
 }
 
+}} // end namespace boostcraft

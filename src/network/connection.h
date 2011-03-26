@@ -31,6 +31,8 @@
 #include "packet/packetparser.h"
 #include "packet/response.h"
 
+namespace boostcraft { namespace network {
+
 // Forward declarations
 class Request;
 
@@ -75,3 +77,4 @@ private:
     std::queue<Response> writeQueue;
 };
 
+}} //end namespace boostcraft::network

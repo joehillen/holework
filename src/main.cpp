@@ -22,10 +22,40 @@
 
 #include <boost/asio.hpp>
 
+#include "events.h"
+#include "network/tcpserver.h"
+
+using namespace boostcraft;
+
+/*
+ * Log event handler
+ */
+void logMessage(LogEvent& event)
+{
+    std::cout << "LOGGED: " << event.source_name << " "  << event.message << "\n";
+    // Now we sneakily cancel the event!
+//    event.canceled = true;
+}
+
+
+void handler2(LogEvent& event)
+{
+    std::cout << "This is the second handler!\n";
+}
+
+
 
 int main()
 {
-    Signals signals;
+    using namespace boost::asio::ip;
+    using namespace boostcraft::network;
+
+    boostcraft::listen<LogEvent>(logMessage);
+    boostcraft::listen<LogEvent>(handler2);
+
+
+    LogEvent event("THIS IS A TEST");
+    LogEvent::signal(event);
 
     try
     {

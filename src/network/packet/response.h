@@ -6,6 +6,9 @@
 #include <iomanip>
 #include <ostream>
 
+
+namespace boostcraft { namespace network { 
+
 enum ResponseType
 {
     RESPONSE_KEEP_ALIVE         = 0,
@@ -65,4 +68,6 @@ Response keepalive();
 Response chatmessage(std::string const& msg);
 Response handshake(std::string const& msg);
 Response loginresponse(uint32_t eid, uint64_t seed, uint8_t dim);
+
+}} //end namespace boostcraft::network
 

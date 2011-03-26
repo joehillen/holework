@@ -19,6 +19,8 @@
 
 #include "packet.h"
 
+namespace boostcraft { namespace network { 
+
 std::pair<Request::pointer, std::list<PacketField::pointer> > packetFactory(int id)
 {
     Request::pointer ptr;
@@ -204,5 +206,5 @@ std::pair<Request::pointer, std::list<PacketField::pointer> > packetFactory(int 
     return std::pair<Request::pointer, std::list<PacketField::pointer> >(ptr, list);
 }
 
-
+}} //end namespace boostcraft::network
 

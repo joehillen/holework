@@ -23,13 +23,17 @@
 
 #include <boost/asio.hpp>
 
-class Player : private Connection,
+namespace boostcraft
+{
+
+
+class Player : private network::Connection,
                public boost::enable_shared_from_this<Player>
 {
 public:
-    Player(boost::asio::io_service& io);
+    Player(boost::asio::io_service& io); 
 
-    void deliver(Response const& packet);
+    void deliver(network::Response const& packet);
 
     void updatePosition(double x, double y, double z);
     void updateLook(float yaw, float pitch);
@@ -42,7 +46,7 @@ private:
      * Called from network layer to dispatch a packet received
      * from the attached client.
      */
-    void dispatch(Request::pointer packet);
+    void dispatch(network::Request::pointer packet);
 
     std::string username_;
 
@@ -66,4 +70,8 @@ private:
     double spawn_x_;
     double spawn_z_;
     double spawn_y_;
+
+    void log(std::string message);
 };
+
+} // end namespace

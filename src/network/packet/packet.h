@@ -21,7 +21,7 @@
 #include "packetfield.h"
 
 #define MAX_USERNAME_LENGTH 16
-
+namespace boostcraft { namespace network { 
 
 enum RequestType
 {
@@ -75,59 +75,6 @@ struct ChatRequest : public Request
     std::string message;
 };
 
-/* We aren't going to use classes for this anymore
-struct Response
-{
-    uint8_t id;
-    Response(uint8_t id) : id(id) { }
-};
-
-struct KeepAliveResponse : public Response
-{
-    KeepAliveResponse() : Response(RESPONSE_KEEP_ALIVE) { }
-};
-
-struct LoginResponse : public Response
-{
-    LoginResponse(uint32_t id, uint64_t seed, uint8_t dim)
-        : Response(RESPONSE_LOGIN), entityId(id), mapSeed(seed), dimension(dim)
-    {
-    }
-
-    uint32_t entityId;
-    std::string servername;
-    std::string motd;
-    uint64_t mapSeed;
-    uint8_t dimension;
-};
-
-struct HandshakeResponse : public Response
-{
-    HandshakeResponse(std::string const& hash) 
-        : Response(RESPONSE_HANDSHAKE), connectionHash(hash) { }
-
-    std::string connectionHash;
-};
-
-struct ChatResponse : public Response
-{
-    ChatResponse(std::string const& msg) 
-        : Response(RESPONSE_CHAT), message(msg) { }
-    std::string message;
-};
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
 std::pair<Request::pointer, std::list<PacketField::pointer> > packetFactory(int id);
 
+}} //end namespace boostcraft::network

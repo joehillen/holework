@@ -33,6 +33,8 @@
 // Magic Numbers
 #define DEFAULT_MAXLEN 100
 
+namespace boostcraft { namespace network { 
+
 /**
  * A PacketField represents a field in a packet during parsing. Supports
  * reading from a streambuf and continuing the read later if the buffer
@@ -346,4 +348,6 @@ private:
     int length_;
 };
 
+
+}} //end namespace boostcraft::network
 

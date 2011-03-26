@@ -9,6 +9,9 @@ uint64_t htonll(uint64_t n)
     return (((uint64_t)htonl(n)) << 32) | (htonl(n >> 32));
 }
 
+
+namespace boostcraft { namespace network { 
+
 Response& operator<<(Response& os, uint8_t n)
 {
     std::ostream out(os.data.get());
@@ -77,9 +80,12 @@ Response loginresponse(uint32_t entityId, uint64_t seed, uint8_t dimension)
     Response r;
     r << (uint8_t)RESPONSE_LOGIN;
     r << entityId;
-    r << "HELLO";
-    r << "GOODBYE";
+    r << "THESE ARE NOT";
+    r << "CURRENTLY USED";
     r << seed;
     r << dimension;
     return r;
 }
+
+}} //end namespace boostcraft::network
+

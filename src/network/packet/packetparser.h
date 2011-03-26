@@ -24,6 +24,8 @@
 #include <boost/system/error_code.hpp>
 #include <boost/asio.hpp>
 
+namespace boostcraft { namespace network { 
+
 /*
  * PacketParser facilitates the reading of Minecraft packets with boost::asio
  * read() or async_read(). A PacketParser's buffer and completion function can
@@ -47,3 +49,7 @@ private:
     Request::pointer packet;
     std::list<PacketField::pointer> fieldList;
 };
+
+
+}} //end namespace boostcraft::network
+
