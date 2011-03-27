@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <boost/asio.hpp>
+#include <boost/bind.hpp>
 #include <boost/signals2/signal.hpp>
 
 namespace boostcraft
@@ -28,6 +30,12 @@ class Player;
 namespace network {
 class LoginRequest;
 }
+
+
+/**
+ * THE IO_SERVICE
+ */
+extern boost::asio::io_service io_service;
 
 
 /**
@@ -71,8 +79,6 @@ struct LoginRequestEvent : public PlayerEvent
 
 
 // signal connection stuff
-
-
 template<class EventType>
 void callIfNotCanceled(
         boost::function<void(EventType&)> callback,
@@ -119,6 +125,15 @@ void fire(EventType& e)
     EventType::signal(e);
 }
 
+/**
+ * Fires an event asynchronously; returns immediately, and the event is fired
+ * as soon as io_service gets to it.
+ */
+template<class EventType>
+void async_fire(EventType& e)
+{
+    io_service.post(boost::bind(boost::ref(EventType::signal), e));
+}
 
 
 } // end namespace boostcraft

@@ -20,8 +20,10 @@
 
 namespace boostcraft {
 
-boost::signals2::signal<void(LogEvent&)> LogEvent::signal;
+boost::asio::io_service io_service;
+
 boost::signals2::signal<void(LoginRequestEvent&)> LoginRequestEvent::signal;
+boost::signals2::signal<void(LogEvent&)> LogEvent::signal;
 
 }
 

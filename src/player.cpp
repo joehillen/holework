@@ -70,7 +70,7 @@ void Player::dispatch(network::Request::pointer packet)
     case REQUEST_LOGIN:
     {
         LoginRequestEvent event(*this, *((network::LoginRequest*)p));
-        LoginRequestEvent::signal(event);
+        async_fire(event);
         break;
     }
     default:

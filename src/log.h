@@ -27,7 +27,7 @@ static void log(std::string source, std::string message)
 {
     LogEvent logevent(message);
     logevent.source_name = source;
-    LogEvent::signal(logevent);
+    async_fire(logevent);
 }
 
 } //end namespace
