@@ -33,10 +33,47 @@ class LoginRequest;
 
 
 /**
- * THE IO_SERVICE
+ * Function: io_service()
+ *
+ * Returns a reference to the io_service object for the boostcraft system.
+ *
+ * Various parts of the boostcraft system can use this object to schedule
+ * tasks, create timers, or perform other asynchronous activities.
+ *
+ * Boostcraft is run by executing io_service::run in (potentially) several
+ * threads; all tasks are done asynchronously through the io_service, which
+ * means that tasks might be picked up by any thread that is executing
+ * io_service::run. This means: minimize shared mutable state if you can, and
+ * use boost::asio::strand for any callbacks that access state that must be
+ * synchronized (or else do your own locking of entire objects with mutexes,
+ * but beware the vile deadlock beast!).
  */
-extern boost::asio::io_service io_service;
+boost::asio::io_service& io_service();
 
+
+
+/**
+ * Events in boostcraft are exposed through a set of public classes, one for
+ * each type of event that can occur in the system. Each event class includes
+ * a static boost::signals2::signal which is used for all instances of that
+ * event.
+ *
+ * To raise an event, create an instance of the desired event class and call
+ * fire() on it, e.g.:
+ *         LogEvent log("This is a log message.");
+ *         fire(log);
+ * Alternatively, call async_fire() if you want handling of the event to occur
+ * asynchronously.
+ *
+ * To listen for events, create a function that matches the signature
+ * void(EventType&), and then call listen() on it, e.g.:
+ *         void logHandler(LogEvent& e) { ... }
+ *         listen(logHandler);
+ * Your handler will be called whenever the event is fired, unless a handler
+ * that ran prior to yours canceled the event. To request that your handler be
+ * called even when the event was canceled, use listen_always.
+ * 
+ */
 
 /**
  * The base class for all events
@@ -79,6 +116,13 @@ struct LoginRequestEvent : public PlayerEvent
 
 
 // signal connection stuff
+
+
+/**
+ * Internal helper: callIfNotCanceled
+ *
+ * Calls a callback if the given event is uncanceled. Used by wrapper.
+ */
 template<class EventType>
 void callIfNotCanceled(
         boost::function<void(EventType&)> callback,
@@ -89,8 +133,10 @@ void callIfNotCanceled(
 }
 
 /**
+ * Internal helper: wrapper
+ *
  * Wraps an event signal callback so that it will not be called if the event
- * that dispatched it was cancelled by a prior signal callback.
+ * that dispatched it was canceled by a prior signal callback.
  */
 template<class EventType>
 boost::function<void(EventType&)> wrapper(
@@ -101,7 +147,22 @@ boost::function<void(EventType&)> wrapper(
 
 
 /**
- * Registers an event listener
+ * Function: listen( callback )
+ *
+ * Registers an event listener function, to be called whenever the appropriate
+ * event is raised (and not canceled). Which event to listen for is inferred
+ * from the callback's signature.
+ * 
+ * The specified callback will NOT be called in response to an event if that
+ * event is canceled by a prior handler. To register a listener that will be
+ * called even for canceled events, use listen_always.
+ *
+ * TODO: add handler priority classes.
+ *
+ * TODO: events may get "result" values in the future; if this happens we will
+ *       need to parameterize on the return type also, not to mention give some
+ *       thought to the way in which the results of multiple callbacks are
+ *       aggregated.
  */
 template<class EventType>
 void listen(boost::function<void(EventType&)> callback)
@@ -117,7 +178,29 @@ void listen(void (*callback)(EventType&))
 
 
 /**
- * Fires an event
+ * Function: listen_always( callback )
+ *
+ * Registers an event listener function, as per listen, with the distinction
+ * that the function will always be called when the appropriate event is
+ * raised, even if the event gets canceled.
+ */
+template<class EventType>
+void listen_always(boost::function<void(EventType&)> callback)
+{
+    EventType::signal.connect(callback);
+}
+
+template<class EventType>
+void listen_always(void (*callback)(EventType&))
+{
+    EventType::signal.connect(callback);
+}
+
+/**
+ * Function: fire
+ *
+ * Fires an event object, calling all listener functions that are registered to
+ * the event.
  */
 template<class EventType>
 void fire(EventType& e)
@@ -126,13 +209,18 @@ void fire(EventType& e)
 }
 
 /**
- * Fires an event asynchronously; returns immediately, and the event is fired
- * as soon as io_service gets to it.
+ * Function: async_fire
+ *
+ * Fires an event asynchronously. This function returns immediately, and the
+ * callbacks associated with the event are run as soon as possible.
+ *
+ * TODO: if events get return values, async_fire will need to take a callback
+ *       to deliver the result.
  */
 template<class EventType>
 void async_fire(EventType& e)
 {
-    io_service.post(boost::bind(boost::ref(EventType::signal), e));
+    io_service().post(boost::bind(boost::ref(EventType::signal), e));
 }
 
 

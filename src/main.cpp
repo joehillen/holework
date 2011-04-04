@@ -68,10 +68,9 @@ int main()
     try
     {
         tcp::endpoint endpoint(tcp::v4(), 25565);
-        // io_service comes from the core
-        TcpServer server(io_service, endpoint);
+        TcpServer server(io_service(), endpoint);
 
-        io_service.run();
+        io_service().run();
     }
     catch (std::exception& e)
     {
