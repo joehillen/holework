@@ -20,6 +20,7 @@
 
 #include <ostream>
 #include <stdint.h>
+#include <cstring>
 
 namespace boostcraft {
 
@@ -51,6 +52,10 @@ private:
         this->metadata = new uint8_t[size/2];
         this->blocklight = new uint8_t[size/2];
         this->skylight = new uint8_t[size/2];
+        std::memset(this->blocks, 0, size);
+        std::memset(this->metadata, 0, size/2);
+        std::memset(this->blocklight, 0, size/2);
+        std::memset(this->skylight, 0, size/2);
     }
 
     void free() {

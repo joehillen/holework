@@ -20,6 +20,8 @@
 #include <ostream>
 #include <netinet/in.h>
 
+#include <iostream>
+#include <boost/iostreams/device/back_inserter.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/zlib.hpp>
@@ -36,6 +38,12 @@ uint64_t htonll(uint64_t n)
 
 
 namespace boostcraft { namespace network { 
+
+void Response::raw_string(std::string const& s)
+{
+    std::ostream out(this->data.get());
+    out << s;
+}
 
 Response& operator<<(Response& os, uint8_t n)
 {
@@ -130,15 +138,20 @@ Response chunkresponse(uint32_t x, uint32_t z, Chunk const& chunk)
     r << (uint8_t)Chunk::size_z;
 
     // Compressify!
-    boost::iostreams::filtering_streambuf<boost::iostreams::output> out;
-    out.push(boost::iostreams::zlib_compressor());
+    std::stringstream source_data;
+    std::stringstream compressed_data;
 
-    // write chunk to the streambuf
-    std::ostream os(&out);
-    os << chunk;
+    source_data << chunk;
 
-    r << (uint32_t)out.size();
-    boost::iostreams::copy(out, r.buffer());
+    boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
+    in.push(boost::iostreams::zlib_compressor());
+    in.push(source_data);
+    boost::iostreams::copy(in, compressed_data);
+
+    std::string s = compressed_data.str();
+
+    r << (uint32_t)s.size();
+    r.raw_string(s);
 
     return r;
 }

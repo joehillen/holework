@@ -200,6 +200,7 @@ std::pair<Request::pointer, std::list<PacketField::pointer> > packetFactory(int 
             list.push_back(StringField::create(packet->text4));
         }*/
         default:
+            printf("PacketID: %x\n", id);
             throw std::runtime_error("Unrecognized PacketID");
     }
     

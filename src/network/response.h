@@ -57,7 +57,7 @@ struct Response
     boost::shared_ptr<boost::asio::streambuf> data;
     
     Response() 
-        : data(new boost::asio::streambuf(64))
+        : data(new boost::asio::streambuf())
     {
     }
 
@@ -65,6 +65,8 @@ struct Response
     {
         return *(this->data);
     }
+
+    void raw_string(std::string const& s);
 };
 
 static std::ostream& operator<<(std::ostream& os, Response const& r)

@@ -25,7 +25,8 @@
 
 #include "log.h"
 #include "events.h"
-#include "network/tcpserver.h"
+#include "network/tcpserver.h"  
+#include "chunk.h"
 
 using namespace boostcraft;
 
@@ -55,6 +56,14 @@ void loginHandler(LoginRequestEvent& e)
                     " Given entity id %2%") 
                     % e.player.username() 
                     % e.player.id));
+    
+    Chunk chunk;
+    boostcraft::network::Response r = boostcraft::network::chunkresponse(0xaa, 0xbb, chunk);
+
+
+    for(int x = -5; x < 5; ++x)
+        for(int z = -5; z < 5; ++z)
+            e.player.deliver(boostcraft::network::chunkresponse(x, z, chunk));
 }
 
 int main()
