@@ -3,7 +3,7 @@
 #
 
 flags = '-Wall -Wno-unused-function'
-libs = 'boost_system'
+libs = 'boost_system boost_iostreams'
 
 # Set up environment
 env = Environment()

@@ -20,6 +20,15 @@
 #include <ostream>
 #include <netinet/in.h>
 
+#include <boost/iostreams/filtering_streambuf.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filter/zlib.hpp>
+
+#include "../chunk.h" // TODO: this is kinda messy; maybe responses that depend
+                      // on classes outside the network namespace should be
+                      // promoted out of the network namespace, so that we only
+                      // have downward dependencies
+
 uint64_t htonll(uint64_t n)
 {
     return (((uint64_t)htonl(n)) << 32) | (htonl(n >> 32));
@@ -100,6 +109,37 @@ Response loginresponse(uint32_t entityId, uint64_t seed, uint8_t dimension)
     r << "CURRENTLY USED";
     r << seed;
     r << dimension;
+    return r;
+}
+
+
+Response chunkresponse(uint32_t x, uint32_t z, Chunk const& chunk)
+{
+    Response r;
+
+    // Always include a pre-chunk "packet" as a header
+    r << (uint8_t)RESPONSE_PRECHUNK << x << z << (uint8_t) 1; //1 for initialize mode
+    // Send chunk
+    // TODO: refactor this coordinate stuff
+    r << (uint8_t)RESPONSE_CHUNK;
+    r << (uint32_t)(x * 16);
+    r << (uint16_t)0;
+    r << (uint32_t)(z * 16);
+    r << (uint8_t)Chunk::size_x;
+    r << (uint8_t)Chunk::size_y;
+    r << (uint8_t)Chunk::size_z;
+
+    // Compressify!
+    boost::iostreams::filtering_streambuf<boost::iostreams::output> out;
+    out.push(boost::iostreams::zlib_compressor());
+
+    // write chunk to the streambuf
+    std::ostream os(&out);
+    os << chunk;
+
+    r << (uint32_t)out.size();
+    boost::iostreams::copy(out, r.buffer());
+
     return r;
 }
 

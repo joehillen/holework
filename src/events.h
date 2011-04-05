@@ -114,6 +114,19 @@ struct LoginRequestEvent : public PlayerEvent
     }
 };
 
+struct PlayerNeedsChunkEvent : public PlayerEvent
+{
+    static boost::signals2::signal<void(PlayerNeedsChunkEvent&)> signal;
+
+    int x;
+    int z;
+
+    PlayerNeedsChunkEvent(Player& player, int x, int z)
+        : PlayerEvent(player), x(x), z(z)
+    {
+    }
+};
+
 
 // signal connection stuff
 

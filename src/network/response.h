@@ -24,7 +24,11 @@
 #include <ostream>
 
 
-namespace boostcraft { namespace network { 
+namespace boostcraft {
+
+class Chunk;
+
+namespace network { 
 
 enum ResponseType
 {
@@ -44,6 +48,8 @@ enum ResponseType
     RESPONSE_MOB_SPAWN          = 0x18,
     RESPONSE_ENTITY_PAINTING    = 0x19,
     // TODO: add the rest of this stuff
+    RESPONSE_PRECHUNK           = 0x32,
+    RESPONSE_CHUNK              = 0x33,
 };
 
 struct Response
@@ -85,6 +91,7 @@ Response keepalive();
 Response chatmessage(std::string const& msg);
 Response handshake(std::string const& msg);
 Response loginresponse(uint32_t eid, uint64_t seed, uint8_t dim);
+Response chunkresponse(uint32_t x, uint32_t z, Chunk const& chunk);
 
 }} //end namespace boostcraft::network
 

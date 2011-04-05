@@ -1,4 +1,4 @@
-// events.cpp
+// chunk.cpp
 
 /***********************************************************************
 * Copyright (C) 2011 Holework Project
@@ -16,20 +16,20 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *************************************************************************/
 
-#include "events.h"
+#include "chunk.h"
 
 namespace boostcraft {
 
-boost::asio::io_service the_service;
-
-boost::asio::io_service& io_service()
+std::ostream& operator<<(std::ostream& os, Chunk const& chunk)
 {
-    return the_service;
+    size_t size = Chunk::size_x * Chunk::size_y * Chunk::size_z;
+    // we would be in serious trouble if sizeof(char) != sizeof(uint8_t) :D
+    os.write((const char*)chunk.blocks, size);
+    os.write((const char*)chunk.metadata, size/2);
+    os.write((const char*)chunk.blocklight, size/2);
+    os.write((const char*)chunk.skylight, size/2);
+    return os;
 }
 
-boost::signals2::signal<void(LoginRequestEvent&)> LoginRequestEvent::signal;
-boost::signals2::signal<void(LogEvent&)> LogEvent::signal;
-boost::signals2::signal<void(PlayerNeedsChunkEvent&)> PlayerNeedsChunkEvent::signal;
-
-}
+} // namespace boostcraft
 
