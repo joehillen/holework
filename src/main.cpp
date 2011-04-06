@@ -38,6 +38,9 @@ int main()
 
     listen(loginHandler);
     listen(logHandler);
+    listen(lookHandler);
+    listen(positionHandler);
+    listen(ongroundHandler);
 
     try
     {

@@ -58,6 +58,17 @@ std::pair<Request::pointer, std::list<PacketField::pointer> > packetFactory(int 
             ptr.reset(packet);
             break;
         }
+        case REQUEST_POSITION:
+        {
+            PositionRequest* packet = new PositionRequest();
+            list.push_back(DoubleField::create(packet->x));
+            list.push_back(DoubleField::create(packet->y));
+            list.push_back(DoubleField::create(packet->stance));
+            list.push_back(DoubleField::create(packet->z));
+            list.push_back(BoolField::create(packet->on_ground));
+            ptr.reset(packet);
+            break;
+        }
         case REQUEST_POSITION_AND_LOOK:
         {
             PositionLookRequest* packet = new PositionLookRequest();
@@ -99,17 +110,6 @@ std::pair<Request::pointer, std::list<PacketField::pointer> > packetFactory(int 
         case REQUEST_PLAYER:
         {
             Player* packet = new Player();
-            list.push_back(BoolField::create(packet->on_ground));
-            ptr.reset(packet);
-            break;
-        }
-        case REQUEST_POSITION:
-        {
-            Position* packet = new Position();
-            list.push_back(DoubleField::create(packet->x));
-            list.push_back(DoubleField::create(packet->y));
-            list.push_back(DoubleField::create(packet->stance));
-            list.push_back(DoubleField::create(packet->z));
             list.push_back(BoolField::create(packet->on_ground));
             ptr.reset(packet);
             break;

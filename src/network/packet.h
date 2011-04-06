@@ -29,6 +29,7 @@ enum RequestType
     REQUEST_LOGIN               = 0x01,
     REQUEST_HANDSHAKE           = 0x02,
     REQUEST_CHAT                = 0x03,
+    REQUEST_POSITION            = 0x0b,
     REQUEST_POSITION_AND_LOOK   = 0x0d,
     // TODO: add the rest
 };
@@ -74,6 +75,17 @@ struct ChatRequest : public Request
     ChatRequest() : Request(REQUEST_CHAT) { }
 
     std::string message;
+};
+
+struct PositionRequest : public Request
+{
+    PositionRequest() : Request(REQUEST_POSITION) { }
+
+    double x;
+    double stance;
+    double y;
+    double z;
+    uint8_t on_ground;
 };
 
 struct PositionLookRequest : public Request
