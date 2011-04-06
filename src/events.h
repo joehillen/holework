@@ -127,6 +127,45 @@ struct PlayerNeedsChunkEvent : public PlayerEvent
     }
 };
 
+struct PlayerLookEvent : public PlayerEvent
+{
+    static boost::signals2::signal<void(PlayerLookEvent&)> signal;
+
+    float yaw;
+    float pitch;
+
+    PlayerLookEvent(Player& player, float yaw, float pitch)
+        : PlayerEvent(player), yaw(yaw), pitch(pitch)
+    {
+    }
+};
+
+struct PlayerPositionEvent : public PlayerEvent
+{
+    static boost::signals2::signal<void(PlayerPositionEvent&)> signal;
+
+    double x;
+    double z;
+    double y;
+
+    PlayerPositionEvent(Player& player, double x, double z, double y)
+        : PlayerEvent(player), x(x), z(z), y(y)
+    {
+    }
+};
+
+struct PlayerOnGroundEvent : public PlayerEvent
+{
+    static boost::signals2::signal<void(PlayerOnGroundEvent&)> signal;
+
+    bool on_ground;
+
+    PlayerOnGroundEvent(Player& player, bool on_ground)
+        : PlayerEvent(player), on_ground(on_ground)
+    {
+    }
+};
+
 
 // signal connection stuff
 

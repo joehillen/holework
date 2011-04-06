@@ -25,10 +25,11 @@ namespace boostcraft { namespace network {
 
 enum RequestType
 {
-    REQUEST_KEEP_ALIVE          = 0,
-    REQUEST_LOGIN               = 1,
-    REQUEST_HANDSHAKE           = 2,
-    REQUEST_CHAT                = 3,
+    REQUEST_KEEP_ALIVE          = 0x00,
+    REQUEST_LOGIN               = 0x01,
+    REQUEST_HANDSHAKE           = 0x02,
+    REQUEST_CHAT                = 0x03,
+    REQUEST_POSITION_AND_LOOK   = 0x0d,
     // TODO: add the rest
 };
 
@@ -73,6 +74,19 @@ struct ChatRequest : public Request
     ChatRequest() : Request(REQUEST_CHAT) { }
 
     std::string message;
+};
+
+struct PositionLookRequest : public Request
+{
+    PositionLookRequest() : Request(REQUEST_POSITION_AND_LOOK) { }
+
+    double x;
+    double stance;
+    double y;
+    double z;
+    float yaw;
+    float pitch;
+    uint8_t on_ground;
 };
 
 std::pair<Request::pointer, std::list<PacketField::pointer> > packetFactory(int id);

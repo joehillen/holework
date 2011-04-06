@@ -1,4 +1,4 @@
-// events.cpp
+// handlers.h
 
 /***********************************************************************
 * Copyright (C) 2011 Holework Project
@@ -16,23 +16,31 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *************************************************************************/
 
+#pragma once
+
+#include <sstream>
+#include <string>
+#include <iostream>
+#include "network/response.h"
+#include "boost/format.hpp"
+
 #include "events.h"
+#include "player.h"
+#include "log.h"
+#include "chunk.h"
 
 namespace boostcraft {
 
-boost::asio::io_service the_service;
-
-boost::asio::io_service& io_service()
+static int newEntityID()
 {
-    return the_service;
+    static int id = 0;
+    return id++;
 }
 
-boost::signals2::signal<void(LoginRequestEvent&)> LoginRequestEvent::signal;
-boost::signals2::signal<void(LogEvent&)> LogEvent::signal;
-boost::signals2::signal<void(PlayerNeedsChunkEvent&)> PlayerNeedsChunkEvent::signal;
-boost::signals2::signal<void(PlayerLookEvent&)> PlayerLookEvent::signal;
-boost::signals2::signal<void(PlayerPositionEvent&)> PlayerPositionEvent::signal;
-boost::signals2::signal<void(PlayerOnGroundEvent&)> PlayerOnGroundEvent::signal;
+void logHandler(LogEvent& event);
+void loginHandler(LoginRequestEvent& e);
+void lookHandler(PlayerLookEvent& event);
+void positionHandler(PlayerPositionEvent& event);
+void ongroundHandler(PlayerOnGroundEvent& event);
 
-}
-
+} //end namespace

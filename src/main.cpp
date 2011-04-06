@@ -27,44 +27,9 @@
 #include "events.h"
 #include "network/tcpserver.h"  
 #include "chunk.h"
+#include "handlers.h"
 
 using namespace boostcraft;
-
-static int newEntityID()
-{
-    static int id = 0;
-    return id++;
-}
-
-/*
- * Log event handler
- */
-void logHandler(LogEvent& event)
-{
-    std::cout << "LOGGED: " << event.source_name << " "  << event.message << "\n";
-    // Now we sneakily cancel the event!
-    event.canceled = true;
-}
-
-
-void loginHandler(LoginRequestEvent& e)
-{
-    e.player.id = newEntityID();
-    e.player.deliver(boostcraft::network::loginresponse(e.player.id,0,0));
-    boostcraft::log("loginhandler:", 
-        boost::str(boost::format("Login request from %1%."
-                    " Given entity id %2%") 
-                    % e.player.username() 
-                    % e.player.id));
-    
-    Chunk chunk;
-    boostcraft::network::Response r = boostcraft::network::chunkresponse(0xaa, 0xbb, chunk);
-
-
-    for(int x = -5; x < 5; ++x)
-        for(int z = -5; z < 5; ++z)
-            e.player.deliver(boostcraft::network::chunkresponse(x, z, chunk));
-}
 
 int main()
 {
