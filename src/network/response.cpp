@@ -85,6 +85,20 @@ Response& operator<<(Response& os, std::string const& s)
     return os;
 }
 
+Response& operator<<(Response& os, float n)
+{
+    std::ostream out(os.data.get());
+    out.write((const char*)&n, 4);
+    return os;
+}
+
+Response& operator<<(Response& os, double n)
+{
+    std::ostream out(os.data.get());
+    out.write((const char*)&n, 8);
+    return os;
+}
+
 Response keepalive()
 {
     Response r;
@@ -152,6 +166,20 @@ Response chunkresponse(uint32_t x, uint32_t z, Chunk const& chunk)
 
     r << (uint32_t)s.size();
     r.raw_string(s);
+
+    return r;
+}
+
+Response positionresponse(double x, double z, double y,
+                          double stance, float yaw, float pitch,
+                          bool on_ground)
+{
+    Response r;
+
+    r << (uint8_t)RESPONSE_POSITION;
+    r << x << y << stance << z;
+    r << yaw << pitch;
+    r << (uint8_t)on_ground;
 
     return r;
 }

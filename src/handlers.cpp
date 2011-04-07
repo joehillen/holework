@@ -41,13 +41,14 @@ void loginHandler(LoginRequestEvent& e)
                     % e.player.username() 
                     % e.player.id));
     
+    e.player.deliver(network::positionresponse(0, 0, 0, 0, 0, 0, 1));
+
     Chunk chunk;
-    network::Response r = network::chunkresponse(0xaa, 0xbb, chunk);
-
-
     for(int x = -5; x < 5; ++x)
         for(int z = -5; z < 5; ++z)
             e.player.deliver(network::chunkresponse(x, z, chunk));
+
+
 }
 
 void lookHandler(PlayerLookEvent& event)
