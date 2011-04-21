@@ -113,8 +113,7 @@ Response loginresponse(uint32_t entityId, uint64_t seed, uint8_t dimension)
     Response r;
     r << (uint8_t)RESPONSE_LOGIN;
     r << entityId;
-    r << "THESE ARE NOT";
-    r << "CURRENTLY USED";
+    r << "NOT USED";
     r << seed;
     r << dimension;
     return r;

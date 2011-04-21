@@ -21,7 +21,8 @@
 
 namespace boostcraft { namespace network { 
 
-std::pair<Request::pointer, std::list<PacketField::pointer> > packetFactory(int id)
+std::pair<Request::pointer, std::list<PacketField::pointer> > 
+packetFactory(int id)
 {
     Request::pointer ptr;
     std::list<PacketField::pointer> list;
@@ -38,7 +39,6 @@ std::pair<Request::pointer, std::list<PacketField::pointer> > packetFactory(int 
             LoginRequest* packet = new LoginRequest();
             list.push_back(IntField::create(packet->protocolVersion));
             list.push_back(StringField::create(packet->username, MAX_USERNAME_LENGTH));
-            list.push_back(StringField::create(packet->password));
             list.push_back(LongField::create(packet->mapSeed));
             list.push_back(ByteField::create(packet->dimension));
             ptr.reset(packet);
@@ -200,7 +200,7 @@ std::pair<Request::pointer, std::list<PacketField::pointer> > packetFactory(int 
             list.push_back(StringField::create(packet->text4));
         }*/
         default:
-            printf("PacketID: %x\n", id);
+            printf("PacketID: 0x%2x\n", id);
             throw std::runtime_error("Unrecognized PacketID");
     }
     

@@ -63,7 +63,6 @@ struct LoginRequest : public Request
 
     uint32_t protocolVersion;
     std::string username;
-    std::string password;
     uint64_t mapSeed;
     uint8_t dimension;
 };
