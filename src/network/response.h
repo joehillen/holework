@@ -32,24 +32,24 @@ namespace network {
 
 enum ResponseType
 {
-    RESPONSE_KEEP_ALIVE         = 0,
-    RESPONSE_LOGIN              = 1,
-    RESPONSE_HANDSHAKE          = 2,
-    RESPONSE_CHAT               = 3,
-    RESPONSE_UPDATE_TIME        = 4,
-    RESPONSE_ENTITY_EQUIPMENT   = 5,
-    RESPONSE_SPAWN_POS          = 6,
-    RESPONSE_UPDATE_HEALTH      = 7,
-    RESPONSE_POSITION_LOOK      = 0xD,
+    RESPONSE_KEEP_ALIVE         = 0x00,
+    RESPONSE_LOGIN              = 0x01,
+    RESPONSE_HANDSHAKE          = 0x02,
+    RESPONSE_CHAT               = 0x03,
+    RESPONSE_UPDATE_TIME        = 0x04,
+    RESPONSE_ENTITY_EQUIPMENT   = 0x05,
+    RESPONSE_SPAWN_POS          = 0x06,
+    RESPONSE_UPDATE_HEALTH      = 0x07,
+    RESPONSE_POSITION_AND_LOOK  = 0x0D,
     RESPONSE_NAMED_ENTITY_SPAWN = 0x14,
     RESPONSE_PICKUP_SPAWN       = 0x15,
     RESPONSE_COLLECT_ITEM       = 0x16,
     RESPONSE_ADD_OBJECT         = 0x17,
     RESPONSE_MOB_SPAWN          = 0x18,
     RESPONSE_ENTITY_PAINTING    = 0x19,
-    // TODO: add the rest of this stuff
     RESPONSE_PRECHUNK           = 0x32,
     RESPONSE_CHUNK              = 0x33,
+    // TODO: add the rest of this stuff
 };
 
 struct Response
@@ -85,6 +85,8 @@ Response& operator<<(Response& os, uint16_t n);
 Response& operator<<(Response& os, uint32_t n);
 Response& operator<<(Response& os, uint64_t n);
 Response& operator<<(Response& os, std::string const& s);
+Response& operator<<(Response& os, float n);
+Response& operator<<(Response& os, double n);
 
 /*
  * Response construction functions
@@ -93,7 +95,11 @@ Response keepalive();
 Response chatmessage(std::string const& msg);
 Response handshake(std::string const& msg);
 Response loginresponse(uint32_t eid, uint64_t seed, uint8_t dim);
+Response spawnresponse(uint32_t x, uint32_t y, uint32_t z);
 Response chunkresponse(uint32_t x, uint32_t z, Chunk const& chunk);
+Response positionresponse(double x, double z, double y,
+                          double stance, float yaw, float pitch,
+                          bool on_ground);
 
 }} //end namespace boostcraft::network
 
