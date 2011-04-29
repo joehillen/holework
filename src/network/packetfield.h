@@ -31,9 +31,10 @@
 
 
 // Magic Numbers
-#define DEFAULT_MAXLEN 100
 
 namespace boostcraft { namespace network { 
+
+const int DEFAULT_MAXLEN  = 100;
 
 /**
  * A PacketField represents a field in a packet during parsing. Supports
@@ -269,20 +270,20 @@ private:
 };
 
 
-class StringField : public PacketField
+class String8Field : public PacketField
 {
 public:
     static PacketField::pointer create(std::string& out, int maxlen)
     {
-        return PacketField::pointer(new StringField(out, maxlen));
+        return PacketField::pointer(new String8Field(out, maxlen));
     }
     
     static PacketField::pointer create(std::string& out)
     {
-        return PacketField::pointer(new StringField(out, DEFAULT_MAXLEN));
+        return PacketField::pointer(new String8Field(out, DEFAULT_MAXLEN));
     }
     
-    StringField(std::string& out, int maxlen)
+    String8Field(std::string& out, int maxlen)
         : out_(out), state_(NEED_LENGTH), length_(0)
     {
     }
@@ -293,7 +294,7 @@ public:
     {
         using namespace boost::asio;
         /*
-         * StringField can be in three states:
+         * String8Field can be in three states:
          *  - need length
          *  - need rest of string
          *  - done
@@ -313,6 +314,87 @@ public:
             if (available >= 2)
             {
                 length_ = ntohs(buffer_cast<const uint16_t*>(buf.data())[0]);
+                out_.resize(length_);
+                buf.consume(2);
+                state_ = NEED_DATA;
+            }
+            else
+            {
+                return 2 - available;
+            }
+        }
+
+        if (state_ == NEED_DATA)
+        {
+            unsigned int available = MIN(length_, buf.size());
+            if (available >= length_)
+            {
+                out_.assign(buffer_cast<const char*>(buf.data()), length_);
+                buf.consume(length_);
+                state_ = DONE;
+            }
+
+            return MAX(0, length_ - available);
+        }
+        return 0;
+    }
+
+private:
+    std::string& out_;
+
+    enum state {
+        NEED_LENGTH,
+        NEED_DATA,
+        DONE
+    } state_;
+    unsigned int length_;
+};
+
+
+class String16Field : public PacketField
+{
+public:
+    static PacketField::pointer create(std::string& out, int maxlen)
+    {
+        return PacketField::pointer(new String16Field(out, maxlen));
+    }
+    
+    static PacketField::pointer create(std::string& out)
+    {
+        return PacketField::pointer(new String16Field(out, DEFAULT_MAXLEN));
+    }
+    
+    String16Field(std::string& out, int maxlen)
+        : out_(out), state_(NEED_LENGTH), length_(0)
+    {
+    }
+
+    // TODO: this needs to be fixed to read the string in chunks;
+    // otherwise string read size is limited by buffer size. Oops! :)
+    int readFrom(boost::asio::streambuf& buf)
+    {
+        using namespace boost::asio;
+        /*
+         * String16Field can be in three states:
+         *  - need length
+         *  - need rest of string
+         *  - done
+         */
+
+
+        //
+        if (state_ == DONE)
+        {
+            length_ = 0;
+            state_ = NEED_LENGTH;
+        }
+
+        if (state_ == NEED_LENGTH)
+        {
+            int available = MIN(2, buf.size());
+            if (available >= 2)
+            {
+                length_ = 2*ntohs(buffer_cast<const uint16_t*>(buf.data())[0]);
                 out_.resize(length_);
                 buf.consume(2);
                 state_ = NEED_DATA;

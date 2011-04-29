@@ -38,7 +38,7 @@ packetFactory(int id)
         {
             LoginRequest* packet = new LoginRequest();
             list.push_back(IntField::create(packet->protocolVersion));
-            list.push_back(StringField::create(packet->username, MAX_USERNAME_LENGTH));
+            list.push_back(String16Field::create(packet->username, MAX_USERNAME_LENGTH));
             list.push_back(LongField::create(packet->mapSeed));
             list.push_back(ByteField::create(packet->dimension));
             ptr.reset(packet);
@@ -47,14 +47,14 @@ packetFactory(int id)
         case REQUEST_HANDSHAKE:
         {
             HandshakeRequest* packet = new HandshakeRequest();
-            list.push_back(StringField::create(packet->username, MAX_USERNAME_LENGTH));
+            list.push_back(String16Field::create(packet->username, MAX_USERNAME_LENGTH));
             ptr.reset(packet);
             break;
         }
         case REQUEST_CHAT:
         {
             ChatRequest* packet = new ChatRequest();
-            list.push_back(StringField::create(packet->message));
+            list.push_back(String16Field::create(packet->message));
             ptr.reset(packet);
             break;
         }
@@ -194,10 +194,10 @@ packetFactory(int id)
             list.push_back(IntField::create(packet->x));
             list.push_back(ShortField::create(packet->y));
             list.push_back(IntField::create(packet->z));
-            list.push_back(StringField::create(packet->text1));
-            list.push_back(StringField::create(packet->text2));
-            list.push_back(StringField::create(packet->text3));
-            list.push_back(StringField::create(packet->text4));
+            list.push_back(String16Field::create(packet->text1));
+            list.push_back(String16Field::create(packet->text2));
+            list.push_back(String16Field::create(packet->text3));
+            list.push_back(String16Field::create(packet->text4));
         }*/
         default:
             printf("PacketID: 0x%2x\n", id);
