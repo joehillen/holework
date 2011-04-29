@@ -52,10 +52,21 @@ private:
         this->metadata = new uint8_t[size/2];
         this->blocklight = new uint8_t[size/2];
         this->skylight = new uint8_t[size/2];
+
         std::memset(this->blocks, 0, size);
         std::memset(this->metadata, 0, size/2);
         std::memset(this->blocklight, 0, size/2);
         std::memset(this->skylight, 0, size/2);
+        // set all y=0 to smooth stone
+        for(int x = 0; x < size_x; ++x)
+        {
+            for(int z = 0; z < size_z; ++z)
+            {
+                int index = z * size_y + (x * size_y * size_z);
+                this->blocks[index] = 1;
+                this->skylight[index/2] = 0xff;
+            }
+        }
     }
 
     void free() {
