@@ -27,6 +27,29 @@ boost::asio::io_service& io_service()
     return the_service;
 }
 
+
+/**
+ * Function: timeout_wrapper
+ *
+ * The only purpose of this function is to bind a deadline_timer to its
+ * associated callback, so that the timer is not destroyed before it expires.
+ */
+void timeout_wrapper(boost::shared_ptr<boost::asio::deadline_timer> timer,
+        boost::function<void()> callback)
+{
+    callback();
+}
+
+void schedule(unsigned int ms, boost::function<void()> callback)
+{
+    boost::shared_ptr<boost::asio::deadline_timer>
+        timer(new boost::asio::deadline_timer(io_service()));
+
+    timer->expires_from_now(boost::posix_time::milliseconds(ms));
+
+    timer->async_wait(boost::bind(timeout_wrapper, timer, callback));
+}
+
 boost::signals2::signal<void(LoginRequestEvent&)> LoginRequestEvent::signal;
 boost::signals2::signal<void(LogEvent&)> LogEvent::signal;
 boost::signals2::signal<void(PlayerNeedsChunkEvent&)> PlayerNeedsChunkEvent::signal;

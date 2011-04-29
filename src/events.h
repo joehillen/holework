@@ -275,5 +275,12 @@ void async_fire(EventType& e)
     io_service().post(boost::bind(boost::ref(EventType::signal), e));
 }
 
+/**
+ * Function: schedule
+ *
+ * Schedules a callback to be run in the specified number of milliseconds.
+ */
+void schedule(unsigned int ms, boost::function<void()> callback);
 
 } // end namespace boostcraft
+
