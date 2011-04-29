@@ -18,23 +18,25 @@
 
 #include <iostream>
 #include <string>
-#include <vector>
 
 #include <boost/asio.hpp>
-#include <boost/format.hpp>
 
-#include "log.h"
 #include "events.h"
 #include "network/tcpserver.h"  
-#include "chunk.h"
 #include "handlers.h"
 
-using namespace boostcraft;
+void test()
+{
+    std::cout << "Timer expired!\n";
+}
 
 int main()
 {
     using namespace boost::asio::ip;
+    using namespace boostcraft;
     using namespace boostcraft::network;
+
+    schedule(3000, test);
 
     listen(loginHandler);
     listen(logHandler);
