@@ -58,6 +58,12 @@ std::pair<Request::pointer, std::list<PacketField::pointer> > packetFactory(int 
             ptr.reset(packet);
             break;
         }
+        case REQUEST_PLAYER:
+        {
+            PlayerRequest* packet = new PlayerRequest();
+            list.push_back(BoolField::create(packet->on_ground));
+            ptr.reset(packet);
+        }
         case REQUEST_POSITION:
         {
             PositionRequest* packet = new PositionRequest();

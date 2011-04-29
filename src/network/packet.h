@@ -29,8 +29,15 @@ enum RequestType
     REQUEST_LOGIN               = 0x01,
     REQUEST_HANDSHAKE           = 0x02,
     REQUEST_CHAT                = 0x03,
+    REQUEST_RESPAWN             = 0x09,
+    REQUEST_PLAYER              = 0x0a,
     REQUEST_POSITION            = 0x0b,
+    REQUEST_LOOK                = 0x0c,
     REQUEST_POSITION_AND_LOOK   = 0x0d,
+    REQUEST_DIGGING             = 0x0e,
+    REQUEST_BLOCK_PUT           = 0x0f,
+    REQUEST_HOLDING_CHANGE      = 0x10,
+    REQUEST_USE_BED             = 0x11,
     // TODO: add the rest
 };
 
@@ -77,6 +84,12 @@ struct ChatRequest : public Request
     std::string message;
 };
 
+struct PlayerRequest : public Request
+{
+    PlayerRequest() : Request(REQUEST_PLAYER) { }
+    uint8_t on_ground;
+};
+
 struct PositionRequest : public Request
 {
     PositionRequest() : Request(REQUEST_POSITION) { }
@@ -99,6 +112,11 @@ struct PositionLookRequest : public Request
     float yaw;
     float pitch;
     uint8_t on_ground;
+};
+
+struct RespawnRequest : public Request
+{
+    RespawnRequest() : Request(REQUEST_RESPAWN) { }
 };
 
 std::pair<Request::pointer, std::list<PacketField::pointer> > packetFactory(int id);
