@@ -352,7 +352,7 @@ public:
     };
 
     String16Field(std::string& out, int maxlen)
-        : out_(out), length_needed_(NO_LENGTH_SET)
+        : out_(out), bytes_needed_(NO_LENGTH_SET)
     {
     }
 
@@ -362,13 +362,13 @@ public:
     {
         using namespace boost::asio;
 
-        if (length_needed_ == NO_LENGTH_SET)
+        if (bytes_needed_ == NO_LENGTH_SET)
         {
             int available = MIN(2, buf.size());
             if (available >= 2)
             {
-                length_needed_ = 2*ntohs(buffer_cast<const uint16_t*>(buf.data())[0]);
-                temp_.resize(length_needed_);
+                bytes_needed_ = 2*ntohs(buffer_cast<const uint16_t*>(buf.data())[0]);
+                temp_.reserve(bytes_needed_/2);
                 buf.consume(2);
             }
             else
@@ -377,28 +377,28 @@ public:
             }
         }
 
-        if (length_needed_ > 0)
+        if (bytes_needed_ > 0)
         {
-            unsigned int available = MIN(length_needed_, buf.size());
+            unsigned int available = MIN(bytes_needed_, buf.size());
 
             temp_.append(buffer_cast<const char16_t*>(buf.data()), available);
             buf.consume(available);
 
-            length_needed_ -= available;
+            bytes_needed_ -= available;
         }
 
-        if (length_needed_ == 0)
+        if (bytes_needed_ == 0)
         {
             out_ = ucs2toutf8(temp_);
         }
-        return length_needed_;
+        return bytes_needed_;
     }
     
 private:
     std::string& out_;
     std::u16string temp_;
 
-    int length_needed_;
+    int bytes_needed_;
 };
 
 
