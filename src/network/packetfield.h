@@ -363,7 +363,8 @@ public:
     
     void finalizeString()
     {
-        out_ = ucs2toutf8(out_);
+        std::u16string wstr(reinterpret_cast<const char16_t*>(out_.c_str()), out_.length()/2);
+        out_ = ucs2toutf8(wstr);
     }
 };
 
