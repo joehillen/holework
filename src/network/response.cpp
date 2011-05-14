@@ -169,13 +169,13 @@ Response chunkresponse(uint32_t x, uint32_t z, Chunk const& chunk)
     return r;
 }
 
-Response positionresponse(double x, double z, double y,
+Response positionlookresponse(double x, double z, double y,
                           double stance, float yaw, float pitch,
                           bool on_ground)
 {
     Response r;
 
-    r << (uint8_t)RESPONSE_POSITION;
+    r << (uint8_t)RESPONSE_POSITION_LOOK;
     r << x << y << stance << z;
     r << yaw << pitch;
     r << (uint8_t)on_ground;

@@ -41,7 +41,7 @@ void loginHandler(LoginRequestEvent& e)
                     % e.player.username() 
                     % e.player.id));
     
-    e.player.deliver(network::positionresponse(0, 0, 0, 0, 0, 0, 1));
+    e.player.deliver(network::positionlookresponse(0, 0, 0, 0, 0, 0, 1));
 
     Chunk chunk;
     for(int x = -5; x < 5; ++x)

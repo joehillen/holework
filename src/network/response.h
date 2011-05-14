@@ -96,7 +96,7 @@ Response chatmessage(std::string const& msg);
 Response handshake(std::string const& msg);
 Response loginresponse(uint32_t eid, uint64_t seed, uint8_t dim);
 Response chunkresponse(uint32_t x, uint32_t z, Chunk const& chunk);
-Response positionresponse(double x, double z, double y,
+Response positionlookresponse(double x, double z, double y,
                           double stance, float yaw, float pitch,
                           bool on_ground);
 
