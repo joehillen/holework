@@ -3,7 +3,7 @@
 #
 
 flags = '-std=c++0x -Wall -Wno-unused-function -O0 -fno-inline -ggdb'
-libs = 'boost_system boost_iostreams gtest'
+libs = 'boost_system boost_iostreams gtest pthread'
 
 # Set up environment
 import os
