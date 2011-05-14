@@ -1,4 +1,4 @@
-// main.cpp
+// handlers.h
 
 /***********************************************************************
 * Copyright (C) 2011 Holework Project
@@ -16,42 +16,31 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *************************************************************************/
 
-#include <iostream>
+#pragma once
+
+#include <sstream>
 #include <string>
-#include <vector>
+#include <iostream>
+#include "network/response.h"
+#include "boost/format.hpp"
 
-#include <boost/asio.hpp>
-#include <boost/format.hpp>
-
-#include "log.h"
 #include "events.h"
-#include "network/tcpserver.h"  
+#include "player.h"
+#include "log.h"
 #include "chunk.h"
-#include "handlers.h"
 
-using namespace boostcraft;
+namespace boostcraft {
 
-int main()
+static int newEntityID()
 {
-    using namespace boost::asio::ip;
-    using namespace boostcraft::network;
-
-    listen(loginHandler);
-    listen(logHandler);
-    listen(lookHandler);
-    listen(positionHandler);
-    listen(ongroundHandler);
-
-    try
-    {
-        tcp::endpoint endpoint(tcp::v4(), 25565);
-        TcpServer server(io_service(), endpoint);
-
-        io_service().run();
-    }
-    catch (std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }
-    return 0;
+    static int id = 0;
+    return id++;
 }
+
+void logHandler(LogEvent& event);
+void loginHandler(LoginRequestEvent& e);
+void lookHandler(PlayerLookEvent& event);
+void positionHandler(PlayerPositionEvent& event);
+void ongroundHandler(PlayerOnGroundEvent& event);
+
+} //end namespace

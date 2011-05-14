@@ -30,6 +30,9 @@ boost::asio::io_service& io_service()
 boost::signals2::signal<void(LoginRequestEvent&)> LoginRequestEvent::signal;
 boost::signals2::signal<void(LogEvent&)> LogEvent::signal;
 boost::signals2::signal<void(PlayerNeedsChunkEvent&)> PlayerNeedsChunkEvent::signal;
+boost::signals2::signal<void(PlayerLookEvent&)> PlayerLookEvent::signal;
+boost::signals2::signal<void(PlayerPositionEvent&)> PlayerPositionEvent::signal;
+boost::signals2::signal<void(PlayerOnGroundEvent&)> PlayerOnGroundEvent::signal;
 
 }
 

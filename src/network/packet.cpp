@@ -58,6 +58,30 @@ packetFactory(int id)
             ptr.reset(packet);
             break;
         }
+        case REQUEST_POSITION:
+        {
+            PositionRequest* packet = new PositionRequest();
+            list.push_back(DoubleField::create(packet->x));
+            list.push_back(DoubleField::create(packet->y));
+            list.push_back(DoubleField::create(packet->stance));
+            list.push_back(DoubleField::create(packet->z));
+            list.push_back(BoolField::create(packet->on_ground));
+            ptr.reset(packet);
+            break;
+        }
+        case REQUEST_POSITION_AND_LOOK:
+        {
+            PositionLookRequest* packet = new PositionLookRequest();
+            list.push_back(DoubleField::create(packet->x));
+            list.push_back(DoubleField::create(packet->stance));
+            list.push_back(DoubleField::create(packet->y));
+            list.push_back(DoubleField::create(packet->z));
+            list.push_back(FloatField::create(packet->yaw));
+            list.push_back(FloatField::create(packet->pitch));
+            list.push_back(BoolField::create(packet->on_ground));
+            ptr.reset(packet);
+            break;
+        }
         /* TODO: FIX
         case REQUEST_ENTITY_EQUIPMENT:
         {
@@ -90,33 +114,9 @@ packetFactory(int id)
             ptr.reset(packet);
             break;
         }
-        case REQUEST_POSITION:
-        {
-            Position* packet = new Position();
-            list.push_back(DoubleField::create(packet->x));
-            list.push_back(DoubleField::create(packet->y));
-            list.push_back(DoubleField::create(packet->stance));
-            list.push_back(DoubleField::create(packet->z));
-            list.push_back(BoolField::create(packet->on_ground));
-            ptr.reset(packet);
-            break;
-        }
         case REQUEST_LOOK:
         {
             Look* packet = new Look();
-            list.push_back(FloatField::create(packet->yaw));
-            list.push_back(FloatField::create(packet->pitch));
-            list.push_back(BoolField::create(packet->on_ground));
-            ptr.reset(packet);
-            break;
-        }
-        case REQUEST_POSITION_AND_LOOK:
-        {
-            PositionLook* packet = new PositionLook();
-            list.push_back(DoubleField::create(packet->x));
-            list.push_back(DoubleField::create(packet->stance));
-            list.push_back(DoubleField::create(packet->y));
-            list.push_back(DoubleField::create(packet->z));
             list.push_back(FloatField::create(packet->yaw));
             list.push_back(FloatField::create(packet->pitch));
             list.push_back(BoolField::create(packet->on_ground));

@@ -47,9 +47,9 @@ enum ResponseType
     RESPONSE_ADD_OBJECT         = 0x17,
     RESPONSE_MOB_SPAWN          = 0x18,
     RESPONSE_ENTITY_PAINTING    = 0x19,
-    // TODO: add the rest of this stuff
     RESPONSE_PRECHUNK           = 0x32,
     RESPONSE_CHUNK              = 0x33,
+    // TODO: add the rest of this stuff
 };
 
 struct Response
@@ -85,6 +85,8 @@ Response& operator<<(Response& os, uint16_t n);
 Response& operator<<(Response& os, uint32_t n);
 Response& operator<<(Response& os, uint64_t n);
 Response& operator<<(Response& os, std::string const& s);
+Response& operator<<(Response& os, float n);
+Response& operator<<(Response& os, double n);
 
 /*
  * Response construction functions
@@ -94,6 +96,9 @@ Response chatmessage(std::string const& msg);
 Response handshake(std::string const& msg);
 Response loginresponse(uint32_t eid, uint64_t seed, uint8_t dim);
 Response chunkresponse(uint32_t x, uint32_t z, Chunk const& chunk);
+Response positionresponse(double x, double z, double y,
+                          double stance, float yaw, float pitch,
+                          bool on_ground);
 
 }} //end namespace boostcraft::network
 
