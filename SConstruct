@@ -2,7 +2,7 @@
 # Simple scons build file
 #
 
-flags = '-Wall -Wno-unused-function'
+flags = '-Wall -Wno-unused-function -O0 -fno-inline -ggdb'
 libs = 'boost_system boost_iostreams'
 
 # Set up environment
