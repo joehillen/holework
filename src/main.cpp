@@ -23,6 +23,8 @@
 #include <boost/asio.hpp>
 #include <boost/format.hpp>
 
+#include <gtest/gtest.h>
+
 #include "log.h"
 #include "events.h"
 #include "network/tcpserver.h"  
@@ -31,10 +33,21 @@
 
 using namespace boostcraft;
 
-int main()
+int main(int argc, char** argv)
 {
     using namespace boost::asio::ip;
     using namespace boostcraft::network;
+
+    for (int i = 1; i < argc; ++i)
+    {
+        std::string s(argv[i]);
+
+        if (s == "--test")
+        {
+            ::testing::InitGoogleTest(&argc, argv);
+            return RUN_ALL_TESTS();
+        }
+    }
 
     listen(loginHandler);
     listen(logHandler);
@@ -55,3 +68,9 @@ int main()
     }
     return 0;
 }
+
+TEST(maintestcase, test1)
+{
+    ASSERT_TRUE(false);
+}
+
