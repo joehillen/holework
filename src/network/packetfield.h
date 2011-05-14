@@ -324,26 +324,17 @@ public:
             length_needed_ -= available;
         }
 
-        if (length_needed_ == 0)
-        {
-            finalizeString();
-        }
         return length_needed_;
     }
     
-    virtual void finalizeString()
-    {
-        // does nothing
-    }
-
-protected:
+private:
     std::string& out_;
 
     int length_needed_;
 };
 
 
-class String16Field : public String8Field
+class String16Field : public PacketField
 {
 public:
     static PacketField::pointer create(std::string& out, int maxlen)
@@ -355,17 +346,59 @@ public:
     {
         return PacketField::pointer(new String16Field(out, DEFAULT_MAXLEN));
     }
-    
+
+    enum {
+        NO_LENGTH_SET = -1
+    };
+
     String16Field(std::string& out, int maxlen)
-        : String8Field(out, maxlen) 
+        : out_(out), length_needed_(NO_LENGTH_SET)
     {
+    }
+
+    // TODO: this needs to be fixed to read the string in chunks;
+    // otherwise string read size is limited by buffer size. Oops! :)
+    int readFrom(boost::asio::streambuf& buf)
+    {
+        using namespace boost::asio;
+
+        if (length_needed_ == NO_LENGTH_SET)
+        {
+            int available = MIN(2, buf.size());
+            if (available >= 2)
+            {
+                length_needed_ = 2*ntohs(buffer_cast<const uint16_t*>(buf.data())[0]);
+                temp_.resize(length_needed_);
+                buf.consume(2);
+            }
+            else
+            {
+                return 2 - available;
+            }
+        }
+
+        if (length_needed_ > 0)
+        {
+            unsigned int available = MIN(length_needed_, buf.size());
+
+            temp_.append(buffer_cast<const char16_t*>(buf.data()), available);
+            buf.consume(available);
+
+            length_needed_ -= available;
+        }
+
+        if (length_needed_ == 0)
+        {
+            out_ = ucs2toutf8(temp_);
+        }
+        return length_needed_;
     }
     
-    void finalizeString()
-    {
-        std::u16string wstr(reinterpret_cast<const char16_t*>(out_.c_str()), out_.length()/2);
-        out_ = ucs2toutf8(wstr);
-    }
+private:
+    std::string& out_;
+    std::u16string temp_;
+
+    int length_needed_;
 };
 
 
