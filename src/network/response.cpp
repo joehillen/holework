@@ -127,8 +127,7 @@ Response loginresponse(uint32_t entityId, uint64_t seed, uint8_t dimension)
     Response r;
     r << (uint8_t)RESPONSE_LOGIN;
     r << entityId;
-    r << "THESE ARE NOT";
-    r << "CURRENTLY USED";
+    r << "NOT USED";
     r << seed;
     r << dimension;
     return r;
@@ -170,7 +169,6 @@ Response chunkresponse(uint32_t x, uint32_t z, Chunk const& chunk)
     return r;
 }
 
-
 Response spawnresponse(uint32_t x, uint32_t y, uint32_t z)
 {
     Response r;
@@ -179,13 +177,13 @@ Response spawnresponse(uint32_t x, uint32_t y, uint32_t z)
     return r;
 }
 
-Response positionresponse(double x, double z, double y,
+Response positionlookresponse(double x, double z, double y,
                           double stance, float yaw, float pitch,
                           bool on_ground)
 {
     Response r;
 
-    r << (uint8_t)RESPONSE_POSITION_AND_LOOK;
+    r << (uint8_t)RESPONSE_POSITION_LOOK;
     r << x << y << stance << z;
     r << yaw << pitch;
     r << (uint8_t)on_ground;

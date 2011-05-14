@@ -58,7 +58,7 @@ void Player::dispatch(network::Request::pointer packet)
         if (username_.empty())
         {
             this->username_ = ((HandshakeRequest*)p)->username;
-            log("Handshake request.");
+            log("Handshake request from " + this->username_);
             this->deliver(handshake("-"));
         }
         else

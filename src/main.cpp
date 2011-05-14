@@ -21,6 +21,8 @@
 
 #include <boost/asio.hpp>
 
+#include <gtest/gtest.h>
+
 #include "events.h"
 #include "network/tcpserver.h"  
 #include "handlers.h"
@@ -30,13 +32,24 @@ void test()
     std::cout << "Timer expired!\n";
 }
 
-int main()
+int main(int argc, char** argv)
 {
     using namespace boost::asio::ip;
     using namespace boostcraft;
     using namespace boostcraft::network;
 
     schedule(3000, test);
+
+    for (int i = 1; i < argc; ++i)
+    {
+        std::string s(argv[i]);
+
+        if (s == "--test")
+        {
+            ::testing::InitGoogleTest(&argc, argv);
+            return RUN_ALL_TESTS();
+        }
+    }
 
     listen(loginHandler);
     listen(logHandler);
@@ -57,3 +70,9 @@ int main()
     }
     return 0;
 }
+
+TEST(maintestcase, test1)
+{
+    ASSERT_TRUE(true);
+}
+

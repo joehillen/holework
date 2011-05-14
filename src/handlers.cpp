@@ -48,7 +48,7 @@ void sendSpawnStuff(Player& player)
     }
     player.deliver(r);
 
-    player.deliver(network::positionresponse(0, 0, 200, 201.6, 512, 90, true));
+    player.deliver(network::positionlookresponse(0, 0, 200, 201.6, 512, 90, true));
 }
 
 void loginHandler(LoginRequestEvent& e)
@@ -60,7 +60,6 @@ void loginHandler(LoginRequestEvent& e)
                     " Given entity id %2%") 
                     % e.player.username() 
                     % e.player.id));
-    
 
     Chunk chunk;
     for(int x = -8; x < 8; ++x)

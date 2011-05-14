@@ -23,6 +23,7 @@
 #include <boost/asio.hpp>
 #include <string>
 #include <netinet/in.h>
+#include "uniconv.h"
 
 // TODO: move to implementation file
 
@@ -31,9 +32,10 @@
 
 
 // Magic Numbers
-#define DEFAULT_MAXLEN 100
 
 namespace boostcraft { namespace network { 
+
+const int DEFAULT_MAXLEN  = 100;
 
 /**
  * A PacketField represents a field in a packet during parsing. Supports
@@ -269,21 +271,25 @@ private:
 };
 
 
-class StringField : public PacketField
+class String8Field : public PacketField
 {
 public:
     static PacketField::pointer create(std::string& out, int maxlen)
     {
-        return PacketField::pointer(new StringField(out, maxlen));
+        return PacketField::pointer(new String8Field(out, maxlen));
     }
     
     static PacketField::pointer create(std::string& out)
     {
-        return PacketField::pointer(new StringField(out, DEFAULT_MAXLEN));
+        return PacketField::pointer(new String8Field(out, DEFAULT_MAXLEN));
     }
     
-    StringField(std::string& out, int maxlen)
-        : out_(out), state_(NEED_LENGTH), length_(0)
+    enum {
+        NO_LENGTH_SET = -1
+    };
+
+    String8Field(std::string& out, int maxlen)
+        : out_(out), length_needed_(NO_LENGTH_SET)
     {
     }
 
@@ -292,30 +298,15 @@ public:
     int readFrom(boost::asio::streambuf& buf)
     {
         using namespace boost::asio;
-        /*
-         * StringField can be in three states:
-         *  - need length
-         *  - need rest of string
-         *  - done
-         */
 
-
-        //
-        if (state_ == DONE)
-        {
-            length_ = 0;
-            state_ = NEED_LENGTH;
-        }
-
-        if (state_ == NEED_LENGTH)
+        if (length_needed_ == NO_LENGTH_SET)
         {
             int available = MIN(2, buf.size());
             if (available >= 2)
             {
-                length_ = ntohs(buffer_cast<const uint16_t*>(buf.data())[0]);
-                out_.resize(length_);
+                length_needed_ = ntohs(buffer_cast<const uint16_t*>(buf.data())[0]);
+                out_.resize(length_needed_);
                 buf.consume(2);
-                state_ = NEED_DATA;
             }
             else
             {
@@ -323,30 +314,91 @@ public:
             }
         }
 
-        if (state_ == NEED_DATA)
+        if (length_needed_ > 0)
         {
-            unsigned int available = MIN(length_, buf.size());
-            if (available >= length_)
-            {
-                out_.assign(buffer_cast<const char*>(buf.data()), length_);
-                buf.consume(length_);
-                state_ = DONE;
-            }
+            unsigned int available = MIN(length_needed_, buf.size());
 
-            return MAX(0, length_ - available);
+            out_.append(buffer_cast<const char*>(buf.data()), available);
+            buf.consume(available);
+
+            length_needed_ -= available;
         }
-        return 0;
-    }
 
+        return length_needed_;
+    }
+    
 private:
     std::string& out_;
 
-    enum state {
-        NEED_LENGTH,
-        NEED_DATA,
-        DONE
-    } state_;
-    unsigned int length_;
+    int length_needed_;
+};
+
+
+class String16Field : public PacketField
+{
+public:
+    static PacketField::pointer create(std::string& out, int maxlen)
+    {
+        return PacketField::pointer(new String16Field(out, maxlen));
+    }
+    
+    static PacketField::pointer create(std::string& out)
+    {
+        return PacketField::pointer(new String16Field(out, DEFAULT_MAXLEN));
+    }
+
+    enum {
+        NO_LENGTH_SET = -1
+    };
+
+    String16Field(std::string& out, int maxlen)
+        : out_(out), bytes_needed_(NO_LENGTH_SET)
+    {
+    }
+
+    // TODO: this needs to be fixed to read the string in chunks;
+    // otherwise string read size is limited by buffer size. Oops! :)
+    int readFrom(boost::asio::streambuf& buf)
+    {
+        using namespace boost::asio;
+
+        if (bytes_needed_ == NO_LENGTH_SET)
+        {
+            int available = MIN(2, buf.size());
+            if (available >= 2)
+            {
+                bytes_needed_ = 2*ntohs(buffer_cast<const uint16_t*>(buf.data())[0]);
+                temp_.reserve(bytes_needed_/2);
+                buf.consume(2);
+            }
+            else
+            {
+                return 2 - available;
+            }
+        }
+
+        if (bytes_needed_ > 0)
+        {
+            unsigned int available = MIN(bytes_needed_, buf.size());
+
+            temp_.append(buffer_cast<const char16_t*>(buf.data()), available);
+            buf.consume(available);
+
+            bytes_needed_ -= available;
+        }
+
+        if (bytes_needed_ == 0)
+        {
+            out_ = ucs2toutf8(temp_);
+        }
+        return bytes_needed_;
+    }
+    
+private:
+    std::string& out_;
+    std::u16string temp_;
+
+    int bytes_needed_;
 };
 
 

@@ -40,7 +40,7 @@ enum ResponseType
     RESPONSE_ENTITY_EQUIPMENT   = 0x05,
     RESPONSE_SPAWN_POS          = 0x06,
     RESPONSE_UPDATE_HEALTH      = 0x07,
-    RESPONSE_POSITION_AND_LOOK  = 0x0D,
+    RESPONSE_POSITION_LOOK      = 0x0D,
     RESPONSE_NAMED_ENTITY_SPAWN = 0x14,
     RESPONSE_PICKUP_SPAWN       = 0x15,
     RESPONSE_COLLECT_ITEM       = 0x16,
@@ -97,7 +97,7 @@ Response handshake(std::string const& msg);
 Response loginresponse(uint32_t eid, uint64_t seed, uint8_t dim);
 Response spawnresponse(uint32_t x, uint32_t y, uint32_t z);
 Response chunkresponse(uint32_t x, uint32_t z, Chunk const& chunk);
-Response positionresponse(double x, double z, double y,
+Response positionlookresponse(double x, double z, double y,
                           double stance, float yaw, float pitch,
                           bool on_ground);
 
