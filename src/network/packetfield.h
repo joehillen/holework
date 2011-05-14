@@ -23,6 +23,7 @@
 #include <boost/asio.hpp>
 #include <string>
 #include <netinet/in.h>
+#include "uniconv.h"
 
 // TODO: move to implementation file
 
@@ -283,8 +284,12 @@ public:
         return PacketField::pointer(new String8Field(out, DEFAULT_MAXLEN));
     }
     
+    enum {
+        NO_LENGTH_SET = -1
+    };
+
     String8Field(std::string& out, int maxlen)
-        : out_(out), state_(NEED_LENGTH), length_(0)
+        : out_(out), length_needed_(NO_LENGTH_SET)
     {
     }
 
@@ -293,30 +298,15 @@ public:
     int readFrom(boost::asio::streambuf& buf)
     {
         using namespace boost::asio;
-        /*
-         * String8Field can be in three states:
-         *  - need length
-         *  - need rest of string
-         *  - done
-         */
 
-
-        //
-        if (state_ == DONE)
-        {
-            length_ = 0;
-            state_ = NEED_LENGTH;
-        }
-
-        if (state_ == NEED_LENGTH)
+        if (length_needed_ == NO_LENGTH_SET)
         {
             int available = MIN(2, buf.size());
             if (available >= 2)
             {
-                length_ = ntohs(buffer_cast<const uint16_t*>(buf.data())[0]);
-                out_.resize(length_);
+                length_needed_ = ntohs(buffer_cast<const uint16_t*>(buf.data())[0]);
+                out_.resize(length_needed_);
                 buf.consume(2);
-                state_ = NEED_DATA;
             }
             else
             {
@@ -324,34 +314,36 @@ public:
             }
         }
 
-        if (state_ == NEED_DATA)
+        if (length_needed_ > 0)
         {
-            unsigned int available = MIN(length_, buf.size());
-            if (available >= length_)
-            {
-                out_.assign(buffer_cast<const char*>(buf.data()), length_);
-                buf.consume(length_);
-                state_ = DONE;
-            }
+            unsigned int available = MIN(length_needed_, buf.size());
 
-            return MAX(0, length_ - available);
+            out_.append(buffer_cast<const char*>(buf.data()), available);
+            buf.consume(available);
+
+            length_needed_ -= available;
         }
-        return 0;
+
+        if (length_needed_ == 0)
+        {
+            finalizeString();
+        }
+        return length_needed_;
+    }
+    
+    virtual void finalizeString()
+    {
+        // does nothing
     }
 
-private:
+protected:
     std::string& out_;
 
-    enum state {
-        NEED_LENGTH,
-        NEED_DATA,
-        DONE
-    } state_;
-    unsigned int length_;
+    int length_needed_;
 };
 
 
-class String16Field : public PacketField
+class String16Field : public String8Field
 {
 public:
     static PacketField::pointer create(std::string& out, int maxlen)
@@ -365,70 +357,14 @@ public:
     }
     
     String16Field(std::string& out, int maxlen)
-        : out_(out), state_(NEED_LENGTH), length_(0)
+        : String8Field(out, maxlen) 
     {
     }
-
-    // TODO: this needs to be fixed to read the string in chunks;
-    // otherwise string read size is limited by buffer size. Oops! :)
-    int readFrom(boost::asio::streambuf& buf)
+    
+    void finalizeString()
     {
-        using namespace boost::asio;
-        /*
-         * String16Field can be in three states:
-         *  - need length
-         *  - need rest of string
-         *  - done
-         */
-
-
-        //
-        if (state_ == DONE)
-        {
-            length_ = 0;
-            state_ = NEED_LENGTH;
-        }
-
-        if (state_ == NEED_LENGTH)
-        {
-            int available = MIN(2, buf.size());
-            if (available >= 2)
-            {
-                length_ = 2*ntohs(buffer_cast<const uint16_t*>(buf.data())[0]);
-                out_.resize(length_);
-                buf.consume(2);
-                state_ = NEED_DATA;
-            }
-            else
-            {
-                return 2 - available;
-            }
-        }
-
-        if (state_ == NEED_DATA)
-        {
-            unsigned int available = MIN(length_, buf.size());
-            if (available >= length_)
-            {
-                out_.assign(buffer_cast<const char*>(buf.data()), length_);
-                buf.consume(length_);
-                state_ = DONE;
-            }
-
-            return MAX(0, length_ - available);
-        }
-        return 0;
+        out_ = ucs2toutf8(out_);
     }
-
-private:
-    std::string& out_;
-
-    enum state {
-        NEED_LENGTH,
-        NEED_DATA,
-        DONE
-    } state_;
-    unsigned int length_;
 };
 
 
