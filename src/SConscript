@@ -1,0 +1,18 @@
+#
+# scons script specifying just the sources and target for the project
+#
+sources = Glob('*.cpp') + Glob('*/*.cpp')
+libs    = ['boost_system', 'boost_iostreams', 'gtest', 'pthread']
+
+Import('env')
+env.Append(LIBS=libs)
+
+objects = env.Object(source = sources)
+server = env.Program(target='server', source = objects)
+
+# Run unit tests after a successful build
+test_alias = env.Alias('test', [server], server[0].abspath + ' --test')
+AlwaysBuild(test_alias)
+
+Default(server)
+Default(test_alias)
