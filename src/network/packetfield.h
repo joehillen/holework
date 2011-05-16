@@ -22,7 +22,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/asio.hpp>
 #include <string>
-#include <netinet/in.h>
+
+#include "inetconv.h"
 #include "uniconv.h"
 
 // TODO: move to implementation file
@@ -54,221 +55,47 @@ public:
     virtual int readFrom(boost::asio::streambuf& buf) = 0;
 };
 
-class ByteField : public PacketField
+
+
+template<typename T>
+class NumField : public PacketField
 {
 public:
-    static PacketField::pointer create(uint8_t& out)
+    static PacketField::pointer create(T& out)
     {
-        return PacketField::pointer(new ByteField(out));
+        return PacketField::pointer(new NumField<T>(out));
     }
 
-    ByteField(uint8_t& out)
-        : out_(out)
+    NumField(T& out) : out_(out)
     {
     }
+
+    enum {
+        required = sizeof(T)
+    };
 
     int readFrom(boost::asio::streambuf& buf)
     {
-        int available = MIN(1, buf.size());
-        if (available >= 1)
+        int available = MIN(required, buf.size());
+        if (available >= required)
         {
-            out_ = boost::asio::buffer_cast<const uint8_t*>(buf.data())[0];
-            buf.consume(1);
+            out_ = ntoh(boost::asio::buffer_cast<const T*>(buf.data())[0]);
+            buf.consume(required);
         }
-        return MAX(0, 1 - available);
+        return MAX(0, required - available);
     }
 
 private:
-    uint8_t& out_;
+    T& out_;
 };
 
-class ShortField : public PacketField
-{
-public:
-    static PacketField::pointer create(uint16_t& out)
-    {
-        return PacketField::pointer(new ShortField(out));
-    }
-
-    ShortField(uint16_t& out)
-        : out_(out)
-    {
-    }
-
-    int readFrom(boost::asio::streambuf& buf)
-    {
-        int available = MIN(2, buf.size());
-        if (available >= 2)
-        {
-            out_ = ntohs(boost::asio::buffer_cast<const uint16_t*>(buf.data())[0]);
-        }
-        return MAX(0, 1 - available);
-    }
-
-private:
-    uint16_t& out_;
-};
-
-class IntField : public PacketField
-{
-public:
-    static PacketField::pointer create(uint32_t& out)
-    {
-        return PacketField::pointer(new IntField(out));
-    }
-
-    IntField(uint32_t& out)
-        : out_(out)
-    {
-    }
-
-    int readFrom(boost::asio::streambuf& buf)
-    {
-        // Consume at most 4 bytes
-        int available = MIN(4, buf.size());
-
-        if(available >= 4)
-        {
-            out_ = ntohl(boost::asio::buffer_cast<const uint32_t*>(buf.data())[0]);
-            buf.consume(4);
-        }
-
-        return MAX(0, 4 - available);
-    }
-
-private:
-    uint32_t& out_;
-};
-
-/*
- * TODO: move this to a separate header
- */
-static uint64_t ntohll(uint64_t n)
-{
-    // TODO: return n if host byte order is big-endian
-    return (n>>56) | 
-        ((n<<40) & 0x00FF000000000000LLU) |
-        ((n<<24) & 0x0000FF0000000000LLU) |
-        ((n<<8)  & 0x000000FF00000000LLU) |
-        ((n>>8)  & 0x00000000FF000000LLU) |
-        ((n>>24) & 0x0000000000FF0000LLU) |
-        ((n>>40) & 0x000000000000FF00LLU) |
-        (n<<56);
-}
-
-class LongField : public PacketField
-{
-public:
-    static PacketField::pointer create(uint64_t& out)
-    {
-        return PacketField::pointer(new LongField(out));
-    }
-
-    LongField(uint64_t& out)
-        : out_(out)
-    {
-    }
-
-    int readFrom(boost::asio::streambuf& buf)
-    {
-        int available = MIN(8, buf.size());
-
-        if (available >= 8)
-        {
-            out_ = ntohll(boost::asio::buffer_cast<const uint64_t*>(buf.data())[0]);
-            buf.consume(8);
-        }
-
-        return MAX(0, 8 - available);
-    }
-
-private:
-    uint64_t& out_;
-};
-
-class BoolField : public PacketField
-{
-public:
-    static PacketField::pointer create(uint8_t& out)
-    {
-        return PacketField::pointer(new BoolField(out));
-    }
-
-    BoolField(uint8_t& out)
-        : out_(out)
-    {
-    }
-
-    int readFrom(boost::asio::streambuf& buf)
-    {
-        int available = MIN(1, buf.size());
-        if (available >= 1)
-        {
-            out_ = boost::asio::buffer_cast<const uint8_t*>(buf.data())[0];
-            buf.consume(1);
-        }
-        return MAX(0, 1 - available);
-    }
-
-private:
-    uint8_t& out_;
-};
-
-class FloatField : public PacketField
-{
-public:
-    static PacketField::pointer create(float& out)
-    {
-        return PacketField::pointer(new FloatField(out));
-    }
-
-    FloatField(float& out)
-        : out_(out)
-    {
-    }
-
-    int readFrom(boost::asio::streambuf& buf)
-    {
-        int available = MIN(4, buf.size());
-        if (available >= 4)
-        {
-            out_ = boost::asio::buffer_cast<const float*>(buf.data())[0];
-            buf.consume(4);
-        }
-        return MAX(0, 4 - available);
-    }
-
-private:
-    float& out_;
-};
-
-class DoubleField : public PacketField
-{
-public:
-    static PacketField::pointer create(double& out)
-    {
-        return PacketField::pointer(new DoubleField(out));
-    }
-
-    DoubleField(double& out)
-        : out_(out)
-    {
-    }
-
-    int readFrom(boost::asio::streambuf& buf)
-    {
-        int available = MIN(8, buf.size());
-        if (available >= 1)
-        {
-            out_ = boost::asio::buffer_cast<const double*>(buf.data())[0];
-            buf.consume(8);
-        }
-        return MAX(0, 8 - available);
-    }
-
-private:
-    double& out_;
-};
+typedef NumField<uint8_t> ByteField;
+typedef NumField<uint8_t> BoolField;
+typedef NumField<uint16_t> ShortField;
+typedef NumField<uint32_t> IntField;
+typedef NumField<uint64_t> LongField;
+typedef NumField<float> FloatField;
+typedef NumField<double> DoubleField;
 
 
 class String8Field : public PacketField
