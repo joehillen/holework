@@ -132,7 +132,7 @@ public:
             if (available >= 2)
             {
                 length_needed_ = ntohs(buffer_cast<const uint16_t*>(buf.data())[0]);
-                out_.resize(length_needed_);
+                out_.reserve(length_needed_);
                 buf.consume(2);
             }
             else
