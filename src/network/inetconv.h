@@ -1,11 +1,8 @@
 // inetconv.h
-#pragma once
-
-//
 // Functions for conversion from network to host byte order
 //
-#include <sys/types.h>
-#include <netinet/in.h>
+#pragma once
+
 
 /**
  * Function: isbigendian
@@ -15,13 +12,6 @@
  * machines that practice freaky byte sex.
  */
 bool isbigendian();
-
-/**
- * Function: ntohll
- *
- * Converts an unsigned 64-bit integer from network to host byte order.
- */
-uint64_t ntohll(uint64_t);
 
 
 /**
