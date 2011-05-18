@@ -98,104 +98,70 @@ typedef NumField<float> FloatField;
 typedef NumField<double> DoubleField;
 
 
-class String8Field : public PacketField
+/**
+ * Template class: StringField
+ *
+ * Specializations of this class represent string fields which convert their
+ * underlying network data from some format to UTF-8 std::strings. Boostcraft
+ * rolls with UTF-8 all the way because it's the only thing that makes sense.
+ * Java and its UCS-2 can suck it.
+ *
+ * This template has two parameters:
+ *
+ *   T          Character type of the underlying string data. This parameter
+ *              is only used to compute the number of bytes to read; string
+ *              fields always "output" to std::string.
+ *
+ *   Converter  Function that converts from the underlying encoding to UTF-8.
+ *              
+ */
+template<typename T, std::string Converter(std::string const&)>
+class StringField : public PacketField
 {
 public:
-    static PacketField::pointer create(std::string& out, int maxlen)
-    {
-        return PacketField::pointer(new String8Field(out, maxlen));
-    }
-    
     static PacketField::pointer create(std::string& out)
     {
-        return PacketField::pointer(new String8Field(out, DEFAULT_MAXLEN));
+        return PacketField::pointer(new StringField<T,Converter>(out));
     }
     
-    enum {
-        NO_LENGTH_SET = -1
-    };
-
-    String8Field(std::string& out, int maxlen)
-        : out_(out), length_needed_(NO_LENGTH_SET)
+    static PacketField::pointer create(std::string& out, size_t maxlen)
     {
-    }
-
-    // TODO: this needs to be fixed to read the string in chunks;
-    // otherwise string read size is limited by buffer size. Oops! :)
-    int readFrom(boost::asio::streambuf& buf)
-    {
-        using namespace boost::asio;
-
-        if (length_needed_ == NO_LENGTH_SET)
-        {
-            int available = MIN(2, buf.size());
-            if (available >= 2)
-            {
-                length_needed_ = ntohs(buffer_cast<const uint16_t*>(buf.data())[0]);
-                out_.reserve(length_needed_);
-                buf.consume(2);
-            }
-            else
-            {
-                return 2 - available;
-            }
-        }
-
-        if (length_needed_ > 0)
-        {
-            unsigned int available = MIN(length_needed_, buf.size());
-
-            out_.append(buffer_cast<const char*>(buf.data()), available);
-            buf.consume(available);
-
-            length_needed_ -= available;
-        }
-
-        return length_needed_;
-    }
-    
-private:
-    std::string& out_;
-
-    int length_needed_;
-};
-
-
-class String16Field : public PacketField
-{
-public:
-    static PacketField::pointer create(std::string& out, int maxlen)
-    {
-        return PacketField::pointer(new String16Field(out, maxlen));
-    }
-    
-    static PacketField::pointer create(std::string& out)
-    {
-        return PacketField::pointer(new String16Field(out, DEFAULT_MAXLEN));
+        // TODO: implement maxlen
+        return create(out);
     }
 
     enum {
-        NO_LENGTH_SET = -1
+        NO_LENGTH_SET = 0xffffffff
     };
 
-    String16Field(std::string& out, int maxlen)
+    StringField(std::string& out)
         : out_(out), bytes_needed_(NO_LENGTH_SET)
     {
     }
 
-    // TODO: this needs to be fixed to read the string in chunks;
-    // otherwise string read size is limited by buffer size. Oops! :)
+    StringField(std::string& out, size_t maxlen)
+        : out_(out), bytes_needed_(NO_LENGTH_SET)
+    {
+    }
+
+    /**
+     * Attempts to read the string from the given buffer; will consume whatever
+     * is available, allowing large strings to be read in successive reads of
+     * small buffers.
+     */
     int readFrom(boost::asio::streambuf& buf)
     {
         using namespace boost::asio;
 
+        // First read the length tag
         if (bytes_needed_ == NO_LENGTH_SET)
         {
-            int available = MIN(2, buf.size());
+            unsigned available = MIN(2, buf.size());
             if (available >= 2)
             {
-                bytes_needed_ = 2*ntohs(buffer_cast<const uint16_t*>(buf.data())[0]);
-                temp_.reserve(bytes_needed_/2);
+                bytes_needed_ = sizeof(T) * ntoh(
+                    buffer_cast<const uint16_t*>(buf.data())[0]);
+                out_.reserve(bytes_needed_);
                 buf.consume(2);
             }
             else
@@ -204,29 +170,38 @@ public:
             }
         }
 
+        // Then read as much data as needed/possible
         if (bytes_needed_ > 0)
         {
-            unsigned int available = MIN(bytes_needed_, buf.size());
-
-            temp_.append(buffer_cast<const char16_t*>(buf.data()), available);
+            unsigned available = MIN(bytes_needed_, buf.size());
+            out_.append(buffer_cast<const char*>(buf.data()), available);
             buf.consume(available);
-
             bytes_needed_ -= available;
         }
 
+        // When everything is done, convert the string
         if (bytes_needed_ == 0)
         {
-            out_ = ucs2toutf8(temp_);
+            out_ = Converter(out_);
+            // TODO: PacketFields need a "done" flag; attempting to re-read
+            // into a completed field should be a runtime error.
         }
+
         return bytes_needed_;
     }
-    
+
 private:
     std::string& out_;
-    std::u16string temp_;
-
-    int bytes_needed_;
+    std::basic_string<T> temp_;
+    unsigned bytes_needed_;
 };
+
+
+std::string NullConverter(std::string const& str);
+std::string UCS2Converter(std::string const& str);
+
+typedef StringField<char, &NullConverter> String8Field;
+typedef StringField<char16_t, &UCS2Converter> String16Field;
 
 
 }} //end namespace boostcraft::network

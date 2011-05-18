@@ -5,6 +5,21 @@
 
 using namespace boostcraft::network;
 
+namespace boostcraft { namespace network {
+
+std::string NullConverter(std::string const& str)
+{
+    return str;
+}
+
+std::string UCS2Converter(std::string const& str)
+{
+    return ucs2toutf8(reinterpret_cast<const char16_t*>(str.data()),
+            str.length()/2);
+}
+
+}} // namespace boostcraft::network
+
 TEST(PacketFieldTests, ByteField)
 {
     boost::asio::streambuf b;
