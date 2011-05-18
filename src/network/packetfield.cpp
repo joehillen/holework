@@ -1,21 +1,25 @@
 // packetfield.cpp
-
+//
 #include "packetfield.h"
+
+#include "uniconv.h"
 #include <gtest/gtest.h>
 
 using namespace boostcraft::network;
 
 namespace boostcraft { namespace network {
 
+/*
+ * Converter functions for StringFields
+ */
 std::string NullConverter(std::string const& str)
 {
     return str;
 }
 
-std::string UCS2Converter(std::string const& str)
+std::string UCS2Converter(std::u16string const& str)
 {
-    return ucs2toutf8(reinterpret_cast<const char16_t*>(str.data()),
-            str.length()/2);
+    return ucs2toutf8(str);
 }
 
 }} // namespace boostcraft::network
