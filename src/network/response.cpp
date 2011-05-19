@@ -17,6 +17,8 @@
 *************************************************************************/
 
 #include "response.h"
+#include "uniconv.h"
+
 #include <ostream>
 #include <netinet/in.h>
 
@@ -85,6 +87,16 @@ Response& operator<<(Response& os, std::string const& s)
     return os;
 }
 
+Response& operator<<(Response& os, std::u16string const& s)
+{
+    std::ostream out(os.data.get());
+    uint16_t len = htons(s.length());
+    out.write((const char*)&len, 2);
+    std::cout << "Sending string of length " << s.length() << std::endl;
+    out.write((const char*)s.c_str(), s.length()*sizeof(char16_t));
+    return os;
+}
+
 Response& operator<<(Response& os, float n)
 {
     std::ostream out(os.data.get());
@@ -118,7 +130,7 @@ Response handshake(std::string const& hash)
 {
     Response r;
     r << (uint8_t)RESPONSE_HANDSHAKE;
-    r << hash;
+    r << utf8toucs2(hash);
     return r;
 }
 
@@ -127,7 +139,7 @@ Response loginresponse(uint32_t entityId, uint64_t seed, uint8_t dimension)
     Response r;
     r << (uint8_t)RESPONSE_LOGIN;
     r << entityId;
-    r << "NOT USED";
+    r << utf8toucs2("NOT USED");
     r << seed;
     r << dimension;
     return r;
