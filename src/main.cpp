@@ -16,6 +16,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *************************************************************************/
 
+
 #include <iostream>
 #include <string>
 
@@ -24,6 +25,7 @@
 #include <gtest/gtest.h>
 
 #include "events.h"
+#include "log.h"
 #include "network/tcpserver.h"  
 #include "handlers.h"
 
@@ -31,6 +33,8 @@ void test()
 {
     std::cout << "Timer expired!\n";
 }
+
+bool boostcraft::debug_mode = false;
 
 int main(int argc, char** argv)
 {
@@ -48,6 +52,11 @@ int main(int argc, char** argv)
         {
             ::testing::InitGoogleTest(&argc, argv);
             return RUN_ALL_TESTS();
+        } 
+        else if (s == "-d") 
+        {
+           debug_mode = true; 
+           log(DEBUG, "main", "DEBUG Mode Enabled");
         }
     }
 

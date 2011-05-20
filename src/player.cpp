@@ -19,6 +19,7 @@
 #include "player.h"
 #include "network/packet.h"
 #include "network/connection.h"
+#include "events.h"
 #include "log.h"
 
 #define MAX_DELTA 10000 //change this or make it configurable?
@@ -34,7 +35,7 @@ Player::Player(boost::asio::io_service& io)
 
 void Player::log(std::string message)
 {
-    boostcraft::log("Player: " + this->username_, message);
+    boostcraft::log(INFO, "Player: " + this->username_, message);
 }
 
 void Player::deliver(network::Response const& packet)
@@ -47,6 +48,7 @@ void Player::dispatch(network::Request::pointer packet)
     using namespace network;
     Request* p = packet.get();
 
+    std::cout << "Packet type: " << std::hex << (int)packet->type << std::endl;
     switch(packet->type)
     {
     case REQUEST_KEEP_ALIVE:
@@ -63,7 +65,7 @@ void Player::dispatch(network::Request::pointer packet)
         }
         else
         {
-            log("ERROR: Username is already set.");
+            log("Username is already set.");
         }
         break;
     }

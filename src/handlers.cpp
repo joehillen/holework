@@ -25,7 +25,26 @@ namespace boostcraft {
  */
 void logHandler(LogEvent& event)
 {
-    std::cout << "LOGGED: " << event.source_name << " "  << event.message << "\n";
+    std::string type;
+    
+    switch (event.type)
+    {
+        case INFO:
+            type = "INFO";
+            break;
+        case WARN:
+            type = "WARN";
+            break;
+        case ERROR:
+            type = "ERROR";
+            break;
+        case DEBUG:
+            type = "DEBUG";
+            break;
+        default:
+            type = "LOG";
+    }
+    std::cout << type << ":" << event.source_name << ": "  << event.message << "\n";
     // Now we sneakily cancel the event!
     event.canceled = true;
 }
@@ -55,7 +74,7 @@ void loginHandler(LoginRequestEvent& e)
 {
     e.player.id = newEntityID();
     e.player.deliver(boostcraft::network::loginresponse(e.player.id,0,0));
-    log("loginhandler:", 
+    log(INFO, "loginhandler:", 
         boost::str(boost::format("Login request from %1%."
                     " Given entity id %2%") 
                     % e.player.username() 
@@ -74,23 +93,21 @@ void lookHandler(PlayerLookEvent& event)
 {
 //    std::stringstream str;
 //    str << event.player.username() << ": " << "Yaw: " << event.yaw << " Pitch: " << event.pitch;
-//    log("lookHandler", str.str());
+//    log(DEBUG, "lookHandler", str.str());
 }
 
 void positionHandler(PlayerPositionEvent& event)
 {
-//    std::stringstream str;
-//    str << event.player.username() << ": " << "X: " << event.x << " Z: " << event.z << " Y: " << event.y;
-//    log("lookHandler", str.str());
+    std::stringstream str;
+    str << event.player.username() << ": " << "X: " << event.x << " Z: " << event.z << " Y: " << event.y;
+    log(DEBUG, "positionHandler", str.str());
 }
 
 void ongroundHandler(PlayerOnGroundEvent& event)
 {
-    std::cout << "ONGROUND HANDLER\n";
-    std::cout << event.player.username() << "\n";
-//    std::stringstream str;
-//    str << event.player.username() << ": " << "onground: " << event.on_ground;
-//    log("ongroundHandler", str.str());
+    std::stringstream str;
+    str << event.player.username() << ": " << "onground: " << event.on_ground;
+    log(DEBUG, "ongroundHandler", str.str());
 }
 
 
