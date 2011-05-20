@@ -22,13 +22,15 @@
 #include <boost/bind.hpp>
 #include <boost/signals2/signal.hpp>
 
+#include "log.h"
+
 namespace boostcraft
 {
 
 // Forward declarations
 class Player;
 namespace network {
-class LoginRequest;
+    class LoginRequest;
 }
 
 
@@ -60,8 +62,8 @@ boost::asio::io_service& io_service();
  *
  * To raise an event, create an instance of the desired event class and call
  * fire() on it, e.g.:
- *         LogEvent log("This is a log message.");
- *         fire(log);
+ *         LogEvent log_event(INFO, "This is a log message.");
+ *         fire(log_event);
  * Alternatively, call async_fire() if you want handling of the event to occur
  * asynchronously.
  *
@@ -98,8 +100,10 @@ struct LogEvent : public Event
 {
     static boost::signals2::signal<void(LogEvent&)> signal;
     std::string message;
+    LogType type;
 
-    LogEvent(std::string const& msg) : message(msg) { }
+    LogEvent(boostcraft::LogType type, std::string const& msg) : message(msg), type(type)
+    {}
 };
 
 struct LoginRequestEvent : public PlayerEvent
