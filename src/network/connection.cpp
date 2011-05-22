@@ -28,6 +28,8 @@
 #include "packetparser.h"
 #include "connection.h"
 
+#include "../log.h"
+
 namespace boostcraft { namespace network {
 
 Connection::Connection(boost::asio::io_service& io)
@@ -62,7 +64,7 @@ void Connection::startRead()
 
 void Connection::start()
 {
-    std::cout << "Listening for a client...\n";
+    log(INFO, "Netowrk","Listening for a client...");
     startRead();
 }
 
@@ -81,7 +83,7 @@ void Connection::handleRead(const boost::system::error_code& error, size_t bytes
         startRead();
     }
     else
-        std::cout << "CONNECTION CLOSED.\n";
+        log(INFO, "Network","CONNECTION CLOSED.");
 }
 
 void Connection::handleWrite(const boost::system::error_code& error, 
@@ -101,7 +103,7 @@ void Connection::handleWrite(const boost::system::error_code& error,
     }
     else
     {
-        std::cout << "ERROR WRITING! (we should probably do something)";
+        log(ERROR,"Network","CANNOT WRITE! (TODO: we should probably do something)");
     }
 }
 

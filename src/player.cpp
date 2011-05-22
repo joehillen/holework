@@ -22,6 +22,8 @@
 #include "events.h"
 #include "log.h"
 
+#include <sstream>
+
 #define MAX_DELTA 10000 //change this or make it configurable?
 
 namespace boostcraft
@@ -48,7 +50,9 @@ void Player::dispatch(network::Request::pointer packet)
     using namespace network;
     Request* p = packet.get();
 
-    std::cout << "Packet type: " << std::hex << (int)packet->type << std::endl;
+    std::stringstream ss;
+    ss << "Packet type: " << std::hex << (int)packet->type;
+    boostcraft::log(DEBUG, "Player: " + this->username_, ss.str());
     switch(packet->type)
     {
     case REQUEST_KEEP_ALIVE:
@@ -96,7 +100,7 @@ void Player::dispatch(network::Request::pointer packet)
         break;
     }
     default:
-        std::cout << "Unhandled packet!\n";
+        log("Unhandled packet!");
     }
 }
 

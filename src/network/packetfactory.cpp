@@ -18,6 +18,10 @@
 
 
 #include "packet.h"
+#include "../log.h"
+
+#include <sstream>
+#include <iomanip>
 
 namespace boostcraft { namespace network { 
 
@@ -206,7 +210,10 @@ packetFactory(int id)
             list.push_back(String16Field::create(packet->text4));
         }*/
         default:
-            printf("PacketID: 0x%2x\n", id);
+            std::stringstream ss;
+            ss << "Unrecognized PacketID: 0x" 
+                << std::setfill ('0') << std::setw(2) << std::hex << id; 
+            log(ERROR,"PacketFactory", ss.str());
             throw std::runtime_error("Unrecognized PacketID");
     }
     

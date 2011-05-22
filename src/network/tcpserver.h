@@ -24,6 +24,7 @@
 #include <boost/shared_ptr.hpp>
 #include "connection.h"
 #include "../player.h" // TODO: this is icky
+#include "../log.h"
 
 namespace boostcraft {
 
@@ -44,7 +45,7 @@ public:
 
     void startAccept()
     {
-        std::cout << "Waiting for a connection...\n";
+        log(INFO, "TcpServer","Waiting for a connection...");
 
         Connection::pointer new_connection(
                                 (Connection*) new Player(io_));
@@ -60,7 +61,7 @@ public:
     {
         if (!error)
         {
-            std::cout << "Got a connection!\n";
+            log(INFO, "TcpServer","Got a connection!");
             connection->start();
             startAccept();
         }

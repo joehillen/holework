@@ -92,7 +92,6 @@ Response& operator<<(Response& os, std::u16string const& s)
     std::ostream out(os.data.get());
     uint16_t len = htons(s.length());
     out.write((const char*)&len, 2);
-    std::cout << "Sending string of length " << s.length() << std::endl;
     out.write((const char*)s.c_str(), s.length()*sizeof(char16_t));
     return os;
 }

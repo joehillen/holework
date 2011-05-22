@@ -31,7 +31,8 @@
 
 void test()
 {
-    std::cout << "Timer expired!\n";
+    using namespace boostcraft;
+    log(INFO, "Timer","Timer expired!");
 }
 
 bool boostcraft::debug_mode = false;
