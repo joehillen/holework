@@ -22,7 +22,7 @@
 
 namespace boostcraft {
 
-extern void log(LogType type, std::string source, std::string message)
+void log(LogType type, std::string source, std::string message)
 {
     if (debug_mode == true || type != DEBUG)
     {
