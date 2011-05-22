@@ -114,22 +114,20 @@ std::u16string utf8toucs2(std::string const& utf8str)
 }
 
 
-
-/*
- * UNIT TESTS
- * 
+/**
+ * Streaming support for std::u16string
  */
-
-
-//
-// TODO: move this to a common header, at least until gtest
-//  and/or C++ support streaming u16string natively
-//
 std::ostream& operator<<(std::ostream& os, std::u16string const& str)
 {
     os << ucs2toutf8(str);
     return os;
 }
+
+
+/*
+ * UNIT TESTS
+ * 
+ */
 
 //
 // Because we work with UCS-2 big-endian strings, we may need to transform
