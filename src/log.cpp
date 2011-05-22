@@ -1,4 +1,4 @@
-// log.h
+// log.cpp
 
 /***********************************************************************
 * Copyright (C) 2011 Holework Project
@@ -16,21 +16,20 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *************************************************************************/
 
-#pragma once
-
+#include "log.h"
+#include "events.h"
 #include <string>
 
 namespace boostcraft {
 
-enum LogType {
-    INFO,
-    WARN,
-    ERROR,
-    DEBUG
-};
-
-extern bool debug_mode;
-
-extern void log(LogType type, std::string source, std::string message);
+extern void log(LogType type, std::string source, std::string message)
+{
+    if (debug_mode == true || type != DEBUG)
+    {
+        LogEvent logevent(type, message);
+        logevent.source_name = source;
+        async_fire(logevent);
+    }
+}
 
 } //end namespace
