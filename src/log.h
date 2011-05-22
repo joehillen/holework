@@ -31,6 +31,6 @@ enum LogType {
 
 extern bool debug_mode;
 
-extern void log(LogType type, std::string source, std::string message);
+void log(LogType type, std::string source, std::string message);
 
 } //end namespace
