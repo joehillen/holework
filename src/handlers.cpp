@@ -26,7 +26,12 @@ namespace boostcraft {
 void logHandler(LogEvent& event)
 {
     std::string type;
-    
+
+    if (!event.valid) {
+        std::cout << "PREPARING NASAL DEMONS...\n";
+        return;
+    }   
+
     switch (event.type)
     {
         case INFO:
