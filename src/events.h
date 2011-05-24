@@ -284,12 +284,7 @@ void fire(EventType& e)
 template<class EventType>
 void async_fire(EventType& e)
 {
-//    io_service().post(boost::bind(boost::ref(EventType::signal), e));
-
-    io_service().post(
-        [=]() {
-            EventType::signal(const_cast<EventType&>(e));
-        });
+    io_service().post(boost::bind(boost::ref(EventType::signal), e));
 }
 
 /**
