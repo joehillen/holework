@@ -50,6 +50,7 @@ struct Request
 
     uint8_t type;
     Request(RequestType id) : type(id) { }
+    virtual ~Request() { }
 };
 
 struct KeepAliveRequest : public Request
@@ -87,6 +88,8 @@ struct PlayerRequest : public Request
 {
     PlayerRequest() : Request(REQUEST_PLAYER) { }
     uint8_t on_ground;
+
+    virtual ~PlayerRequest() { }
 };
 
 struct PositionRequest : public Request

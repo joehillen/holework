@@ -28,10 +28,7 @@
 namespace boostcraft { namespace network { 
 
 PacketParser::PacketParser()
-    // Hard-coded buffer size for now.
-    // NOTE: buffer size must be _at least_ 8 bytes to accomodate delayed reading
-    // of all primitive types.
-    : buffer_(512)
+    : buffer_()
 {
 }
 
@@ -65,17 +62,15 @@ size_t PacketParser::done(const boost::system::error_code& error,
     if (fieldList.empty())
         return 0;
     
-    // Read fields until we empty the buffer
-    while(buffer_.size() > 0)
-    {
-        int need = fieldList.front()->readFrom(buffer_);
+    size_t need = 0;
 
-        // When a field is complete, remove it from the list
+    while (need == 0)
+    {
+        need = fieldList.front()->readFrom(buffer_);
+
         if (need == 0)
         {
             fieldList.pop_front();
-
-            // Done with packet when there are no more fields
             if (fieldList.empty())
                 return 0;
         }
