@@ -77,24 +77,22 @@ void Player::dispatch(network::Request::pointer packet)
     }
     case REQUEST_POSITION:
     {
-        log("Position!");
-        /*PositionRequest* pkt =  (network::PositionRequest*)p;
+        PositionRequest* pkt =  (network::PositionRequest*)p;
         PlayerPositionEvent event_pos(*this, pkt->x, pkt->z, pkt->y);
-        fire(event_pos);
+        async_fire(event_pos);
         PlayerOnGroundEvent event_onground(*this, (bool)pkt->on_ground);
-        async_fire(event_onground);*/
+        async_fire(event_onground);
         break;
     }
     case REQUEST_POSITION_AND_LOOK:
     {
-        log("Position and look!");
-        /*PositionLookRequest* pkt =  (network::PositionLookRequest*)p;
+        PositionLookRequest* pkt =  (network::PositionLookRequest*)p;
         PlayerLookEvent event_look(*this, pkt->yaw, pkt->pitch);
         async_fire(event_look);
         PlayerPositionEvent event_pos(*this, pkt->x, pkt->z, pkt->y);
-        fire(event_pos);
+        async_fire(event_pos);
         PlayerOnGroundEvent event_onground(*this, (bool)pkt->on_ground);
-        async_fire(event_onground);*/
+        async_fire(event_onground);
         break;
     }
     default:

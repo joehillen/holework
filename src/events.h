@@ -22,8 +22,6 @@
 #include <boost/bind.hpp>
 #include <boost/signals2/signal.hpp>
 
-#include <iostream>
-
 #include "log.h"
 
 namespace boostcraft
@@ -88,7 +86,6 @@ struct Event
     bool canceled;
 
     Event() : canceled(false) { }
-    virtual ~Event() { }
 };
 
 
@@ -97,7 +94,6 @@ struct PlayerEvent : public Event
     Player& player;
 
     PlayerEvent(Player& player) : player(player) { }
-    virtual ~PlayerEvent() { }
 };
 
 struct LogEvent : public Event
@@ -105,13 +101,9 @@ struct LogEvent : public Event
     static boost::signals2::signal<void(LogEvent&)> signal;
     std::string message;
     LogType type;
-    bool valid;
 
-    LogEvent(boostcraft::LogType type, std::string const& msg) 
-        : message(msg), type(type), valid(true)
+    LogEvent(boostcraft::LogType type, std::string const& msg) : message(msg), type(type)
     {}
-
-    ~LogEvent() { valid = false; }
 };
 
 struct LoginRequestEvent : public PlayerEvent
