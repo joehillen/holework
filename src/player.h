@@ -40,7 +40,7 @@ public:
     void updateHealth(short health);
 
     int id; // entity id
-    std::string username();
+    std::string name();
 
 private:
     /**
@@ -49,7 +49,7 @@ private:
      */
     void dispatch(network::Request::pointer packet);
 
-    std::string username_;
+    std::string name_;
 
 
     /* Position */

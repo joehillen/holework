@@ -37,7 +37,7 @@ Player::Player(boost::asio::io_service& io)
 
 void Player::log(std::string message)
 {
-    boostcraft::log(INFO, "Player: " + this->username_, message);
+    boostcraft::log(INFO, "Player: " + this->name_, message);
 }
 
 void Player::deliver(network::Response const& packet)
@@ -52,7 +52,7 @@ void Player::dispatch(network::Request::pointer packet)
 
     std::stringstream ss;
     ss << "Packet type: " << std::hex << (int)packet->type;
-    boostcraft::log(DEBUG, "Player: " + this->username_, ss.str());
+    boostcraft::log(DEBUG, "Player: " + this->name_, ss.str());
     switch(packet->type)
     {
     case REQUEST_KEEP_ALIVE:
@@ -61,10 +61,10 @@ void Player::dispatch(network::Request::pointer packet)
     case REQUEST_HANDSHAKE:
     {
         log("Got Handshake request.");
-        if (username_.empty())
+        if (name_.empty())
         {
-            this->username_ = ((HandshakeRequest*)p)->username;
-            log("Handshake request from " + this->username_);
+            this->name_ = ((HandshakeRequest*)p)->username;
+            log("Handshake request from " + this->name_);
             this->deliver(handshake("-"));
         }
         else
@@ -135,8 +135,8 @@ void Player::updateHealth(short health)
     }
 }
 
-std::string Player::username()
+std::string Player::name()
 {
-    return this->username_;
+    return this->name_;
 }
 } // end namespace

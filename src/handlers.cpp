@@ -84,7 +84,7 @@ void loginHandler(LoginRequestEvent& e)
     log(INFO, "loginhandler:", 
         boost::str(boost::format("Login request from %1%."
                     " Given entity id %2%") 
-                    % e.player.username() 
+                    % e.player.name() 
                     % e.player.id));
 
     Chunk chunk;
@@ -99,21 +99,21 @@ void loginHandler(LoginRequestEvent& e)
 void lookHandler(PlayerLookEvent& event)
 {
 //    std::stringstream str;
-//    str << event.player.username() << ": " << "Yaw: " << event.yaw << " Pitch: " << event.pitch;
+//    str << event.player.name() << ": " << "Yaw: " << event.yaw << " Pitch: " << event.pitch;
 //    log(DEBUG, "lookHandler", str.str());
 }
 
 void positionHandler(PlayerPositionEvent& event)
 {
     std::stringstream str;
-    str << event.player.username() << ": " << "X: " << event.x << " Z: " << event.z << " Y: " << event.y;
+    str << event.player.name() << ": " << "X: " << event.x << " Z: " << event.z << " Y: " << event.y;
     log(DEBUG, "positionHandler", str.str());
 }
 
 void ongroundHandler(PlayerOnGroundEvent& event)
 {
     std::stringstream str;
-    str << event.player.username() << ": " << "onground: " << event.on_ground;
+    str << event.player.name() << ": " << "onground: " << event.on_ground;
     log(DEBUG, "ongroundHandler", str.str());
 }
 
