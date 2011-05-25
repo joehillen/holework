@@ -18,9 +18,9 @@
 
 #include "response.h"
 #include "uniconv.h"
+#include "inetconv.h"
 
 #include <ostream>
-#include <netinet/in.h>
 
 #include <iostream>
 #include <boost/iostreams/device/back_inserter.hpp>
@@ -32,12 +32,6 @@
                       // on classes outside the network namespace should be
                       // promoted out of the network namespace, so that we only
                       // have downward dependencies
-
-uint64_t htonll(uint64_t n)
-{
-    return (((uint64_t)htonl(n)) << 32) | (htonl(n >> 32));
-}
-
 
 namespace boostcraft { namespace network { 
 
@@ -57,7 +51,7 @@ Response& operator<<(Response& os, uint8_t n)
 Response& operator<<(Response& os, uint16_t n)
 {
     std::ostream out(os.data.get());
-    n = htons(n);
+    n = ntoh(n);
     out.write((const char*)&n, 2);
     return os;
 }
@@ -65,7 +59,7 @@ Response& operator<<(Response& os, uint16_t n)
 Response& operator<<(Response& os, uint32_t n)
 {
     std::ostream out(os.data.get());
-    n = htonl(n);
+    n = ntoh(n);
     out.write((const char*)&n, 4);
     return os;
 }
@@ -73,7 +67,7 @@ Response& operator<<(Response& os, uint32_t n)
 Response& operator<<(Response& os, uint64_t n)
 {
     std::ostream out(os.data.get());
-    n = htonll(n);
+    n = ntoh(n);
     out.write((const char*)&n, 8);
     return os;
 }
@@ -81,7 +75,7 @@ Response& operator<<(Response& os, uint64_t n)
 Response& operator<<(Response& os, std::string const& s)
 {
     std::ostream out(os.data.get());
-    uint16_t len = htons(s.length());
+    uint16_t len = ntoh((uint16_t)s.length());
     out.write((const char*)&len, 2);
     out << s;
     return os;
@@ -90,7 +84,7 @@ Response& operator<<(Response& os, std::string const& s)
 Response& operator<<(Response& os, std::u16string const& s)
 {
     std::ostream out(os.data.get());
-    uint16_t len = htons(s.length());
+    uint16_t len = ntoh((uint16_t)s.length());
     out.write((const char*)&len, 2);
     out.write((const char*)s.c_str(), s.length()*sizeof(char16_t));
     return os;
@@ -99,6 +93,7 @@ Response& operator<<(Response& os, std::u16string const& s)
 Response& operator<<(Response& os, float n)
 {
     std::ostream out(os.data.get());
+    n = ntoh(n);
     out.write((const char*)&n, 4);
     return os;
 }
@@ -106,6 +101,7 @@ Response& operator<<(Response& os, float n)
 Response& operator<<(Response& os, double n)
 {
     std::ostream out(os.data.get());
+    n = ntoh(n);
     out.write((const char*)&n, 8);
     return os;
 }
