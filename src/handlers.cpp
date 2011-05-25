@@ -26,6 +26,9 @@ namespace boostcraft {
 void logHandler(LogEvent& event)
 {
     std::string type;
+    //Dear WinDevs, fix this!
+    std::string color = "";
+    std::string color_end = "\033[00m";
     
     switch (event.type)
     {
@@ -34,17 +37,21 @@ void logHandler(LogEvent& event)
             break;
         case WARN:
             type = "WARN";
+            color = "\033[01;33m"; //yellow
             break;
         case ERROR:
             type = "ERROR";
+            color = "\033[22;31m"; //red
             break;
         case DEBUG:
             type = "DEBUG";
+            color = "\033[22;32m"; //green
             break;
         default:
             type = "LOG";
     }
-    std::cout << type << ":" << event.source_name << ": "  << event.message << "\n";
+    std::cout << color << type << ":" << event.source_name << ": "
+        << event.message << color_end << std::endl; 
     // Now we sneakily cancel the event!
     event.canceled = true;
 }
