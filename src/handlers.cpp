@@ -57,26 +57,6 @@ void logHandler(LogEvent& event)
 }
 
 
-void sendSpawnStuff(Player& player)
-{
-    player.deliver(network::spawnresponse(10, 10, 100));
-
-    // HACK: send inventory
-    network::Response r;
-    r << (uint8_t)0x68;
-    r << (uint8_t)0;
-    r << (uint16_t)45;
-
-    for(int i = 0; i < 45; ++i) {
-        r << (uint16_t)331;
-        r << (uint8_t)2;
-        r << (uint16_t)0;
-    }
-    player.deliver(r);
-
-    player.deliver(network::positionlookresponse(0, 0, 200, 201.6, 512, 90, true));
-}
-
 void loginHandler(LoginRequestEvent& e)
 {
     e.player.id = newEntityID();
@@ -92,7 +72,34 @@ void loginHandler(LoginRequestEvent& e)
         for(int z = -8; z < 8; ++z)
             e.player.deliver(network::chunkresponse(x, z, chunk));
 
-    boostcraft::schedule(3000, boost::bind(sendSpawnStuff, boost::ref(e.player)));
+    //Send spawn info
+    std::stringstream ss;
+    ss << "Sending spawn to " << e.player.name();
+    log(DEBUG, "loginHandler", ss.str());
+    e.player.deliver(network::spawnresponse(10, 10, 100));
+
+    // HACK: send inventory
+    network::Response r;
+    r << (uint8_t)0x68;
+    r << (uint8_t)0;
+    r << (uint16_t)45;
+
+    for(int i = 0; i < 45; ++i) {
+        r << (uint16_t)331;
+        r << (uint8_t)2;
+        r << (uint16_t)0;
+    }
+    e.player.deliver(r);
+
+    e.player.deliver(network::positionlookresponse(
+        /*x*/0, 
+        /*z*/0, 
+        /*y*/200, 
+        /*stance*/201.6, 
+        /*yaw*/512, 
+        /*pitch*/90, 
+        /*on_ground*/true
+    ));
 }
 
 
