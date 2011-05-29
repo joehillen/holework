@@ -38,6 +38,7 @@ size_t readNumber(boost::asio::streambuf& buf, T& out)
 /**
  * Specialized numeric readers
  */
+size_t readBool(boost::asio::streambuf&, bool&);
 size_t readByte(boost::asio::streambuf&, int8_t&);
 size_t readShort(boost::asio::streambuf&, int16_t&);
 size_t readInt(boost::asio::streambuf&, int32_t&);

@@ -10,6 +10,12 @@ namespace boostcraft { namespace network {
  * Specialized number readers
  */
 
+size_t readBool(boost::asio::streambuf& buf, bool& out) {
+    int8_t temp;
+    size_t result = readNumber<int8_t>(buf, temp);
+    out = (temp != 0);
+    return result;
+}
 size_t readByte(boost::asio::streambuf& buf, int8_t& out) {
     return readNumber<int8_t>(buf, out);
 }
