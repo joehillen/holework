@@ -17,7 +17,6 @@
 *************************************************************************/
 
 #include "packetparser.h"
-#include "packet.h"
 
 #include <iostream>
 #include <iomanip>
@@ -40,50 +39,29 @@ boost::asio::streambuf& PacketParser::buffer()
 size_t PacketParser::done(const boost::system::error_code& error, 
                           size_t bytes_read)
 {
-    if (error) {
+    if (error) 
         return 0;
-    }
 
     if (buffer_.size() == 0)
         return buffer_.max_size();
 
-
-    if ( !packet )
+    if ( !packet_ )
     {
         uint8_t id = boost::asio::buffer_cast<const uint8_t*>(buffer_.data())[0];
         buffer_.consume(1);
-
-        std::pair<Request::pointer, std::list<PacketField::pointer> > packet_pair = packetFactory(id);
-        
-        packet = packet_pair.first;
-        fieldList = packet_pair.second;
+        packet_ = makerequest(id);
     }
 
-    if (fieldList.empty())
+    // Read whatever is available into the packet object
+    if (packet_->read(buffer_) == 0)
         return 0;
-    
-    size_t need = 0;
-
-    while (need == 0)
-    {
-        need = fieldList.front()->readFrom(buffer_);
-
-        if (need == 0)
-        {
-            fieldList.pop_front();
-            if (fieldList.empty())
-                return 0;
-        }
-    }
 
     return buffer_.max_size();
 }
 
-Request::pointer PacketParser::consumePacket()
+std::unique_ptr<Request> PacketParser::consumePacket()
 {
-   Request::pointer this_packet(this->packet);
-   this->packet.reset();
-   return this_packet;
+    return move(this->packet_);
 }
 
 
