@@ -71,7 +71,8 @@ void Player::dispatch(network::Request::pointer packet)
     }
     case REQUEST_LOGIN:
     {
-        LoginRequestEvent event(*this, *((network::LoginRequest*)p));
+        LoginRequest* pkt = (LoginRequest*)p;
+        LoginRequestEvent event(*this, pkt->username, pkt->protocolVersion);
         async_fire(event);
         break;
     }
