@@ -53,15 +53,15 @@ void Player::dispatch(network::Request const& packet)
 
 void Player::handshake(std::string const& username)
 {
-    if (username_.empty())
+    if (name_.empty())
     {
-        username_ = username;
+        name_ = username;
         deliver(network::handshake("-"));
-        log("Handshake request for user " + username_);
+        log("Handshake request for user " + name_);
     }
     else
     {
-        log("Received handshake " + username + " when username already set to " + username_);
+        log("Received handshake " + username + " when username already set to " + name_);
     }
 }
 
