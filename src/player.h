@@ -18,14 +18,14 @@
 #pragma once
 
 #include "network/connection.h"
-#include "network/packet.h"
-#include "network/response.h"
 
 #include <boost/asio.hpp>
 
-namespace boostcraft
-{
-
+namespace boostcraft {
+    namespace network {
+        class Request;
+        class Response;
+    }
 
 class Player : private network::Connection,
                public boost::enable_shared_from_this<Player>
@@ -35,6 +35,8 @@ public:
 
     void deliver(network::Response const& packet);
 
+    void handshake(std::string const& username);
+
     void updatePosition(double x, double y, double z);
     void updateLook(float yaw, float pitch);
     void updateHealth(short health);
@@ -43,14 +45,9 @@ public:
     std::string name();
 
 private:
-    /**
-     * Called from network layer to dispatch a packet received
-     * from the attached client.
-     */
-    void dispatch(network::Request::pointer packet);
+    void dispatch(network::Request const&);
 
     std::string name_;
-
 
     /* Position */
     double x_;

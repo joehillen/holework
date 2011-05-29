@@ -33,9 +33,7 @@
 
 namespace boostcraft { namespace network {
 
-// Forward declarations
 class Request;
-
 
 class Connection
     : public boost::enable_shared_from_this<Connection>
@@ -58,7 +56,6 @@ public:
      */
     void start();
 
-
     /**
      * Delivers a packet to the connected client.
      */
@@ -70,8 +67,8 @@ private:
     void handleRead(const boost::system::error_code& error, size_t bytes_read);
     void handleWrite(const boost::system::error_code& error, size_t bytes_written);
 
-    virtual void dispatch(Request::pointer packet) = 0;
-    
+    virtual void dispatch(Request const&) = 0;
+
     boost::asio::ip::tcp::socket soc;
     PacketParser parser;
     std::queue<Response> writeQueue;

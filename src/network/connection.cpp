@@ -76,10 +76,8 @@ void Connection::handleRead(const boost::system::error_code& error, size_t bytes
 {
     if (!error)
     {
-        Request::pointer packet = this->parser.consumePacket();
-
-        this->dispatch(packet);
-
+        auto packet = this->parser.consumePacket();
+        dispatch(*packet);
         startRead();
     }
     else

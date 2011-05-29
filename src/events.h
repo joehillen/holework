@@ -29,9 +29,6 @@ namespace boostcraft
 
 // Forward declarations
 class Player;
-namespace network {
-    class LoginRequest;
-}
 
 
 /**
@@ -110,10 +107,11 @@ struct LoginRequestEvent : public PlayerEvent
 {
     static boost::signals2::signal<void(LoginRequestEvent&)> signal;
 
-    network::LoginRequest& request;
+    int version;
+    std::string username;
 
-    LoginRequestEvent(Player& player, network::LoginRequest& request)
-        : PlayerEvent(player), request(request)
+    LoginRequestEvent(Player& player, std::string const& username, int version)
+        : PlayerEvent(player), version(version), username(username)
     {
     }
 };

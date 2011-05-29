@@ -17,14 +17,15 @@
 *************************************************************************/
 #pragma once
 
-#include "packet.h"
-#include "packetfield.h"
-
-#include <list>
 #include <boost/system/error_code.hpp>
 #include <boost/asio.hpp>
+#include <memory>
 
-namespace boostcraft { namespace network { 
+#include "request.h" // std::unique_ptr requires complete type :I
+
+namespace boostcraft { namespace network {
+
+class Request;
 
 /*
  * PacketParser facilitates the reading of Minecraft packets with boost::asio
@@ -37,17 +38,35 @@ class PacketParser
 public:
     PacketParser();
 
+    /**
+     * Function: buffer
+     *
+     * Returns a reference to the buffer used for this packet reader.
+     */
     boost::asio::streambuf& buffer();
 
+    /**
+     * Function: done
+     *
+     * Completion condition for use with boost::asio::async_read.
+     */
     size_t done(const boost::system::error_code& error, size_t bytes_read);
 
-    Request::pointer consumePacket();
+    /**
+     * Function: consumePacket
+     *
+     * Returns a pointer to the packet most recently completed by this reader;
+     * also nulls the internal packet pointer, preparing the reader to begin a
+     * fresh packet read.
+     * 
+     * Call this function ONCE each time the completion condition returns zero.
+     * Any other call will throw a (TODO) incomplete_request exception.
+     */
+    std::unique_ptr<Request> consumePacket();
 
 private:
     boost::asio::streambuf buffer_;
-
-    Request::pointer packet;
-    std::list<PacketField::pointer> fieldList;
+    std::unique_ptr<Request> packet_;
 };
 
 
