@@ -17,11 +17,6 @@ public:
     virtual ~Request() { }
 
     /**
-     * Factory method; returns a new empty Request object of the specified type
-     */
-    static std::unique_ptr<Request> create(int type);
-
-    /**
      * Virtual method: read
      *
      * Called to read the packet's contents from a streambuf. The buffer may or
@@ -48,7 +43,7 @@ public:
      * TODO: if we eliminate global event handling (which may be a good idea),
      *       this will need to take a reference to an event target of some kind
      */
-    virtual void dispatch(Player&) = 0;
+    virtual void dispatch(Player&) const = 0;
 
 /*
     Some thoughts:
@@ -62,4 +57,15 @@ protected:
     int fields_read_;
 };
 
+
+/**
+ * Function: makerequest
+ *
+ * A factory function that creates and returns a new empty Request object of
+ * the specified type.
+ */
+std::unique_ptr<Request> makerequest(int type);
+
+
 }} // namespace boostcraft::network
+

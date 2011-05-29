@@ -93,10 +93,8 @@ namespace packets {
  */
 struct KeepAlive : public Request
 {
-    BEGIN_FIELDS
-    END_FIELDS
-
-    void dispatch(Player& p)
+    size_t read(boost::asio::streambuf&) { return 0; }
+    void dispatch(Player& p) const
     {
         // No event dispatch on keepalive; just ping back
         p.deliver(keepalive());
@@ -120,7 +118,7 @@ struct LoginRequest : public Request
         BYTE        (dimension)
     END_FIELDS
 
-    void dispatch(Player& p)
+    void dispatch(Player& p) const
     {
         LoginRequestEvent e(p, username, version);
         async_fire(e);
@@ -138,9 +136,9 @@ struct Handshake : public Request
         STRING_UCS2 (username)
     END_FIELDS
 
-    void dispatch(Player& p)
+    void dispatch(Player& p) const
     {
-        // TODO: p.handshake(username);
+        p.handshake(username);
     }
 };
 
@@ -155,7 +153,7 @@ struct Respawn : public Request
         BYTE        (world)
     END_FIELDS
 
-    void dispatch(Player& p)
+    void dispatch(Player& p) const
     {
         // TODO: respawn event
     }
@@ -164,14 +162,15 @@ struct Respawn : public Request
 /*
  * 0x0A PLAYER ONGROUND
  */
-struct OnGround : public Request
+struct PlayerOnGround : public Request
 {
     bool onground;
+
     BEGIN_FIELDS
         BOOLEAN     (onground)
     END_FIELDS
 
-    void dispatch(Player& p)
+    void dispatch(Player& p) const
     {
         PlayerOnGroundEvent e(p, onground);
         async_fire(e);
@@ -194,7 +193,7 @@ struct PlayerPosition : public Request
         BOOLEAN     (onground)
     END_FIELDS
 
-    void dispatch(Player& p)
+    void dispatch(Player& p) const
     {
         PlayerOnGroundEvent g(p, onground);
         async_fire(g);
@@ -215,7 +214,7 @@ struct PlayerLook : public Request
         BOOLEAN     (onground)
     END_FIELDS
 
-    void dispatch(Player& p)
+    void dispatch(Player& p) const
     {
         PlayerOnGroundEvent g(p, onground);
         async_fire(g);
@@ -244,7 +243,7 @@ struct PlayerPositionAndLook : public Request
         BOOLEAN     (onground)
     END_FIELDS
 
-    void dispatch(Player &p)
+    void dispatch(Player &p) const
     {
         PlayerOnGroundEvent g(p, onground);
         async_fire(g);
@@ -260,5 +259,31 @@ struct PlayerPositionAndLook : public Request
 
 } // namespace packets
 
+#define REQUEST_CASE(num, type) case num: return ptr(new type());
+
+std::unique_ptr<Request> makerequest(int type)
+{
+    typedef std::unique_ptr<Request> ptr;
+    using namespace packets;
+
+    switch(type)
+    {
+        REQUEST_CASE(0x00, KeepAlive)
+        REQUEST_CASE(0x01, LoginRequest)
+        REQUEST_CASE(0x02, Handshake)
+        REQUEST_CASE(0x09, Respawn)
+        REQUEST_CASE(0x0A, PlayerOnGround)
+        REQUEST_CASE(0x0B, PlayerPosition)
+        REQUEST_CASE(0x0C, PlayerLook)
+        REQUEST_CASE(0x0D, PlayerPositionAndLook)
+
+    default:
+        {
+            std::stringstream ss;
+            ss << "Unrecognized packet ID " << std::hex << type;
+            throw std::runtime_error(ss.str());
+        }
+    }
+}
 
 }} // namespace boostcraft::network
