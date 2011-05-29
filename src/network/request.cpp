@@ -2,7 +2,10 @@
 //
 #include "request.h"
 #include "requestfields.h"
+
+#include "../player.h"
 #include "../events.h"
+#include "response.h"
 
 #include <string>
 
@@ -73,6 +76,7 @@ namespace boostcraft { namespace network {
 #define END_FIELDS          return 0; \
                         }
 
+#define BOOLEAN(v)  FIELD(readBool, v)
 #define BYTE(v)     FIELD(readByte, v)
 #define SHORT(v)    FIELD(readShort, v)
 #define INT(v)      FIELD(readInt, v)
@@ -82,7 +86,26 @@ namespace boostcraft { namespace network {
 #define STRING_UTF8(v) FIELD(readStringUtf8, v)
 #define STRING_UCS2(v) FIELD(readStringUcs2, v)
 
+namespace packets {
 
+/*
+ * 0x00 KEEP ALIVE
+ */
+struct KeepAlive : public Request
+{
+    BEGIN_FIELDS
+    END_FIELDS
+
+    void dispatch(Player& p)
+    {
+        // No event dispatch on keepalive; just ping back
+        p.deliver(keepalive());
+    }
+};
+
+/*
+ * 0x01 LOGIN REQUEST
+ */
 struct LoginRequest : public Request
 {
     int32_t version;
@@ -97,12 +120,145 @@ struct LoginRequest : public Request
         BYTE        (dimension)
     END_FIELDS
 
-    void dispatch()
+    void dispatch(Player& p)
     {
-        //LoginEvent e(version, username, seed, dimension);
-        //async_fire(e);
+        LoginRequestEvent e(p, username, version);
+        async_fire(e);
     }
 };
+
+/*
+ * 0x02 HANDSHAKE
+ */
+struct Handshake : public Request
+{
+    std::string username;
+
+    BEGIN_FIELDS
+        STRING_UCS2 (username)
+    END_FIELDS
+
+    void dispatch(Player& p)
+    {
+        // TODO: p.handshake(username);
+    }
+};
+
+/*
+ * 0x09 RESPAWN
+ */
+struct Respawn : public Request
+{
+    int8_t world;
+
+    BEGIN_FIELDS
+        BYTE        (world)
+    END_FIELDS
+
+    void dispatch(Player& p)
+    {
+        // TODO: respawn event
+    }
+};
+
+/*
+ * 0x0A PLAYER ONGROUND
+ */
+struct OnGround : public Request
+{
+    bool onground;
+    BEGIN_FIELDS
+        BOOLEAN     (onground)
+    END_FIELDS
+
+    void dispatch(Player& p)
+    {
+        PlayerOnGroundEvent e(p, onground);
+        async_fire(e);
+    }
+};
+
+/*
+ * 0x0B PLAYER POSITION
+ */
+struct PlayerPosition : public Request
+{
+    double x, y, z, stance;
+    bool onground;
+
+    BEGIN_FIELDS
+        DOUBLE      (x)
+        DOUBLE      (y)
+        DOUBLE      (stance)
+        DOUBLE      (z)
+        BOOLEAN     (onground)
+    END_FIELDS
+
+    void dispatch(Player& p)
+    {
+        PlayerOnGroundEvent g(p, onground);
+        async_fire(g);
+    }
+};
+
+/*
+ * 0x0C PLAYER LOOK 
+ */
+struct PlayerLook : public Request
+{
+    float pitch, yaw;
+    bool onground;
+
+    BEGIN_FIELDS
+        FLOAT       (yaw)
+        FLOAT       (pitch)
+        BOOLEAN     (onground)
+    END_FIELDS
+
+    void dispatch(Player& p)
+    {
+        PlayerOnGroundEvent g(p, onground);
+        async_fire(g);
+
+        PlayerLookEvent e(p, yaw, pitch);
+        async_fire(e);
+    }
+};
+
+/*
+ * 0x0D PLAYER POSITION AND LOOK
+ */
+struct PlayerPositionAndLook : public Request
+{
+    double x, y, z, stance;
+    float pitch, yaw;
+    bool onground;
+
+    BEGIN_FIELDS
+        DOUBLE      (x)
+        DOUBLE      (y)
+        DOUBLE      (stance)
+        DOUBLE      (z)
+        FLOAT       (yaw)
+        FLOAT       (pitch)
+        BOOLEAN     (onground)
+    END_FIELDS
+
+    void dispatch(Player &p)
+    {
+        PlayerOnGroundEvent g(p, onground);
+        async_fire(g);
+
+        PlayerLookEvent l(p, yaw, pitch);
+        async_fire(l);
+
+        PlayerPositionEvent e(p, x, z, y);
+        async_fire(e);
+    }
+};
+
+
+} // namespace packets
 
 
 }} // namespace boostcraft::network

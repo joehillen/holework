@@ -6,18 +6,20 @@
 #include <memory>
 #include <boost/asio.hpp>
 
-namespace boostcraft { namespace network {
+namespace boostcraft { 
+    // Forward declaration
+    class Player;
+    namespace network {
 
 class Request
 {
 public:
-    typedef std::shared_ptr<Request> ptr;
     virtual ~Request() { }
 
     /**
      * Factory method; returns a new empty Request object of the specified type
      */
-    static ptr create(int type);
+    static std::unique_ptr<Request> create(int type);
 
     /**
      * Virtual method: read
@@ -46,7 +48,15 @@ public:
      * TODO: if we eliminate global event handling (which may be a good idea),
      *       this will need to take a reference to an event target of some kind
      */
-    virtual void dispatch() = 0;
+    virtual void dispatch(Player&) = 0;
+
+/*
+    Some thoughts:
+
+    Perhaps dispatching should still be delegated through player? The current
+    setup cuts Player out of the loop a bit.
+
+*/
 
 protected:
     int fields_read_;
