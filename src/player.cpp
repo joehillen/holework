@@ -17,10 +17,11 @@
 *************************************************************************/
 
 #include "player.h"
-#include "network/packet.h"
-#include "network/connection.h"
+
 #include "events.h"
 #include "log.h"
+#include "network/connection.h"
+#include "network/request.h"
 
 #define MAX_DELTA 10000 //change this or make it configurable?
 
@@ -43,61 +44,22 @@ void Player::deliver(network::Response const& packet)
     Connection::deliver(packet);
 }
 
-void Player::dispatch(network::Request::pointer packet)
+void Player::dispatch(network::Request const& packet)
 {
-    using namespace network;
-    Request* p = packet.get();
+    packet.dispatch(*this);
+}
 
-    std::cout << "Packet type: " << std::hex << (int)packet->type << std::endl;
-    switch(packet->type)
+void Player::handshake(std::string const& username)
+{
+    if (username_.empty())
     {
-    case REQUEST_KEEP_ALIVE:
-        this->deliver(keepalive());
-        break;
-    case REQUEST_HANDSHAKE:
-    {
-        log("Got Handshake request.");
-        if (username_.empty())
-        {
-            this->username_ = ((HandshakeRequest*)p)->username;
-            log("Handshake request from " + this->username_);
-            this->deliver(handshake("-"));
-        }
-        else
-        {
-            log("Username is already set.");
-        }
-        break;
+        username_ = username;
+        deliver(network::handshake("-"));
+        log("Handshake request for user " + username_);
     }
-    case REQUEST_LOGIN:
+    else
     {
-        LoginRequest* pkt = (LoginRequest*)p;
-        LoginRequestEvent event(*this, pkt->username, pkt->protocolVersion);
-        async_fire(event);
-        break;
-    }
-    case REQUEST_POSITION:
-    {
-        PositionRequest* pkt =  (network::PositionRequest*)p;
-        PlayerPositionEvent event_pos(*this, pkt->x, pkt->z, pkt->y);
-        async_fire(event_pos);
-        PlayerOnGroundEvent event_onground(*this, (bool)pkt->on_ground);
-        async_fire(event_onground);
-        break;
-    }
-    case REQUEST_POSITION_AND_LOOK:
-    {
-        PositionLookRequest* pkt =  (network::PositionLookRequest*)p;
-        PlayerLookEvent event_look(*this, pkt->yaw, pkt->pitch);
-        async_fire(event_look);
-        PlayerPositionEvent event_pos(*this, pkt->x, pkt->z, pkt->y);
-        async_fire(event_pos);
-        PlayerOnGroundEvent event_onground(*this, (bool)pkt->on_ground);
-        async_fire(event_onground);
-        break;
-    }
-    default:
-        std::cout << "Unhandled packet!\n";
+        log("Received handshake " + username + " when username already set to " + username_);
     }
 }
 
@@ -136,4 +98,5 @@ std::string Player::username()
 {
     return this->username_;
 }
-} // end namespace
+
+} // end namespace boostcraft
