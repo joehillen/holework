@@ -256,6 +256,100 @@ struct PlayerPositionAndLook : public Request
     }
 };
 
+/*
+ * 0x0E PLAYER DIGGING
+ */
+struct Digging : public Request
+{
+    int8_t status;
+    int32_t x;
+    int8_t  y;
+    int32_t z;
+    int8_t face;
+
+    BEGIN_FIELDS
+        BYTE        (status)
+        INT         (x)
+        BYTE        (y)
+        INT         (z)
+        BYTE        (face)
+    END_FIELDS
+
+    void dispatch(Player &p) const
+    {
+        if (status == 0)
+            p.deliver(chatmessage("I'm a dwarf and I'm digging a hole!"));
+        else if (status == 2)
+            p.deliver(chatmessage("Diggy diggy hole!"));
+        else if (status == 4)
+            p.deliver(chatmessage("Give a hoot; don't pollute!"));
+    }
+};
+
+/*
+ * 0x0F PLAYER BLOCK PLACEMENT
+ */
+struct BlockPlacement : public Request
+{
+    int32_t x, z;
+    int8_t y;
+    int8_t direction;
+    int16_t itemid;
+    int8_t amount;
+    int16_t damage;
+
+    BEGIN_FIELDS
+        INT         (x)
+        BYTE        (y)
+        INT         (z)
+        BYTE        (direction)
+        SHORT       (itemid)
+        // TODO: optional fields
+        BYTE        (amount)
+        SHORT       (damage)
+    END_FIELDS
+
+    void dispatch(Player& p) const
+    {
+
+    }
+};
+
+/*
+ * 0x10 HOLDING CHANGE
+ */
+struct HoldingChange : public Request
+{
+    int16_t slot;
+
+    BEGIN_FIELDS
+       SHORT        (slot)
+    END_FIELDS
+
+    void dispatch(Player &p) const
+    {
+
+    }
+};
+
+/*
+ * 0x12 ENTITY ANIMATION
+ */
+struct Animation : public Request
+{
+    int32_t eid;
+    int8_t anim;
+
+    BEGIN_FIELDS
+        INT         (eid)
+        BYTE        (anim)
+    END_FIELDS
+
+    void dispatch(Player &p) const
+    {
+    }
+};
+
 
 } // namespace packets
 
@@ -276,6 +370,10 @@ std::unique_ptr<Request> makerequest(int type)
         REQUEST_CASE(0x0B, PlayerPosition)
         REQUEST_CASE(0x0C, PlayerLook)
         REQUEST_CASE(0x0D, PlayerPositionAndLook)
+        REQUEST_CASE(0x0E, Digging)
+        REQUEST_CASE(0x0F, BlockPlacement)
+        REQUEST_CASE(0x10, HoldingChange)
+        REQUEST_CASE(0x12, Animation)
 
     default:
         {
