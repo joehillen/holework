@@ -67,16 +67,19 @@ int main(int argc, char** argv)
     listen(positionHandler);
     listen(ongroundHandler);
 
-    try
-    {
-        tcp::endpoint endpoint(tcp::v4(), 25565);
-        TcpServer server(io_service(), endpoint);
 
-        io_service().run();
-    }
-    catch (std::exception& e)
+    tcp::endpoint endpoint(tcp::v4(), 25565);
+    TcpServer server(io_service(), endpoint);
+
+    while(true)
     {
-        std::cerr << e.what() << std::endl;
+        try {
+            io_service().run();
+            break;
+        }
+        catch (std::exception& e) {
+            std::cerr << e.what() << std::endl;
+        }
     }
     return 0;
 }

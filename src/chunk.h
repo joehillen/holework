@@ -63,7 +63,8 @@ private:
             for(int z = 0; z < size_z; ++z)
             {
                 int index = z * size_y + (x * size_y * size_z);
-                this->blocks[index] = 1;
+                this->blocks[index] = 12;
+                this->blocks[index+1] = 8;
                 this->skylight[index/2] = 0xff;
             }
         }
