@@ -117,7 +117,7 @@ Response chatmessage(std::string const& msg)
 {
     Response r;
     r << (uint8_t)RESPONSE_CHAT;
-    r << msg;
+    r << utf8toucs2(msg);
     return r;
 }
 
