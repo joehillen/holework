@@ -43,8 +43,8 @@ public:
 
     friend class TcpServer;
 
-    // TODO: maybe make private?
     Connection(boost::asio::io_service& io);
+    virtual ~Connection() { }
 
     /**
      * Returns the socket associated with this connection.
