@@ -61,7 +61,7 @@ size_t PacketParser::done(const boost::system::error_code& error,
 
 std::unique_ptr<Request> PacketParser::consumePacket()
 {
-    return move(this->packet_);
+    return std::move(this->packet_);
 }
 
 
