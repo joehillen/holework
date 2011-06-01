@@ -143,6 +143,49 @@ struct Handshake : public Request
 };
 
 /*
+ * 0x03 CHAT MESSAGE
+ */
+struct ChatMessage : public Request
+{
+    std::string message;
+
+    BEGIN_FIELDS
+        STRING_UCS2 (message)
+    END_FIELDS
+
+    void dispatch(Player& p) const
+    {
+        ChatEvent e(p, message);
+        async_fire(e); 
+
+        // Temporary hack :P
+        p.deliver(chatmessage(
+          "<" + p.name() + "> " + message));
+    }
+};
+
+/*
+ * 0x07 USE ENTITY
+ */
+struct UseEntity : public Request
+{
+    int32_t user;
+    int32_t target;
+    bool leftclick;
+
+    BEGIN_FIELDS
+        INT         (user)
+        INT         (target)
+        BOOLEAN     (leftclick)
+    END_FIELDS
+
+    void dispatch(Player& p) const
+    {
+        // TODO: implement dispatch
+    }
+};
+
+/*
  * 0x09 RESPAWN
  */
 struct Respawn : public Request
@@ -304,6 +347,8 @@ struct BlockPlacement : public Request
         INT         (z)
         BYTE        (direction)
         SHORT       (itemid)
+        if (cur_field == 5 && itemid == -1)
+            return 0;
         // TODO: optional fields
         BYTE        (amount)
         SHORT       (damage)
@@ -328,7 +373,12 @@ struct HoldingChange : public Request
 
     void dispatch(Player &p) const
     {
-
+        // TODO: implement dispatch
+        Response r;
+        r << (uint8_t)0x36;
+        r << (uint32_t)0 << (uint16_t)1 << (uint32_t)0;
+        r << (uint8_t)0 << (uint8_t)16;
+        p.deliver(r);
     }
 };
 
@@ -347,6 +397,26 @@ struct Animation : public Request
 
     void dispatch(Player &p) const
     {
+        // TODO: implement dispatch
+    }
+};
+
+/*
+ * 0x13 STANCE CHANGE
+ */
+struct Stance : public Request
+{
+    int32_t eid;
+    int8_t action;  // 1 = crouch, 2 = uncrouch, 3 = leave bed
+
+    BEGIN_FIELDS
+        INT         (eid)
+        BYTE        (action)
+    END_FIELDS
+
+    void dispatch(Player &p) const
+    {
+        // TODO: implement dispatch
     }
 };
 
@@ -365,6 +435,8 @@ std::unique_ptr<Request> makerequest(int type)
         REQUEST_CASE(0x00, KeepAlive)
         REQUEST_CASE(0x01, LoginRequest)
         REQUEST_CASE(0x02, Handshake)
+        REQUEST_CASE(0x03, ChatMessage)
+        REQUEST_CASE(0x07, UseEntity)
         REQUEST_CASE(0x09, Respawn)
         REQUEST_CASE(0x0A, PlayerOnGround)
         REQUEST_CASE(0x0B, PlayerPosition)
@@ -374,6 +446,7 @@ std::unique_ptr<Request> makerequest(int type)
         REQUEST_CASE(0x0F, BlockPlacement)
         REQUEST_CASE(0x10, HoldingChange)
         REQUEST_CASE(0x12, Animation)
+        REQUEST_CASE(0x13, Stance)
 
     default:
         {
