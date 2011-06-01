@@ -51,6 +51,7 @@ void schedule(unsigned int ms, boost::function<void()> callback)
 }
 
 boost::signals2::signal<void(LoginRequestEvent&)> LoginRequestEvent::signal;
+boost::signals2::signal<void(ChatEvent&)> ChatEvent::signal;
 boost::signals2::signal<void(LogEvent&)> LogEvent::signal;
 boost::signals2::signal<void(PlayerNeedsChunkEvent&)> PlayerNeedsChunkEvent::signal;
 boost::signals2::signal<void(PlayerLookEvent&)> PlayerLookEvent::signal;

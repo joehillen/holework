@@ -116,6 +116,18 @@ struct LoginRequestEvent : public PlayerEvent
     }
 };
 
+struct ChatEvent : public PlayerEvent
+{
+    static boost::signals2::signal<void(ChatEvent&)> signal;
+
+    std::string message;
+
+    ChatEvent(Player& player, std::string const& msg)
+        : PlayerEvent(player), message(msg)
+    {
+    }
+};
+
 struct PlayerNeedsChunkEvent : public PlayerEvent
 {
     static boost::signals2::signal<void(PlayerNeedsChunkEvent&)> signal;
