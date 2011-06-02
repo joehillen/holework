@@ -33,8 +33,7 @@ namespace boostcraft
 
 Player::Player(boost::asio::io_service& io)
     : Connection(io),
-      timer_(new interval_timer(
-           5000, std::bind(&Player::deliver, this, network::keepalive())))
+      timer_(0)
 {
 }
 
@@ -60,6 +59,12 @@ void Player::handshake(std::string const& username)
         name_ = username;
         deliver(network::handshake("-"));
         log("Handshake request for user " + name_);
+
+        // Initialize the keepalive timer
+        timer_.reset(new interval_timer(5000,
+            [this]() {
+                this->deliver(network::keepalive());
+            }));
     }
     else
     {
