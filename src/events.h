@@ -212,7 +212,7 @@ boost::function<void(EventType&)> wrapper(
 }
 
 
-/**
+/******************************************************************************
  * Function: listen( callback )
  *
  * Registers an event listener function, to be called whenever the appropriate
@@ -243,7 +243,7 @@ void listen(void (*callback)(EventType&))
 }
 
 
-/**
+/******************************************************************************
  * Function: listen_always( callback )
  *
  * Registers an event listener function, as per listen, with the distinction
@@ -262,7 +262,7 @@ void listen_always(void (*callback)(EventType&))
     EventType::signal.connect(callback);
 }
 
-/**
+/******************************************************************************
  * Function: fire
  *
  * Fires an event object, calling all listener functions that are registered to
@@ -274,7 +274,7 @@ void fire(EventType& e)
     EventType::signal(e);
 }
 
-/**
+/******************************************************************************
  * Function: async_fire
  *
  * Fires an event asynchronously. This function returns immediately, and the
@@ -289,12 +289,48 @@ void async_fire(EventType& e)
     io_service().post(boost::bind(boost::ref(EventType::signal), e));
 }
 
-/**
+/******************************************************************************
  * Function: schedule
  *
  * Schedules a callback to be run in the specified number of milliseconds.
+ *
+ * WARNING: if the specified callback accesses any objects by reference or
+ *  pointer, you must ensure that it is impossible for those objects to be
+ *  destroyed before the interval expires. TODO: provide some way to cancel
+ *  a pending timeout.
  */
 void schedule(unsigned int ms, boost::function<void()> callback);
+
+/******************************************************************************
+ * Class: interval_timer
+ *
+ * Runs a callback at a specified regular interval, automatically canceling
+ * the interval when the interval_timer is destroyed.
+ */
+class interval_timer
+{
+public:
+    /**
+     * Constructor parameters:
+     *  ms      Duration of interval, in milliseconds
+     *  cb      void() callback function to be called
+     *
+     * Remarks:
+     *  The first invocation of the callback will be `ms` milliseconds after
+     *  the call to the constructor. The callback will then be invoked every
+     *  `ms` milliseconds thereafter until this object is destroyed. No calls
+     *  will occur after the object is destroyed. 
+     */
+    interval_timer(unsigned int ms, std::function<void()> const& cb);
+    ~interval_timer();
+
+private:
+    unsigned int ms_;
+    std::function<void()> cb_;
+    boost::asio::deadline_timer timer_;
+
+    void fire();
+};
 
 } // end namespace boostcraft
 

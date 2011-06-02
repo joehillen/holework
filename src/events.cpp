@@ -20,6 +20,8 @@
 
 #include <memory>
 
+
+#include <iostream>
 namespace boostcraft {
 
 boost::asio::io_service the_service;
@@ -52,6 +54,40 @@ void schedule(unsigned int ms, boost::function<void()> callback)
     timer->async_wait(boost::bind(timeout_wrapper, timer, callback));
 }
 
+
+/******************************************************************************
+ * interval_timer implementation
+ */
+
+interval_timer::interval_timer(
+        unsigned int ms, std::function<void()> const& cb)
+    : ms_(ms), cb_(cb), timer_(io_service())
+{
+    timer_.expires_from_now(boost::posix_time::milliseconds(ms_));
+    timer_.async_wait(std::bind(&interval_timer::fire, this));
+}
+
+interval_timer::~interval_timer()
+{
+}
+
+void interval_timer::fire()
+{
+    std::cout << "Firing interval_timer...\n";
+    cb_();
+    timer_.expires_from_now(boost::posix_time::milliseconds(ms_));
+    timer_.async_wait(std::bind(&interval_timer::fire, this));
+}
+
+
+
+/******************************************************************************
+ * Event class signal initialization
+ *
+ * TODO: might be able to remove all this manual initialization with
+ *         some clever templating
+ * TODO: move event types stuff to a different file, at any rate
+ */
 boost::signals2::signal<void(LoginRequestEvent&)> LoginRequestEvent::signal;
 boost::signals2::signal<void(ChatEvent&)> ChatEvent::signal;
 boost::signals2::signal<void(LogEvent&)> LogEvent::signal;
