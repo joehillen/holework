@@ -18,6 +18,8 @@
 
 #include "events.h"
 
+#include <memory>
+
 namespace boostcraft {
 
 boost::asio::io_service the_service;
@@ -34,7 +36,7 @@ boost::asio::io_service& io_service()
  * The only purpose of this function is to bind a deadline_timer to its
  * associated callback, so that the timer is not destroyed before it expires.
  */
-void timeout_wrapper(boost::shared_ptr<boost::asio::deadline_timer> timer,
+void timeout_wrapper(std::shared_ptr<boost::asio::deadline_timer> timer,
         boost::function<void()> callback)
 {
     callback();
@@ -42,7 +44,7 @@ void timeout_wrapper(boost::shared_ptr<boost::asio::deadline_timer> timer,
 
 void schedule(unsigned int ms, boost::function<void()> callback)
 {
-    boost::shared_ptr<boost::asio::deadline_timer>
+    std::shared_ptr<boost::asio::deadline_timer>
         timer(new boost::asio::deadline_timer(io_service()));
 
     timer->expires_from_now(boost::posix_time::milliseconds(ms));
