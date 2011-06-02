@@ -20,12 +20,19 @@
 #include "network/connection.h"
 
 #include <boost/asio.hpp>
+#include <memory>
 
+// Forward declarations
 namespace boostcraft {
     namespace network {
         class Request;
         class Response;
     }
+    class interval_timer;
+}
+
+
+namespace boostcraft{
 
 class Player : private network::Connection,
                public boost::enable_shared_from_this<Player>
@@ -67,6 +74,8 @@ private:
     double spawn_x_;
     double spawn_z_;
     double spawn_y_;
+
+    std::unique_ptr<interval_timer> timer_;
 
     void log(std::string message);
 };

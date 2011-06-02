@@ -22,6 +22,7 @@
 #include "log.h"
 #include "network/connection.h"
 #include "network/request.h"
+#include "network/response.h"
 
 #include <sstream>
 
@@ -31,9 +32,10 @@ namespace boostcraft
 {
 
 Player::Player(boost::asio::io_service& io)
-    : Connection(io)
+    : Connection(io),
+      timer_(new interval_timer(
+           5000, std::bind(&Player::deliver, this, network::keepalive())))
 {
-    
 }
 
 void Player::log(std::string message)
