@@ -19,6 +19,7 @@
 #pragma once
 
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 #include <queue>
@@ -28,12 +29,10 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
-#include "packetparser.h"
 #include "response.h"
+#include "request.h"
 
 namespace boostcraft { namespace network {
-
-class Request;
 
 class Connection
     : public boost::enable_shared_from_this<Connection>
@@ -64,13 +63,15 @@ public:
 
 private:
     void startRead();
-    void handleRead(const boost::system::error_code& error, size_t bytes_read);
-    void handleWrite(const boost::system::error_code& error, size_t bytes_written);
+    void handleRead(boost::system::error_code const& error, size_t bytes_read);
+    void handleWrite(boost::system::error_code const& error, size_t bytes_written);
+    size_t readPacket(boost::system::error_code const& error, size_t bytes_read);
 
     virtual void dispatch(Request const&) = 0;
 
     boost::asio::ip::tcp::socket soc;
-    PacketParser parser;
+    boost::asio::streambuf buffer;
+    std::unique_ptr<Request> packet;
     std::queue<Response> writeQueue;
 };
 
