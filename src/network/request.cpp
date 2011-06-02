@@ -241,6 +241,9 @@ struct PlayerPosition : public Request
     {
         PlayerOnGroundEvent g(p, onground);
         async_fire(g);
+
+        PlayerPositionEvent e(p, x, z, y);
+        async_fire(e);
     }
 };
 
