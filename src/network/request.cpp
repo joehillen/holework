@@ -61,6 +61,7 @@ namespace boostcraft { namespace network {
  *      END_FIELDS
  *  };
  */
+
 #define BEGIN_FIELDS    size_t read(boost::asio::streambuf & buf) \
                         { \
                             int cur_field = 0; \
@@ -347,11 +348,10 @@ struct BlockPlacement : public Request
         INT         (z)
         BYTE        (direction)
         SHORT       (itemid)
-        if (cur_field == 5 && itemid == -1)
-            return 0;
-        // TODO: optional fields
-        BYTE        (amount)
-        SHORT       (damage)
+        if (itemid != -1) {
+            BYTE        (amount)
+            SHORT       (damage)
+        }
     END_FIELDS
 
     void dispatch(Player& p) const
