@@ -18,10 +18,9 @@
 
 #include "events.h"
 
+#include <functional>
 #include <memory>
 
-
-#include <iostream>
 namespace boostcraft {
 
 boost::asio::io_service the_service;
@@ -64,19 +63,26 @@ interval_timer::interval_timer(
     : ms_(ms), cb_(cb), timer_(io_service())
 {
     timer_.expires_from_now(boost::posix_time::milliseconds(ms_));
-    timer_.async_wait(std::bind(&interval_timer::fire, this));
+    timer_.async_wait(boost::bind(
+                &interval_timer::fire, this,
+                boost::asio::placeholders::error));
 }
 
 interval_timer::~interval_timer()
 {
+    timer_.cancel();
 }
 
-void interval_timer::fire()
+void interval_timer::fire(boost::system::error_code const& error)
 {
-    std::cout << "Firing interval_timer...\n";
-    cb_();
-    timer_.expires_from_now(boost::posix_time::milliseconds(ms_));
-    timer_.async_wait(std::bind(&interval_timer::fire, this));
+    if(!error)
+    {
+        cb_();
+        timer_.expires_from_now(boost::posix_time::milliseconds(ms_));
+        timer_.async_wait(boost::bind(
+                    &interval_timer::fire, this,
+                    boost::asio::placeholders::error));
+    }
 }
 
 

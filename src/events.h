@@ -324,12 +324,15 @@ public:
     interval_timer(unsigned int ms, std::function<void()> const& cb);
     ~interval_timer();
 
+    interval_timer(interval_timer const&) = delete;
+    void operator=(interval_timer const&) = delete;
+
 private:
     unsigned int ms_;
     std::function<void()> cb_;
     boost::asio::deadline_timer timer_;
 
-    void fire();
+    void fire(boost::system::error_code const&);
 };
 
 } // end namespace boostcraft
