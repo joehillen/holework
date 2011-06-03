@@ -35,7 +35,7 @@ namespace boostcraft {
 namespace boostcraft{
 
 class Player : private network::Connection,
-               public boost::enable_shared_from_this<Player>
+               public std::enable_shared_from_this<Player>
 {
 public:
     Player(boost::asio::io_service& io); 

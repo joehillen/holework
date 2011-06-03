@@ -25,9 +25,6 @@
 #include <queue>
 
 #include <boost/asio.hpp>
-#include <boost/bind.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/enable_shared_from_this.hpp>
 
 #include "response.h"
 #include "request.h"
@@ -35,10 +32,10 @@
 namespace boostcraft { namespace network {
 
 class Connection
-    : public boost::enable_shared_from_this<Connection>
+    : public std::enable_shared_from_this<Connection>
 {
 public:
-    typedef boost::shared_ptr<Connection> pointer;
+    typedef std::shared_ptr<Connection> pointer;
 
     friend class TcpServer;
 
@@ -60,6 +57,11 @@ public:
      */
     void deliver(Response const&);
 
+    /**
+     * Disable copying and assignment
+     */
+    Connection(Connection const&) = delete; 
+    Connection& operator=(Connection const&) = delete;
 
 private:
     void startRead();

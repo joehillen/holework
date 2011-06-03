@@ -23,9 +23,6 @@
 #include <vector>
 
 #include <boost/asio.hpp>
-#include <boost/bind.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/enable_shared_from_this.hpp>
 
 #include "../log.h"
 
@@ -51,20 +48,15 @@ void Connection::start()
 void Connection::startRead()
 {
     using namespace boost::asio;
-    using namespace boost::system;
-    using boost::bind;
+    using namespace std::placeholders;
 
     async_read(this->soc,
         /* buffer */
         this->buffer,
         /* completion condition */
-        bind(&Connection::readPacket, this,
-            boost::asio::placeholders::error,
-            boost::asio::placeholders::bytes_transferred),
+        std::bind(&Connection::readPacket, this, _1, _2),
         /* read handler */
-        bind(&Connection::handleRead, shared_from_this(),
-            boost::asio::placeholders::error,
-            boost::asio::placeholders::bytes_transferred));
+        std::bind(&Connection::handleRead, shared_from_this(), _1, _2));
 }
 
 /*
@@ -115,16 +107,19 @@ void Connection::handleRead(boost::system::error_code const& error,
 void Connection::handleWrite(boost::system::error_code const& error, 
         size_t bytes_written)
 {
+    using namespace std::placeholders;
+
+    // Clear the write that just completed
     writeQueue.pop();
     if (!error)
     {
+        // Continue with any pending write
         if (!writeQueue.empty())
         {
             async_write(this->soc,
                 writeQueue.front().buffer(),
-                bind(&Connection::handleWrite, shared_from_this(),
-                    boost::asio::placeholders::error,
-                    boost::asio::placeholders::bytes_transferred));
+                /* write completion handler */
+                std::bind(&Connection::handleWrite, shared_from_this(), _1, _2));
         }
     }
     else
@@ -136,15 +131,18 @@ void Connection::handleWrite(boost::system::error_code const& error,
 
 void Connection::deliver(Response const& packet)
 {
+    using namespace std::placeholders;
+
     bool empty = writeQueue.empty();
     writeQueue.push(packet);
+
+    // Start a new write if there were no pending writes
     if (empty)
     {
         async_write(this->soc,
             writeQueue.front().buffer(),
-            bind(&Connection::handleWrite, shared_from_this(),
-                boost::asio::placeholders::error,
-                boost::asio::placeholders::bytes_transferred));
+            /* write completion handler */
+            std::bind(&Connection::handleWrite, shared_from_this(), _1, _2));
     }
 }
 
