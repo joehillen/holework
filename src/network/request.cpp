@@ -423,6 +423,75 @@ struct Stance : public Request
     }
 };
 
+/*
+ * 0x65 CLOSE WINDOW
+ */
+struct CloseWindow : public Request
+{
+    int8_t windowid;
+
+    BEGIN_FIELDS
+        BYTE        (windowid)
+    END_FIELDS
+
+    void dispatch(Player &p) const
+    {
+        // TODO: implement dispatch
+    }
+};
+
+/*
+ * 0x66 WINDOW CLICK
+ */
+struct ClickWindow : public Request
+{
+    int8_t windowid;
+    int16_t slot;
+    bool rclick;
+    bool shift;
+    int16_t actionid;
+    int16_t itemid;
+    int8_t  itemcount;
+    int16_t itemuses;
+
+    BEGIN_FIELDS
+        BYTE        (windowid)
+        SHORT       (slot)
+        BOOLEAN     (rclick)
+        SHORT       (actionid)
+        BOOLEAN     (shift)
+        SHORT       (itemid)
+        if (itemid != -1)
+        {
+            BYTE    (itemcount)
+            SHORT   (itemuses)
+        }
+    END_FIELDS
+
+    void dispatch(Player &p) const
+    {
+        // TODO: implement dispatch
+    }
+};
+
+/*
+ * 0xFF DISCONNECT
+ */
+struct Disconnect : public Request
+{
+    std::string message;
+
+    BEGIN_FIELDS
+        STRING_UCS2 (message)
+    END_FIELDS
+
+    void dispatch(Player &p) const
+    {
+        log(INFO, "client", p.name() + " has left the server: " + message);
+        // TODO: disconnect player's connection so we don't abort with an error
+    }
+};
+
 
 } // namespace packets
 
@@ -450,6 +519,9 @@ std::unique_ptr<Request> makerequest(int type)
         REQUEST_CASE(0x10, HoldingChange)
         REQUEST_CASE(0x12, Animation)
         REQUEST_CASE(0x13, Stance)
+        REQUEST_CASE(0x65, CloseWindow)
+        REQUEST_CASE(0x66, ClickWindow)
+        REQUEST_CASE(0xFF, Disconnect)
 
     default:
         {
