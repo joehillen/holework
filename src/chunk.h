@@ -64,8 +64,10 @@ private:
             {
                 int index = z * size_y + (x * size_y * size_z);
                 this->blocks[index] = 12;
-                this->blocks[index+1] = 25;
+                if (x == 0 || x == size_x-1 || z == 0 || z == size_z-1)
+                    this->blocks[index+1] = 25;
                 this->skylight[index/2] = 0xff;
+                this->skylight[index/2+1] = 0xff;
             }
         }
     }
