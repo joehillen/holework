@@ -59,24 +59,24 @@ void logHandler(LogEvent& event)
 
 void loginHandler(LoginRequestEvent& e)
 {
-    e.player.id = newEntityID();
-    e.player.deliver(boostcraft::network::loginresponse(e.player.id,0,0));
+    e.player->id = newEntityID();
+    e.player->deliver(boostcraft::network::loginresponse(e.player->id,0,0));
     log(INFO, "loginhandler:", 
         boost::str(boost::format("Login request from %1%."
                     " Given entity id %2%") 
-                    % e.player.name() 
-                    % e.player.id));
+                    % e.player->name() 
+                    % e.player->id));
 
     Chunk chunk;
     for(int x = -8; x < 8; ++x)
         for(int z = -8; z < 8; ++z)
-            e.player.deliver(network::chunkresponse(x, z, chunk));
+            e.player->deliver(network::chunkresponse(x, z, chunk));
 
     //Send spawn info
     std::stringstream ss;
-    ss << "Sending spawn to " << e.player.name();
+    ss << "Sending spawn to " << e.player->name();
     log(DEBUG, "loginHandler", ss.str());
-    e.player.deliver(network::spawnresponse(10, 10, 100));
+    e.player->deliver(network::spawnresponse(10, 10, 100));
 
     // HACK: send inventory
     network::Response r;
@@ -89,9 +89,9 @@ void loginHandler(LoginRequestEvent& e)
         r << (uint8_t)2;
         r << (uint16_t)0;
     }
-    e.player.deliver(r);
+    e.player->deliver(r);
 
-    e.player.deliver(network::positionlookresponse(
+    e.player->deliver(network::positionlookresponse(
         /*x*/0, 
         /*z*/0, 
         /*y*/200, 
@@ -106,21 +106,21 @@ void loginHandler(LoginRequestEvent& e)
 void lookHandler(PlayerLookEvent& event)
 {
 //    std::stringstream str;
-//    str << event.player.name() << ": " << "Yaw: " << event.yaw << " Pitch: " << event.pitch;
+//    str << event.player->name() << ": " << "Yaw: " << event.yaw << " Pitch: " << event.pitch;
 //    log(DEBUG, "lookHandler", str.str());
 }
 
 void positionHandler(PlayerPositionEvent& event)
 {
     std::stringstream str;
-    str << event.player.name() << ": " << "X: " << event.x << " Z: " << event.z << " Y: " << event.y;
+    str << event.player->name() << ": " << "X: " << event.x << " Z: " << event.z << " Y: " << event.y;
     log(DEBUG, "positionHandler", str.str());
 }
 
 void ongroundHandler(PlayerOnGroundEvent& event)
 {
     std::stringstream str;
-    str << event.player.name() << ": " << "onground: " << event.on_ground;
+    str << event.player->name() << ": " << "onground: " << event.on_ground;
     log(DEBUG, "ongroundHandler", str.str());
 }
 

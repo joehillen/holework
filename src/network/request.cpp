@@ -95,10 +95,10 @@ namespace packets {
 struct KeepAlive : public Request
 {
     size_t read(boost::asio::streambuf&) { return 0; }
-    void dispatch(Player& p) const
+    void dispatch(std::shared_ptr<Player> p) const
     {
         // No event dispatch on keepalive; just ping back
-        p.deliver(keepalive());
+        p->deliver(keepalive());
     }
 };
 
@@ -119,7 +119,7 @@ struct LoginRequest : public Request
         BYTE        (dimension)
     END_FIELDS
 
-    void dispatch(Player& p) const
+    void dispatch(std::shared_ptr<Player> p) const
     {
         LoginRequestEvent e(p, username, version);
         async_fire(e);
@@ -137,9 +137,9 @@ struct Handshake : public Request
         STRING_UCS2 (username)
     END_FIELDS
 
-    void dispatch(Player& p) const
+    void dispatch(std::shared_ptr<Player> p) const
     {
-        p.handshake(username);
+        p->handshake(username);
     }
 };
 
@@ -154,14 +154,14 @@ struct ChatMessage : public Request
         STRING_UCS2 (message)
     END_FIELDS
 
-    void dispatch(Player& p) const
+    void dispatch(std::shared_ptr<Player> p) const
     {
         ChatEvent e(p, message);
         async_fire(e); 
 
         // Temporary hack :P
-        p.deliver(chatmessage(
-          "<" + p.name() + "> " + message));
+        p->deliver(chatmessage(
+          "<" + p->name() + "> " + message));
     }
 };
 
@@ -180,7 +180,7 @@ struct UseEntity : public Request
         BOOLEAN     (leftclick)
     END_FIELDS
 
-    void dispatch(Player& p) const
+    void dispatch(std::shared_ptr<Player> p) const
     {
         // TODO: implement dispatch
     }
@@ -197,7 +197,7 @@ struct Respawn : public Request
         BYTE        (world)
     END_FIELDS
 
-    void dispatch(Player& p) const
+    void dispatch(std::shared_ptr<Player> p) const
     {
         // TODO: respawn event
     }
@@ -214,7 +214,7 @@ struct PlayerOnGround : public Request
         BOOLEAN     (onground)
     END_FIELDS
 
-    void dispatch(Player& p) const
+    void dispatch(std::shared_ptr<Player> p) const
     {
         PlayerOnGroundEvent e(p, onground);
         async_fire(e);
@@ -237,7 +237,7 @@ struct PlayerPosition : public Request
         BOOLEAN     (onground)
     END_FIELDS
 
-    void dispatch(Player& p) const
+    void dispatch(std::shared_ptr<Player> p) const
     {
         PlayerOnGroundEvent g(p, onground);
         async_fire(g);
@@ -261,7 +261,7 @@ struct PlayerLook : public Request
         BOOLEAN     (onground)
     END_FIELDS
 
-    void dispatch(Player& p) const
+    void dispatch(std::shared_ptr<Player> p) const
     {
         PlayerOnGroundEvent g(p, onground);
         async_fire(g);
@@ -290,7 +290,7 @@ struct PlayerPositionAndLook : public Request
         BOOLEAN     (onground)
     END_FIELDS
 
-    void dispatch(Player &p) const
+    void dispatch(std::shared_ptr<Player> p) const
     {
         PlayerOnGroundEvent g(p, onground);
         async_fire(g);
@@ -322,14 +322,14 @@ struct Digging : public Request
         BYTE        (face)
     END_FIELDS
 
-    void dispatch(Player &p) const
+    void dispatch(std::shared_ptr<Player> p) const
     {
         if (status == 0)
-            p.deliver(chatmessage("I'm a dwarf and I'm digging a hole!"));
+            p->deliver(chatmessage("I'm a dwarf and I'm digging a hole!"));
         else if (status == 2)
-            p.deliver(chatmessage("Diggy diggy hole!"));
+            p->deliver(chatmessage("Diggy diggy hole!"));
         else if (status == 4)
-            p.deliver(chatmessage("Give a hoot; don't pollute!"));
+            p->deliver(chatmessage("Give a hoot; don't pollute!"));
     }
 };
 
@@ -357,7 +357,7 @@ struct BlockPlacement : public Request
         }
     END_FIELDS
 
-    void dispatch(Player& p) const
+    void dispatch(std::shared_ptr<Player> p) const
     {
 
     }
@@ -374,14 +374,14 @@ struct HoldingChange : public Request
        SHORT        (slot)
     END_FIELDS
 
-    void dispatch(Player &p) const
+    void dispatch(std::shared_ptr<Player> p) const
     {
         // TODO: implement dispatch
         Response r;
         r << (uint8_t)0x36;
         r << (uint32_t)0 << (uint16_t)1 << (uint32_t)0;
         r << (uint8_t)0 << (uint8_t)16;
-        p.deliver(r);
+        p->deliver(r);
     }
 };
 
@@ -398,7 +398,7 @@ struct Animation : public Request
         BYTE        (anim)
     END_FIELDS
 
-    void dispatch(Player &p) const
+    void dispatch(std::shared_ptr<Player> p) const
     {
         // TODO: implement dispatch
     }
@@ -417,7 +417,7 @@ struct Stance : public Request
         BYTE        (action)
     END_FIELDS
 
-    void dispatch(Player &p) const
+    void dispatch(std::shared_ptr<Player> p) const
     {
         // TODO: implement dispatch
     }
@@ -434,7 +434,7 @@ struct CloseWindow : public Request
         BYTE        (windowid)
     END_FIELDS
 
-    void dispatch(Player &p) const
+    void dispatch(std::shared_ptr<Player> p) const
     {
         // TODO: implement dispatch
     }
@@ -468,7 +468,7 @@ struct ClickWindow : public Request
         }
     END_FIELDS
 
-    void dispatch(Player &p) const
+    void dispatch(std::shared_ptr<Player> p) const
     {
         // TODO: implement dispatch
     }
@@ -485,9 +485,9 @@ struct Disconnect : public Request
         STRING_UCS2 (message)
     END_FIELDS
 
-    void dispatch(Player &p) const
+    void dispatch(std::shared_ptr<Player> p) const
     {
-        log(INFO, "client", p.name() + " has left the server: " + message);
+        log(INFO, "client", p->name() + " has left the server: " + message);
         // TODO: disconnect player's connection so we don't abort with an error
     }
 };

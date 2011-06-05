@@ -57,7 +57,7 @@ void Player::deliver(network::Response const& packet)
 
 void Player::dispatch(network::Request const& packet)
 {
-    packet.dispatch(*this);
+    packet.dispatch(shared_from_this());
 }
 
 void Player::handshake(std::string const& username)

@@ -88,9 +88,9 @@ struct Event
 
 struct PlayerEvent : public Event
 {
-    Player& player;
+    std::shared_ptr<Player> player;
 
-    PlayerEvent(Player& player) : player(player) { }
+    PlayerEvent(std::shared_ptr<Player> player) : player(player) { }
 };
 
 struct LogEvent : public Event
@@ -110,7 +110,8 @@ struct LoginRequestEvent : public PlayerEvent
     int version;
     std::string username;
 
-    LoginRequestEvent(Player& player, std::string const& username, int version)
+    LoginRequestEvent(std::shared_ptr<Player> player,
+            std::string const& username, int version)
         : PlayerEvent(player), version(version), username(username)
     {
     }
@@ -122,7 +123,7 @@ struct ChatEvent : public PlayerEvent
 
     std::string message;
 
-    ChatEvent(Player& player, std::string const& msg)
+    ChatEvent(std::shared_ptr<Player> player, std::string const& msg)
         : PlayerEvent(player), message(msg)
     {
     }
@@ -135,7 +136,7 @@ struct PlayerNeedsChunkEvent : public PlayerEvent
     int x;
     int z;
 
-    PlayerNeedsChunkEvent(Player& player, int x, int z)
+    PlayerNeedsChunkEvent(std::shared_ptr<Player> player, int x, int z)
         : PlayerEvent(player), x(x), z(z)
     {
     }
@@ -148,7 +149,7 @@ struct PlayerLookEvent : public PlayerEvent
     float yaw;
     float pitch;
 
-    PlayerLookEvent(Player& player, float yaw, float pitch)
+    PlayerLookEvent(std::shared_ptr<Player> player, float yaw, float pitch)
         : PlayerEvent(player), yaw(yaw), pitch(pitch)
     {
     }
@@ -162,7 +163,7 @@ struct PlayerPositionEvent : public PlayerEvent
     double z;
     double y;
 
-    PlayerPositionEvent(Player& player, double x, double z, double y)
+    PlayerPositionEvent(std::shared_ptr<Player> player, double x, double z, double y)
         : PlayerEvent(player), x(x), z(z), y(y)
     {
     }
@@ -174,7 +175,7 @@ struct PlayerOnGroundEvent : public PlayerEvent
 
     bool on_ground;
 
-    PlayerOnGroundEvent(Player& player, bool on_ground)
+    PlayerOnGroundEvent(std::shared_ptr<Player> player, bool on_ground)
         : PlayerEvent(player), on_ground(on_ground)
     {
     }

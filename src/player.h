@@ -34,9 +34,12 @@ namespace boostcraft {
 
 namespace boostcraft{
 
-class Player : private network::Connection
+class Player : private network::Connection,
+    public std::enable_shared_from_this<Player>
 {
 public:
+    typedef std::shared_ptr<Player> ptr;
+
     explicit Player(std::unique_ptr<Connection::socket_t>); 
     ~Player();
 
