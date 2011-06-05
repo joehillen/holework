@@ -40,6 +40,12 @@ Player::~Player()
     std::cout << "Destroying player " << name() << "\n";
 }
 
+std::shared_ptr<Player> Player::shared_from_this() 
+{
+    return std::static_pointer_cast<Player>(
+            Connection::shared_from_this());
+}
+
 void Player::log(std::string message)
 {
     boostcraft::log(INFO, "Player: " + name(), message);
@@ -58,11 +64,6 @@ void Player::disconnect(std::string const& reason)
     log("disconnected: " + reason);
     PlayerDisconnectEvent e(shared_from_this(), reason);
     async_fire(e);
-}
-
-void Player::deliver(network::Response const& packet)
-{
-    Connection::deliver(packet);
 }
 
 void Player::dispatch(network::Request const& packet)

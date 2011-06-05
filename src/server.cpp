@@ -37,9 +37,13 @@ void Server::connect(std::unique_ptr<tcp::socket> socket)
 {
     std::cout << "Creating a new player!\n";
     // Create a player from the socket
-    players.push_back(
-            std::shared_ptr<Player>(
-                new Player(std::move(socket))));
+    std::shared_ptr<Player> player(new Player(std::move(socket)));
+    players.push_back(player);
+    player->start();
+
+    // TODO: it's not safe to call start() on a player until after a shared_ptr
+    // owning the player has been created!!! this should probably be addressed
+    // by forcing the use of a static Player::create function.
 }
 
 void Server::onPlayerDisconnect(PlayerDisconnectEvent& e)

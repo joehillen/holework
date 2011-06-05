@@ -29,9 +29,11 @@
 #include "response.h"
 #include "request.h"
 
-namespace boostcraft { namespace network {
+namespace boostcraft {
+namespace network {
 
 class Connection
+    : public std::enable_shared_from_this<Connection>
 {
 public:
     friend class TcpServer;
@@ -40,19 +42,29 @@ public:
     explicit Connection(std::unique_ptr<socket_t>);
     virtual ~Connection();
 
-    /**
-     * Begins asynchronous reading of packets from the connected client.
-     */
+/******************************************************************************
+ * Function: start
+ *
+ * Begins asynchronous reading on the connection.
+ *
+ * WARNING: Do not call this function on a connection until a std::shared_ptr
+ *   has been created for the instance! TODO: enforce this with a protected
+ *   constructor and static factory methods.
+ */
     void start();
 
-    /**
-     * Delivers a packet to the connected client.
-     */
+/******************************************************************************
+ * Function: deliver
+ *
+ * Sends a response asynchronously to the connected client. The response data
+ * is placed in a write queue and transmitted after any pending writes have
+ * completed. 
+ */
     void deliver(Response const&);
 
-    /**
-     * Disable copying and assignment
-     */
+/**
+ * Disable copying and assignment
+ */
     Connection(Connection const&) = delete; 
     Connection& operator=(Connection const&) = delete;
 

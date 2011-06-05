@@ -32,23 +32,13 @@ namespace boostcraft {
 }
 
 
-namespace boostcraft{
+namespace boostcraft {
 
-class Player : private network::Connection,
-               public std::enable_shared_from_this<Player>
+class Player : public network::Connection
 {
 public:
     explicit Player(std::unique_ptr<Connection::socket_t>); 
     ~Player();
-
-/******************************************************************************
- * Function: deliver
- *
- * Sends a response asynchronously to the connected client. The response data
- * is placed in a write queue and transmitted after any pending writes have
- * completed. 
- */
-    void deliver(network::Response const& packet);
 
 /******************************************************************************
  * Function: disconnect
@@ -74,6 +64,8 @@ public:
 
 private:
     void dispatch(network::Request const&);
+
+    std::shared_ptr<Player> shared_from_this();
 
     std::string name_;
 

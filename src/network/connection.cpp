@@ -31,7 +31,6 @@ namespace boostcraft { namespace network {
 Connection::Connection(std::unique_ptr<socket_t> sock)
     : sock(std::move(sock)), buffer(), valid(true)
 {
-    startRead();
 }
 
 Connection::~Connection()
@@ -44,7 +43,6 @@ Connection::~Connection()
 
 void Connection::start()
 {
-    log(INFO, "Network", "Listening for a client...");
     startRead();
 }
 
@@ -62,7 +60,7 @@ void Connection::startRead()
         /* completion condition */
         std::bind(&Connection::readPacket, this, _1, _2),
         /* read handler */
-        std::bind(&Connection::handleRead, this, _1, _2));
+        std::bind(&Connection::handleRead, shared_from_this(), _1, _2));
 }
 
 /*
@@ -139,7 +137,7 @@ void Connection::handleWrite(boost::system::error_code const& error,
             async_write(*this->sock,
                 writeQueue.front().buffer(),
                 /* write completion handler */
-                std::bind(&Connection::handleWrite, this, _1, _2));
+                std::bind(&Connection::handleWrite, shared_from_this(), _1, _2));
         }
     }
     else if (error != boost::asio::error::operation_aborted)
@@ -163,7 +161,7 @@ void Connection::deliver(Response const& packet)
         async_write(*this->sock,
             writeQueue.front().buffer(),
             /* write completion handler */
-            std::bind(&Connection::handleWrite, this, _1, _2));
+            std::bind(&Connection::handleWrite, shared_from_this(), _1, _2));
     }
 }
 
