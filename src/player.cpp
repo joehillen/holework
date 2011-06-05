@@ -47,9 +47,17 @@ void Player::log(std::string message)
 
 void Player::disconnect(std::string const& reason)
 {
+    // TODO:
+    // Something about this doesn't seem entirely right. The main handler for
+    // disconnect events (in Server) removes server's shared_ptr to this...
+    // which means that if we fire() this event, we're possibly jumping into
+    // undefined behavior land. async_fire() is the only safe way.
+    //
+    // In short, I think we need a better way of managing Player lifetime.
+    //
     log("disconnected: " + reason);
     PlayerDisconnectEvent e(shared_from_this(), reason);
-    fire(e);
+    async_fire(e);
 }
 
 void Player::deliver(network::Response const& packet)

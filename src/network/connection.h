@@ -78,6 +78,8 @@ private:
     boost::asio::streambuf buffer;
     std::unique_ptr<Request> packet;
     std::queue<Response> writeQueue;
+
+    bool valid;
 };
 
 }} //end namespace boostcraft::network

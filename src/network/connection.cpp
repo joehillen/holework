@@ -29,13 +29,17 @@
 namespace boostcraft { namespace network {
 
 Connection::Connection(std::unique_ptr<socket_t> sock)
-    : sock(std::move(sock)), buffer()
+    : sock(std::move(sock)), buffer(), valid(true)
 {
     startRead();
 }
 
 Connection::~Connection()
 {
+    log(INFO, "Network", "About to cancel socket operations...");
+    sock->cancel();
+    valid = false;
+    log(INFO, "Network", "Canceled pending socket operations!");
 }
 
 void Connection::start()
@@ -48,6 +52,9 @@ void Connection::startRead()
 {
     using namespace boost::asio;
     using namespace std::placeholders;
+
+    if(!valid)
+        log(ERROR, "Connection", "Undefined behavior land in startRead!");
 
     async_read(*this->sock,
         /* buffer */
@@ -65,6 +72,14 @@ void Connection::startRead()
 size_t Connection::readPacket(boost::system::error_code const& error,
         size_t bytes_read)
 {
+    if (!valid)
+        log(ERROR, "Connection", "Undefined behavior in readPacket!");
+    if (error == boost::asio::error::operation_aborted)
+    {
+        log(ERROR, "Connection", "Operation aborted in readPacket?!");
+        throw std::runtime_error("operation aborted");
+    }
+
     if (error)
         return 0;
 
@@ -92,6 +107,9 @@ size_t Connection::readPacket(boost::system::error_code const& error,
 void Connection::handleRead(boost::system::error_code const& error,
         size_t bytes_read)
 {
+    if(!valid)
+        log(ERROR, "Connection", "Undefined behavior land in handleRead!");
+
     if (!error)
     {
         // Dispatch and then destroy the packet we just read
