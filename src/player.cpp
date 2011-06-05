@@ -26,20 +26,28 @@
 
 #include <sstream>
 
-#define MAX_DELTA 10000 //change this or make it configurable?
-
 namespace boostcraft
 {
 
-Player::Player(boost::asio::io_service& io)
-    : Connection(io),
+Player::Player(std::unique_ptr<Connection::socket_t> sock)
+    : Connection(std::move(sock)),
       timer_(0)
 {
 }
 
+Player::~Player()
+{
+    std::cout << "Destroying player " << name() << "\n";
+}
+
 void Player::log(std::string message)
 {
-    boostcraft::log(INFO, "Player: " + this->name_, message);
+    boostcraft::log(INFO, "Player: " + name(), message);
+}
+
+void Player::disconnect()
+{
+    log("disconnected.");
 }
 
 void Player::deliver(network::Response const& packet)

@@ -32,20 +32,13 @@
 namespace boostcraft { namespace network {
 
 class Connection
-    : public std::enable_shared_from_this<Connection>
 {
 public:
-    typedef std::shared_ptr<Connection> pointer;
-
     friend class TcpServer;
+    typedef boost::asio::ip::tcp::socket socket_t;
 
-    Connection(boost::asio::io_service& io);
-    virtual ~Connection() { }
-
-    /**
-     * Returns the socket associated with this connection.
-     */
-    boost::asio::ip::tcp::socket& socket();
+    explicit Connection(std::unique_ptr<socket_t>);
+    virtual ~Connection();
 
     /**
      * Begins asynchronous reading of packets from the connected client.
@@ -69,12 +62,23 @@ private:
     void handleWrite(boost::system::error_code const& error, size_t bytes_written);
     size_t readPacket(boost::system::error_code const& error, size_t bytes_read);
 
+    /**
+     * Called to process a request from the client
+     */
     virtual void dispatch(Request const&) = 0;
 
-    boost::asio::ip::tcp::socket soc;
+    /**
+     * Called when the connection is being closed
+     */
+    virtual void disconnect() = 0;
+
+    std::unique_ptr<
+        boost::asio::ip::tcp::socket> sock;
+
     boost::asio::streambuf buffer;
     std::unique_ptr<Request> packet;
     std::queue<Response> writeQueue;
 };
 
 }} //end namespace boostcraft::network
+

@@ -37,7 +37,8 @@ namespace boostcraft{
 class Player : private network::Connection
 {
 public:
-    Player(boost::asio::io_service& io); 
+    explicit Player(std::unique_ptr<Connection::socket_t>); 
+    ~Player();
 
     void deliver(network::Response const& packet);
 
@@ -52,6 +53,7 @@ public:
 
 private:
     void dispatch(network::Request const&);
+    void disconnect();
 
     std::string name_;
 

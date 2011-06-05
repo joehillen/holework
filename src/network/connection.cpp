@@ -28,15 +28,14 @@
 
 namespace boostcraft { namespace network {
 
-Connection::Connection(boost::asio::io_service& io)
-    : soc(io), buffer()
+Connection::Connection(std::unique_ptr<socket_t> sock)
+    : sock(std::move(sock)), buffer()
 {
+    startRead();
 }
 
-
-boost::asio::ip::tcp::socket& Connection::socket()
+Connection::~Connection()
 {
-    return this->soc;
 }
 
 void Connection::start()
@@ -50,13 +49,13 @@ void Connection::startRead()
     using namespace boost::asio;
     using namespace std::placeholders;
 
-    async_read(this->soc,
+    async_read(*this->sock,
         /* buffer */
         this->buffer,
         /* completion condition */
         std::bind(&Connection::readPacket, this, _1, _2),
         /* read handler */
-        std::bind(&Connection::handleRead, shared_from_this(), _1, _2));
+        std::bind(&Connection::handleRead, this, _1, _2));
 }
 
 /*
@@ -100,8 +99,11 @@ void Connection::handleRead(boost::system::error_code const& error,
         packet.reset();
         startRead();
     }
-    else
+    else if (error != boost::asio::error::operation_aborted)
+    {
         log(INFO, "Network", "Error reading socket: connection closed.");
+        disconnect();
+    }
 }
 
 void Connection::handleWrite(boost::system::error_code const& error, 
@@ -116,16 +118,17 @@ void Connection::handleWrite(boost::system::error_code const& error,
         // Continue with any pending write
         if (!writeQueue.empty())
         {
-            async_write(this->soc,
+            async_write(*this->sock,
                 writeQueue.front().buffer(),
                 /* write completion handler */
-                std::bind(&Connection::handleWrite, shared_from_this(), _1, _2));
+                std::bind(&Connection::handleWrite, this, _1, _2));
         }
     }
-    else
+    else if (error != boost::asio::error::operation_aborted)
     {
         log(ERROR,"Network", "Error writing to socket"
                 "(TODO: we should probably do something)");
+        disconnect();
     }
 }
 
@@ -139,10 +142,10 @@ void Connection::deliver(Response const& packet)
     // Start a new write if there were no pending writes
     if (empty)
     {
-        async_write(this->soc,
+        async_write(*this->sock,
             writeQueue.front().buffer(),
             /* write completion handler */
-            std::bind(&Connection::handleWrite, shared_from_this(), _1, _2));
+            std::bind(&Connection::handleWrite, this, _1, _2));
     }
 }
 

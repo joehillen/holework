@@ -19,18 +19,12 @@
 #pragma once
 
 #include <boost/asio.hpp>
-#include <boost/bind.hpp>
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/shared_ptr.hpp>
-#include "connection.h"
-#include "../player.h" // TODO: this is icky
+#include <functional>
+#include <memory>
+
 #include "../log.h"
 
-namespace boostcraft {
-
-
-namespace network {
-
+namespace boostcraft { namespace network {
 
 using boost::asio::ip::tcp;
 
@@ -43,31 +37,58 @@ public:
         startAccept();
     }
 
-    void startAccept()
+    virtual ~TcpServer()
     {
-        log(INFO, "TcpServer","Waiting for a connection...");
-
-        Connection::pointer new_connection(
-                                (Connection*) new Player(io_));
-
-        acceptor_.async_accept(new_connection->socket(),
-            boost::bind(&TcpServer::handleAccept, this, 
-                new_connection,
-                boost::asio::placeholders::error));
     }
 
-    void handleAccept(Connection::pointer connection, 
-                        const boost::system::error_code& error)
+private:
+    void startAccept()
+    {
+        log(INFO, "TcpServer", "Waiting for a connection...");
+
+        // Create a socket
+        tcp::socket* sock = new tcp::socket(io_);
+
+        //
+        // WARNING! Hackery ahead!
+        // For some reason, std::bind does not support move semantics; so we
+        // cannot create a std::unique_ptr here and transfer ownership to the
+        // AcceptHandler through the std::bind.
+        //
+        // Instead we create a naked pointer and trust that AcceptHandler will
+        // do the right thing and wrap it in a std::unique_ptr.
+        //
+        acceptor_.async_accept(
+            *sock,
+            std::bind(&TcpServer::handleAccept,
+                this,
+                sock,
+                std::placeholders::_1));
+    }
+
+    void handleAccept(tcp::socket* sock,
+            const boost::system::error_code& error)
     {
         if (!error)
         {
-            log(INFO, "TcpServer","Got a connection!");
-            connection->start();
+            sock->remote_endpoint().address();
+            log(INFO, "TcpServer", "Got a connection!");
+
+            // Hand off the newly accepted socket connection with a unique_ptr
+            // so the implementer of connect() takes ownership
+            connect(std::unique_ptr<tcp::socket>(sock));
+
+            // Begin waiting for next connection
             startAccept();
         }
         else
+        {
+            delete sock;
             throw boost::system::system_error(error);
+        }
     }
+
+    virtual void connect(std::unique_ptr<tcp::socket> sock) = 0;
 
 private:
     boost::asio::io_service& io_;

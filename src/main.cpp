@@ -26,8 +26,8 @@
 
 #include "events.h"
 #include "log.h"
-#include "network/tcpserver.h"  
 #include "handlers.h"
+#include "server.h"
 
 void test()
 {
@@ -41,7 +41,6 @@ int main(int argc, char** argv)
 {
     using namespace boost::asio::ip;
     using namespace boostcraft;
-    using namespace boostcraft::network;
 
     schedule(3000, test);
 
@@ -67,9 +66,8 @@ int main(int argc, char** argv)
     listen(positionHandler);
     listen(ongroundHandler);
 
-
     tcp::endpoint endpoint(tcp::v4(), 25565);
-    TcpServer server(io_service(), endpoint);
+    Server server(io_service(), endpoint);
 
     while(true)
     {
