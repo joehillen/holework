@@ -70,7 +70,7 @@ private:
     /**
      * Called when the connection is being closed
      */
-    virtual void disconnect() = 0;
+    virtual void disconnect(std::string const& reason) = 0;
 
     std::unique_ptr<
         boost::asio::ip::tcp::socket> sock;

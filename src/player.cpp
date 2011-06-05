@@ -45,9 +45,11 @@ void Player::log(std::string message)
     boostcraft::log(INFO, "Player: " + name(), message);
 }
 
-void Player::disconnect()
+void Player::disconnect(std::string const& reason)
 {
-    log("disconnected.");
+    log("disconnected: " + reason);
+    PlayerDisconnectEvent e(shared_from_this(), reason);
+    fire(e);
 }
 
 void Player::deliver(network::Response const& packet)

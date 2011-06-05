@@ -102,7 +102,7 @@ void Connection::handleRead(boost::system::error_code const& error,
     else if (error != boost::asio::error::operation_aborted)
     {
         log(INFO, "Network", "Error reading socket: connection closed.");
-        disconnect();
+        disconnect("socket read error");
     }
 }
 
@@ -128,7 +128,7 @@ void Connection::handleWrite(boost::system::error_code const& error,
     {
         log(ERROR,"Network", "Error writing to socket"
                 "(TODO: we should probably do something)");
-        disconnect();
+        disconnect("socket write error");
     }
 }
 

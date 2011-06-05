@@ -487,8 +487,7 @@ struct Disconnect : public Request
 
     void dispatch(std::shared_ptr<Player> p) const
     {
-        log(INFO, "client", p->name() + " has left the server: " + message);
-        // TODO: disconnect player's connection so we don't abort with an error
+        p->disconnect(message);
     }
 };
 
