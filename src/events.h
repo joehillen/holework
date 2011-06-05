@@ -181,6 +181,18 @@ struct PlayerOnGroundEvent : public PlayerEvent
     }
 };
 
+struct PlayerDisconnectEvent : public PlayerEvent
+{
+    static boost::signals2::signal<void(PlayerDisconnectEvent&)> signal;
+
+    std::string reason;
+
+    PlayerDisconnectEvent(std::shared_ptr<Player> player,
+            std::string const& reason)
+        : PlayerEvent(player), reason(reason)
+    {
+    }
+};
 
 // signal connection stuff
 

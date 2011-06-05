@@ -101,6 +101,7 @@ boost::signals2::signal<void(PlayerNeedsChunkEvent&)> PlayerNeedsChunkEvent::sig
 boost::signals2::signal<void(PlayerLookEvent&)> PlayerLookEvent::signal;
 boost::signals2::signal<void(PlayerPositionEvent&)> PlayerPositionEvent::signal;
 boost::signals2::signal<void(PlayerOnGroundEvent&)> PlayerOnGroundEvent::signal;
+boost::signals2::signal<void(PlayerDisconnectEvent&)> PlayerDisconnectEvent::signal;
 
 }
 
