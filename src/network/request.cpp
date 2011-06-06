@@ -5,6 +5,7 @@
 
 #include "../player.h"
 #include "../events.h"
+#include "../music.h"
 #include "response.h"
 
 #include <string>
@@ -158,6 +159,15 @@ struct ChatMessage : public Request
     {
         ChatEvent e(p, message);
         async_fire(e); 
+
+        if (message == "!music")
+        {
+            p->deliver(chatmessage("MUSIC TIME"));
+            using namespace stupidmusic;
+            std::list<int> notes { Fs3,  G3,  Gs3,  A3,  As3,  B3, C4,  Cs4, D4, Ds4, E4, F4, Fs4,  G4,  Gs4,  A4,  As4,  B4, C5,  Cs5, D5, Ds5, E5, F5, Fs5 };
+            std::list<int> times { Q,    Q,   Q,    Q,   Q,    Q,  Q,   Q,   Q,  Q,   Q,  Q,  Q,    Q,   Q,    Q,   Q,    Q,  Q,   Q,   Q,  Q,   Q,  Q,  Q   };
+            playSequence(std::weak_ptr<Player>(p), notes, times);
+        }
     }
 };
 
