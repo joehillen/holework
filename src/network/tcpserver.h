@@ -22,7 +22,7 @@
 #include <functional>
 #include <memory>
 
-#include "../log.h"
+#include "log.h"
 
 namespace boostcraft { namespace network {
 

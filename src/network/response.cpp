@@ -28,10 +28,7 @@
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/zlib.hpp>
 
-#include "../chunk.h" // TODO: this is kinda messy; maybe responses that depend
-                      // on classes outside the network namespace should be
-                      // promoted out of the network namespace, so that we only
-                      // have downward dependencies
+#include "chunk.h" 
 
 namespace boostcraft { namespace network { 
 

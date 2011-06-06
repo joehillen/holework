@@ -24,7 +24,7 @@
 
 #include <boost/asio.hpp>
 
-#include "../log.h"
+#include "log.h"
 
 namespace boostcraft { namespace network {
 

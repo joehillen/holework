@@ -3,10 +3,10 @@
 #include "request.h"
 #include "requestfields.h"
 
-#include "../player.h"
-#include "../events.h"
-#include "../music.h"
-#include "response.h"
+#include "player.h"
+#include "events.h"
+#include "extras/music.h"
+#include "network/response.h"
 
 #include <string>
 
