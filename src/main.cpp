@@ -25,8 +25,9 @@
 #include <gtest/gtest.h>
 
 #include "events.h"
-#include "log.h"
+#include "extras/pdl.h"
 #include "handlers.h"
+#include "log.h"
 #include "server.h"
 
 void test()
@@ -59,6 +60,9 @@ int main(int argc, char** argv)
            log(DEBUG, "main", "DEBUG Mode Enabled");
         }
     }
+
+    // Initialize in-game packet debugging module
+    boostcraft::pdl::init();
 
     listen(loginHandler);
     listen(logHandler);
