@@ -53,14 +53,18 @@ void Server::connect(std::unique_ptr<tcp::socket> socket)
 void Server::onPlayerDisconnect(PlayerDisconnectEvent& e)
 {
     players.remove(e.player);
+
+    auto qmsg = network::chatmessage("§5* " + e.player->name() + " has left the server.");
+    foreach(auto player, players)
+        player->deliver(qmsg);
 }
 
 void Server::onChat(ChatEvent& e)
 {
     // Relay the event to all players
-    std::string message = "<" + e.player->name() + "> " + e.message;
+    auto msg = network::chatmessage("<" + e.player->name() + "> " + e.message);
     foreach(auto player, players)
-        player->deliver(network::chatmessage(message));
+        player->deliver(msg);
 }
 
 } // namespace boostcraft
