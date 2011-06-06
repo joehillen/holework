@@ -12,6 +12,7 @@ namespace boostcraft
   // Forward declarations
   class Player;
   class PlayerDisconnectEvent;
+  class ChatEvent;
 
   class Server : private network::TcpServer
   {
@@ -24,6 +25,7 @@ namespace boostcraft
 
       /* EVENT HANDLERS */
       void onPlayerDisconnect(PlayerDisconnectEvent& e);
+      void onChat(ChatEvent& e);
 
   private:
       std::list<std::shared_ptr<Player>> players;

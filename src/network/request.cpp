@@ -158,10 +158,6 @@ struct ChatMessage : public Request
     {
         ChatEvent e(p, message);
         async_fire(e); 
-
-        // Temporary hack :P
-        p->deliver(chatmessage(
-          "<" + p->name() + "> " + message));
     }
 };
 
@@ -487,7 +483,7 @@ struct Disconnect : public Request
 
     void dispatch(std::shared_ptr<Player> p) const
     {
-        p->disconnect(message);
+        p->stop(message);
     }
 };
 

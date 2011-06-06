@@ -29,6 +29,12 @@
 namespace boostcraft
 {
 
+void Player::log(std::string message)
+{
+    boostcraft::log(INFO, "Player: " + name(), message);
+}
+
+
 Player::Player(std::unique_ptr<Connection::socket_t> sock)
     : Connection(std::move(sock)),
       timer_(0)
@@ -37,7 +43,6 @@ Player::Player(std::unique_ptr<Connection::socket_t> sock)
 
 Player::~Player()
 {
-    std::cout << "Destroying player " << name() << "\n";
 }
 
 std::shared_ptr<Player> Player::shared_from_this() 
@@ -46,24 +51,18 @@ std::shared_ptr<Player> Player::shared_from_this()
             Connection::shared_from_this());
 }
 
-void Player::log(std::string message)
+std::shared_ptr<Player const> Player::shared_from_this() const
 {
-    boostcraft::log(INFO, "Player: " + name(), message);
+    return std::static_pointer_cast<Player const>(
+            Connection::shared_from_this());
 }
 
-void Player::disconnect(std::string const& reason)
+
+void Player::disconnected(std::string const& reason)
 {
-    // TODO:
-    // Something about this doesn't seem entirely right. The main handler for
-    // disconnect events (in Server) removes server's shared_ptr to this...
-    // which means that if we fire() this event, we're possibly jumping into
-    // undefined behavior land. async_fire() is the only safe way.
-    //
-    // In short, I think we need a better way of managing Player lifetime.
-    //
-    log("disconnected: " + reason);
     PlayerDisconnectEvent e(shared_from_this(), reason);
-    async_fire(e);
+    fire(e);
+    log("disconnected: " + reason);
 }
 
 void Player::dispatch(network::Request const& packet)

@@ -3,6 +3,10 @@
 #include "server.h"
 #include "player.h"
 #include "events.h"
+#include "network/response.h"
+
+#include <boost/foreach.hpp>
+#define foreach BOOST_FOREACH
 
 #include <iostream>
 
@@ -14,15 +18,16 @@ Server::Server(boost::asio::io_service& io, tcp::endpoint& endpoint)
     : TcpServer(io, endpoint)
 {
     // Register event handlers
-    //listen(std::bind(&Server::onPlayerDisconnect, this));
+    // TODO: events should be rewritten to use std::function
+    //
+    boost::function<void(PlayerDisconnectEvent&)> disconnect =
+        boost::bind(&Server::onPlayerDisconnect, this, _1);
 
-    boost::function<void(PlayerDisconnectEvent&)>
-        p = [=](PlayerDisconnectEvent& e)
-    {
-        players.remove(e.player);
-    };
+    boost::function<void(ChatEvent&)> chat = 
+        boost::bind(&Server::onChat, this, _1);
 
-    listen(p);
+    listen(disconnect);
+    listen(chat);
 
     //
     // TODO: "listen" needs to return a signal connection so we can remove the
@@ -35,7 +40,6 @@ Server::Server(boost::asio::io_service& io, tcp::endpoint& endpoint)
 
 void Server::connect(std::unique_ptr<tcp::socket> socket)
 {
-    std::cout << "Creating a new player!\n";
     // Create a player from the socket
     std::shared_ptr<Player> player(new Player(std::move(socket)));
     players.push_back(player);
@@ -49,6 +53,14 @@ void Server::connect(std::unique_ptr<tcp::socket> socket)
 void Server::onPlayerDisconnect(PlayerDisconnectEvent& e)
 {
     players.remove(e.player);
+}
+
+void Server::onChat(ChatEvent& e)
+{
+    // Relay the event to all players
+    std::string message = "<" + e.player->name() + "> " + e.message;
+    foreach(auto player, players)
+        player->deliver(network::chatmessage(message));
 }
 
 } // namespace boostcraft

@@ -31,7 +31,6 @@ namespace boostcraft {
     class interval_timer;
 }
 
-
 namespace boostcraft {
 
 class Player : public network::Connection
@@ -40,32 +39,28 @@ public:
     explicit Player(std::unique_ptr<Connection::socket_t>); 
     ~Player();
 
-/******************************************************************************
- * Function: disconnect
- *
- * Raises a disconnect event that will cause the server to remove this player.
- */
-    void disconnect(std::string const& reason);
-
-/******************************************************************************
- * Function: handshake
- *
- * Sets the username and initializes the Player -- call exactly once after
- * receiving a handshake request from the client.
- */
+    /// Set username and initialize keepalive in response to a client handshake
     void handshake(std::string const& username);
+
+    /// Return player nickname
+    std::string name();
 
     void updatePosition(double x, double y, double z);
     void updateLook(float yaw, float pitch);
     void updateHealth(short health);
 
-    int id; // entity id
-    std::string name();
-
+    /// TODO: make private
+    int id;
 private:
+    /// Initiates dispatch for a client request
     void dispatch(network::Request const&);
 
+    /// Responds to disconnection by raising event
+    void disconnected(std::string const& reason);
+
+    /// Conversions for base class's enable_shared_from_this
     std::shared_ptr<Player> shared_from_this();
+    std::shared_ptr<Player const> shared_from_this() const;
 
     std::string name_;
 

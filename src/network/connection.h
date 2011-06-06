@@ -18,14 +18,11 @@
 
 #pragma once
 
+#include <boost/asio.hpp>
 #include <iostream>
 #include <memory>
 #include <string>
-#include <vector>
 #include <queue>
-
-#include <boost/asio.hpp>
-
 #include "response.h"
 #include "request.h"
 
@@ -42,47 +39,30 @@ public:
     explicit Connection(std::unique_ptr<socket_t>);
     virtual ~Connection();
 
-/******************************************************************************
- * Function: start
- *
- * Begins asynchronous reading on the connection.
- *
- * WARNING: Do not call this function on a connection until a std::shared_ptr
- *   has been created for the instance! TODO: enforce this with a protected
- *   constructor and static factory methods.
- */
+    /// Begin asynchronous reading on the connection.
     void start();
 
-/******************************************************************************
- * Function: deliver
- *
- * Sends a response asynchronously to the connected client. The response data
- * is placed in a write queue and transmitted after any pending writes have
- * completed. 
- */
+    /// Halt pending operations and close socket
+    void stop(std::string const& reason);
+
+    /// Send a response packet asynchronously to the connected client.
     void deliver(Response const&);
 
-/**
- * Disable copying and assignment
- */
+    /// Disable copying and assignment
     Connection(Connection const&) = delete; 
     Connection& operator=(Connection const&) = delete;
 
 private:
+    /// Called to process a request from the client
+    virtual void dispatch(Request const&) = 0;
+
+    /// Called when the connection is being closed
+    virtual void disconnected(std::string const& reason) = 0;
+
     void startRead();
     void handleRead(boost::system::error_code const& error, size_t bytes_read);
     void handleWrite(boost::system::error_code const& error, size_t bytes_written);
     size_t readPacket(boost::system::error_code const& error, size_t bytes_read);
-
-    /**
-     * Called to process a request from the client
-     */
-    virtual void dispatch(Request const&) = 0;
-
-    /**
-     * Called when the connection is being closed
-     */
-    virtual void disconnect(std::string const& reason) = 0;
 
     std::unique_ptr<
         boost::asio::ip::tcp::socket> sock;
@@ -90,8 +70,7 @@ private:
     boost::asio::streambuf buffer;
     std::unique_ptr<Request> packet;
     std::queue<Response> writeQueue;
-
-    bool valid;
+    bool started;
 };
 
 }} //end namespace boostcraft::network

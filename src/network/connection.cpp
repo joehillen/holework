@@ -29,32 +29,41 @@
 namespace boostcraft { namespace network {
 
 Connection::Connection(std::unique_ptr<socket_t> sock)
-    : sock(std::move(sock)), buffer(), valid(true)
+    : sock(std::move(sock)), buffer(), started(false)
 {
 }
 
 Connection::~Connection()
 {
-    log(INFO, "Network", "About to cancel socket operations...");
-    sock->cancel();
-    valid = false;
-    log(INFO, "Network", "Canceled pending socket operations!");
+    sock->close();
 }
 
 void Connection::start()
 {
-    startRead();
+    if (started)
+    {
+        throw std::runtime_error("Connection already started!");
+    }
+    try {
+        startRead();
+        started = true;
+    }
+    catch(std::bad_weak_ptr&)
+    {
+        throw std::runtime_error("Connection started without existing shared_ptr!");
+    }
+}
+
+void Connection::stop(std::string const& reason)
+{
+    sock->close();
+    disconnected(reason);
 }
 
 void Connection::startRead()
 {
-    using namespace boost::asio;
     using namespace std::placeholders;
-
-    if(!valid)
-        log(ERROR, "Connection", "Undefined behavior land in startRead!");
-
-    async_read(*this->sock,
+    boost::asio::async_read(*this->sock,
         /* buffer */
         this->buffer,
         /* completion condition */
@@ -70,14 +79,6 @@ void Connection::startRead()
 size_t Connection::readPacket(boost::system::error_code const& error,
         size_t bytes_read)
 {
-    if (!valid)
-        log(ERROR, "Connection", "Undefined behavior in readPacket!");
-    if (error == boost::asio::error::operation_aborted)
-    {
-        log(ERROR, "Connection", "Operation aborted in readPacket?!");
-        throw std::runtime_error("operation aborted");
-    }
-
     if (error)
         return 0;
 
@@ -105,9 +106,6 @@ size_t Connection::readPacket(boost::system::error_code const& error,
 void Connection::handleRead(boost::system::error_code const& error,
         size_t bytes_read)
 {
-    if(!valid)
-        log(ERROR, "Connection", "Undefined behavior land in handleRead!");
-
     if (!error)
     {
         // Dispatch and then destroy the packet we just read
@@ -115,10 +113,10 @@ void Connection::handleRead(boost::system::error_code const& error,
         packet.reset();
         startRead();
     }
-    else if (error != boost::asio::error::operation_aborted)
+    else if (sock->is_open() && error != boost::asio::error::operation_aborted)
     {
-        log(INFO, "Network", "Error reading socket: connection closed.");
-        disconnect("socket read error");
+        log(INFO, "Network", "Error reading socket: " + error.message());
+        disconnected("socket read error");
     }
 }
 
@@ -140,11 +138,10 @@ void Connection::handleWrite(boost::system::error_code const& error,
                 std::bind(&Connection::handleWrite, shared_from_this(), _1, _2));
         }
     }
-    else if (error != boost::asio::error::operation_aborted)
+    else if (sock->is_open() && error != boost::asio::error::operation_aborted)
     {
-        log(ERROR,"Network", "Error writing to socket"
-                "(TODO: we should probably do something)");
-        disconnect("socket write error");
+        log(ERROR,"Network", "Error writing to socket: " + error.message());
+        disconnected("socket write error");
     }
 }
 
