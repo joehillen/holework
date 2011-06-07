@@ -18,25 +18,17 @@
 
 #pragma once
 
-#include <ostream>
+#include <iosfwd>
 #include <stdint.h>
-#include <cstring>
 
 namespace boostcraft {
 
 class Chunk
 {
 public:
-    Chunk()
-    {
-        allocate();
-    }
+    Chunk();
+    ~Chunk();
 
-    ~Chunk()
-    {
-        free();
-    }
-        
     enum {
         size_x = 16,
         size_z = 16,
@@ -46,38 +38,8 @@ public:
     friend std::ostream& operator<<(std::ostream& os, Chunk const& chunk);
 
 private:
-    void allocate() {
-        int size = size_x * size_z * size_y;
-        this->blocks = new uint8_t[size];
-        this->metadata = new uint8_t[size/2];
-        this->blocklight = new uint8_t[size/2];
-        this->skylight = new uint8_t[size/2];
-
-        std::memset(this->blocks, 0, size);
-        std::memset(this->metadata, 0, size/2);
-        std::memset(this->blocklight, 0, size/2);
-        std::memset(this->skylight, 0, size/2);
-        // set all y=0 to smooth stone
-        for(int x = 0; x < size_x; ++x)
-        {
-            for(int z = 0; z < size_z; ++z)
-            {
-                int index = z * size_y + (x * size_y * size_z);
-                this->blocks[index] = 12;
-                if (x == 0 || x == size_x-1 || z == 0 || z == size_z-1)
-                    this->blocks[index+1] = 25;
-                this->skylight[index/2] = 0xff;
-                this->skylight[index/2+1] = 0xff;
-            }
-        }
-    }
-
-    void free() {
-        delete[] blocks;
-        delete[] metadata;
-        delete[] blocklight;
-        delete[] skylight;
-    }
+    void allocate();
+    void free();
 
     uint8_t *blocks;
     uint8_t *metadata;
