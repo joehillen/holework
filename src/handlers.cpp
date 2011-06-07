@@ -18,6 +18,16 @@
 
 #include "handlers.h"
 
+#include <boost/format.hpp>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include "chunk.h"
+#include "events.h"
+#include "log.h"
+#include "network/response.h"
+#include "player.h"
+
 namespace boostcraft {
 
 /*

@@ -18,29 +18,26 @@
 
 #pragma once
 
-#include <sstream>
-#include <string>
-#include <iostream>
-#include "network/response.h"
-#include "boost/format.hpp"
-
-#include "events.h"
-#include "player.h"
-#include "log.h"
-#include "chunk.h"
-
+// Forward declarations
 namespace boostcraft {
-
-static int newEntityID()
-{
-    static int id = 0;
-    return id++;
+    struct LogEvent;
+    struct LoginRequestEvent;
+    struct PlayerLookEvent;
+    struct PlayerPositionEvent;
+    struct PlayerOnGroundEvent;
 }
 
-void logHandler(LogEvent& event);
-void loginHandler(LoginRequestEvent& e);
-void lookHandler(PlayerLookEvent& event);
-void positionHandler(PlayerPositionEvent& event);
-void ongroundHandler(PlayerOnGroundEvent& event);
+namespace boostcraft
+{
+    static int newEntityID()
+    {
+        static int id = 0;
+        return id++;
+    }
 
-} //end namespace
+    void logHandler(LogEvent& event);
+    void loginHandler(LoginRequestEvent& e);
+    void lookHandler(PlayerLookEvent& event);
+    void positionHandler(PlayerPositionEvent& event);
+    void ongroundHandler(PlayerOnGroundEvent& event);
+} // namespace boostcraft

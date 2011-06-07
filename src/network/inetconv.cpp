@@ -3,8 +3,6 @@
 #include "inetconv.h"
 #include <gtest/gtest.h>
 #include <sys/types.h>
-#include <netinet/in.h>
-
 
 bool isbigendian()
 {

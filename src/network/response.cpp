@@ -20,9 +20,8 @@
 #include "uniconv.h"
 #include "inetconv.h"
 
-#include <ostream>
-
 #include <iostream>
+#include <iomanip>
 #include <boost/iostreams/device/back_inserter.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/iostreams/copy.hpp>
@@ -30,7 +29,19 @@
 
 #include "chunk.h" 
 
-namespace boostcraft { namespace network { 
+namespace boostcraft {
+namespace network { 
+
+std::ostream& operator<<(std::ostream& os, Response const& r)
+{
+    const uint8_t* buf = boost::asio::buffer_cast<const uint8_t*>(r.data->data());
+
+    for(size_t i = 0; i < r.data->size(); ++i) {
+        os << std::hex << (int)buf[i] << " ";
+    }
+
+    return os;
+}
 
 void Response::raw_string(std::string const& s)
 {

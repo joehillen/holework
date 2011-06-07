@@ -19,9 +19,7 @@
 #pragma once
 
 #include <boost/asio.hpp>
-#include <iomanip>
-#include <ostream>
-
+#include <iosfwd>
 
 namespace boostcraft {
 
@@ -53,7 +51,7 @@ enum ResponseType
 
 struct Response
 {
-    boost::shared_ptr<boost::asio::streambuf> data;
+    std::shared_ptr<boost::asio::streambuf> data;
     
     Response() 
         : data(new boost::asio::streambuf())
@@ -68,16 +66,7 @@ struct Response
     void raw_string(std::string const& s);
 };
 
-static std::ostream& operator<<(std::ostream& os, Response const& r)
-{
-    const uint8_t* buf = boost::asio::buffer_cast<const uint8_t*>(r.data->data());
-
-    for(size_t i = 0; i < r.data->size(); ++i) {
-        os << std::hex << (int)buf[i] << " ";
-    }
-
-    return os;
-}
+std::ostream& operator<<(std::ostream& os, Response const& r);
 
 Response& operator<<(Response& os, uint8_t n);
 Response& operator<<(Response& os, uint16_t n);
