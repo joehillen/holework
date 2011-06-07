@@ -41,15 +41,15 @@ namespace pdl {
 
         ///////////////////////////////////////
         // Create parser
-        prod BYTE       = 'b' >> int_       [ ref(r) << static_cast_<uint8_t>(_1) ];
-        prod SHORT      = 's' >> short_     [ ref(r) << static_cast_<uint16_t>(_1) ];
-        prod INTEGER    = 'i' >> int_       [ ref(r) << static_cast_<uint32_t>(_1) ];
-        prod LONG       = 'l' >> long_      [ ref(r) << static_cast_<uint64_t>(_1) ];
+        prod BYTE       = 'b' >> int_       [ ref(r) << static_cast_<int8_t>(_1) ];
+        prod SHORT      = 's' >> short_     [ ref(r) << static_cast_<int16_t>(_1) ];
+        prod INTEGER    = 'i' >> int_       [ ref(r) << static_cast_<int32_t>(_1) ];
+        prod LONG       = 'l' >> long_      [ ref(r) << static_cast_<int64_t>(_1) ];
         prod FLOAT      = 'f' >> float_     [ ref(r) << _1 ];
         prod DOUBLE     = 'd' >> double_    [ ref(r) << _1 ];
 
         prod PRIMITIVE  = BYTE | SHORT | INTEGER | LONG | FLOAT | DOUBLE;
-        prod TAG        = '@' >> int_       [ ref(r) << static_cast_<uint8_t>(_1) ];
+        prod TAG        = '@' >> int_       [ ref(r) << static_cast_<int8_t>(_1) ];
         prod PACKET     = TAG >> *PRIMITIVE;
 
         bool success = phrase_parse(

@@ -384,9 +384,9 @@ struct HoldingChange : public Request
     {
         // TODO: implement dispatch
         Response r;
-        r << (uint8_t)0x36;
-        r << (uint32_t)0 << (uint16_t)1 << (uint32_t)0;
-        r << (uint8_t)0 << (uint8_t)16;
+        r << (int8_t)0x36;
+        r << (int32_t)0 << (int16_t)1 << (int32_t)0;
+        r << (int8_t)0 << (int8_t)16;
         p->deliver(r);
     }
 };

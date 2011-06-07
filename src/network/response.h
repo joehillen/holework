@@ -64,14 +64,23 @@ struct Response
     }
 
     void raw_string(std::string const& s);
+
+    // TODO: default copy and assignment don't really make sense here, because
+    // Response is mutable and the changes would be visible through its shared
+    // pointer to the response data. Response should probably be immutable; we
+    // could use a ResponseStream to create Responses; ResponseStream would be
+    // non-copyable but mutable, Response would be immutable but copyable.
+    // 
+    Response(Response const&) = default;
+    Response& operator=(Response const&) = default;
 };
 
 std::ostream& operator<<(std::ostream& os, Response const& r);
 
-Response& operator<<(Response& os, uint8_t n);
-Response& operator<<(Response& os, uint16_t n);
-Response& operator<<(Response& os, uint32_t n);
-Response& operator<<(Response& os, uint64_t n);
+Response& operator<<(Response& os, int8_t n);
+Response& operator<<(Response& os, int16_t n);
+Response& operator<<(Response& os, int32_t n);
+Response& operator<<(Response& os, int64_t n);
 Response& operator<<(Response& os, std::string const& s);
 Response& operator<<(Response& os, float n);
 Response& operator<<(Response& os, double n);
@@ -82,9 +91,9 @@ Response& operator<<(Response& os, double n);
 Response keepalive();
 Response chatmessage(std::string const& msg);
 Response handshake(std::string const& msg);
-Response loginresponse(uint32_t eid, uint64_t seed, uint8_t dim);
-Response spawnresponse(uint32_t x, uint32_t y, uint32_t z);
-Response chunkresponse(uint32_t x, uint32_t z, Chunk const& chunk);
+Response loginresponse(int32_t eid, int64_t seed, int8_t dim);
+Response spawnresponse(int32_t x, int32_t y, int32_t z);
+Response chunkresponse(int32_t x, int32_t z, Chunk const& chunk);
 Response positionlookresponse(double x, double z, double y,
                           double stance, float yaw, float pitch,
                           bool on_ground);

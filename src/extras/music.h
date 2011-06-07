@@ -29,9 +29,9 @@ enum pitches {
 static void send_note(Player& p, int instrument, int pitch)
 {
     network::Response r;
-    r << (uint8_t)0x36;
-    r << (uint32_t)0 << (uint16_t)1 << (uint32_t)0;
-    r << (uint8_t)instrument << (uint8_t)pitch;
+    r << (int8_t)0x36;
+    r << (int32_t)0 << (int16_t)1 << (int32_t)0;
+    r << (int8_t)instrument << (int8_t)pitch;
     p.deliver(r);
 }
 

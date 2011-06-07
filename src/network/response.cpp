@@ -49,14 +49,14 @@ void Response::raw_string(std::string const& s)
     out << s;
 }
 
-Response& operator<<(Response& os, uint8_t n)
+Response& operator<<(Response& os, int8_t n)
 {
     std::ostream out(os.data.get());
     out.put(n);
     return os;
 }
 
-Response& operator<<(Response& os, uint16_t n)
+Response& operator<<(Response& os, int16_t n)
 {
     std::ostream out(os.data.get());
     n = ntoh(n);
@@ -64,7 +64,7 @@ Response& operator<<(Response& os, uint16_t n)
     return os;
 }
 
-Response& operator<<(Response& os, uint32_t n)
+Response& operator<<(Response& os, int32_t n)
 {
     std::ostream out(os.data.get());
     n = ntoh(n);
@@ -72,7 +72,7 @@ Response& operator<<(Response& os, uint32_t n)
     return os;
 }
 
-Response& operator<<(Response& os, uint64_t n)
+Response& operator<<(Response& os, int64_t n)
 {
     std::ostream out(os.data.get());
     n = ntoh(n);
@@ -117,14 +117,14 @@ Response& operator<<(Response& os, double n)
 Response keepalive()
 {
     Response r;
-    r << (uint8_t)RESPONSE_KEEP_ALIVE;
+    r << (int8_t)RESPONSE_KEEP_ALIVE;
     return r;
 }
 
 Response chatmessage(std::string const& msg)
 {
     Response r;
-    r << (uint8_t)RESPONSE_CHAT;
+    r << (int8_t)RESPONSE_CHAT;
     r << utf8toucs2(msg);
     return r;
 }
@@ -132,15 +132,15 @@ Response chatmessage(std::string const& msg)
 Response handshake(std::string const& hash)
 {
     Response r;
-    r << (uint8_t)RESPONSE_HANDSHAKE;
+    r << (int8_t)RESPONSE_HANDSHAKE;
     r << utf8toucs2(hash);
     return r;
 }
 
-Response loginresponse(uint32_t entityId, uint64_t seed, uint8_t dimension)
+Response loginresponse(int32_t entityId, int64_t seed, int8_t dimension)
 {
     Response r;
-    r << (uint8_t)RESPONSE_LOGIN;
+    r << (int8_t)RESPONSE_LOGIN;
     r << entityId;
     r << utf8toucs2("NOT USED");
     r << seed;
@@ -149,21 +149,21 @@ Response loginresponse(uint32_t entityId, uint64_t seed, uint8_t dimension)
 }
 
 
-Response chunkresponse(uint32_t x, uint32_t z, Chunk const& chunk)
+Response chunkresponse(int32_t x, int32_t z, Chunk const& chunk)
 {
     Response r;
 
     // Always include a pre-chunk "packet" as a header
-    r << (uint8_t)RESPONSE_PRECHUNK << x << z << (uint8_t) 1; //1 for initialize mode
+    r << (int8_t)RESPONSE_PRECHUNK << x << z << (int8_t) 1; //1 for initialize mode
     // Send chunk
     // TODO: refactor this coordinate stuff
-    r << (uint8_t)RESPONSE_CHUNK;
-    r << (uint32_t)(x * 16);
-    r << (uint16_t)0;
-    r << (uint32_t)(z * 16);
-    r << (uint8_t)Chunk::size_x;
-    r << (uint8_t)Chunk::size_y;
-    r << (uint8_t)Chunk::size_z;
+    r << (int8_t)RESPONSE_CHUNK;
+    r << (int32_t)(x * 16);
+    r << (int16_t)0;
+    r << (int32_t)(z * 16);
+    r << (int8_t)Chunk::size_x;
+    r << (int8_t)Chunk::size_y;
+    r << (int8_t)Chunk::size_z;
 
     // Compressify!
     std::stringstream source_data;
@@ -178,16 +178,16 @@ Response chunkresponse(uint32_t x, uint32_t z, Chunk const& chunk)
 
     std::string s = compressed_data.str();
 
-    r << (uint32_t)s.size();
+    r << (int32_t)s.size();
     r.raw_string(s);
 
     return r;
 }
 
-Response spawnresponse(uint32_t x, uint32_t y, uint32_t z)
+Response spawnresponse(int32_t x, int32_t y, int32_t z)
 {
     Response r;
-    r << (uint8_t)RESPONSE_SPAWN_POS;
+    r << (int8_t)RESPONSE_SPAWN_POS;
     r << x << y << z;
     return r;
 }
@@ -198,10 +198,10 @@ Response positionlookresponse(double x, double z, double y,
 {
     Response r;
 
-    r << (uint8_t)RESPONSE_POSITION_LOOK;
+    r << (int8_t)RESPONSE_POSITION_LOOK;
     r << x << y << stance << z;
     r << yaw << pitch;
-    r << (uint8_t)on_ground;
+    r << (int8_t)on_ground;
 
     return r;
 }

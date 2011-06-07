@@ -90,14 +90,14 @@ void loginHandler(LoginRequestEvent& e)
 
     // HACK: send inventory
     network::Response r;
-    r << (uint8_t)0x68;
-    r << (uint8_t)0;
-    r << (uint16_t)45;
+    r << (int8_t)0x68;
+    r << (int8_t)0;
+    r << (int16_t)45;
 
     for(int i = 0; i < 45; ++i) {
-        r << (uint16_t)331;
-        r << (uint8_t)2;
-        r << (uint16_t)0;
+        r << (int16_t)331;
+        r << (int8_t)2;
+        r << (int16_t)0;
     }
     e.player->deliver(r);
 
