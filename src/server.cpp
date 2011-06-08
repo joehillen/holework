@@ -18,16 +18,12 @@ Server::Server(boost::asio::io_service& io, tcp::endpoint& endpoint)
     : TcpServer(io, endpoint)
 {
     // Register event handlers
-    // TODO: events should be rewritten to use std::function
-    //
-    boost::function<void(PlayerDisconnectEvent&)> disconnect =
-        boost::bind(&Server::onPlayerDisconnect, this, _1);
+    using std::placeholders::_1;
 
-    boost::function<void(ChatEvent&)> chat = 
-        boost::bind(&Server::onChat, this, _1);
-
-    listen(disconnect);
-    listen(chat);
+    listen<PlayerDisconnectEvent>(
+            std::bind(&Server::onPlayerDisconnect, this, _1));
+    listen<ChatEvent>(
+            std::bind(&Server::onChat, this, _1));
 
     //
     // TODO: "listen" needs to return a signal connection so we can remove the

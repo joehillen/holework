@@ -38,19 +38,19 @@ boost::asio::io_service& io_service()
  * associated callback, so that the timer is not destroyed before it expires.
  */
 void timeout_wrapper(std::shared_ptr<boost::asio::deadline_timer> timer,
-        boost::function<void()> callback)
+        std::function<void()> callback)
 {
     callback();
 }
 
-void schedule(unsigned int ms, boost::function<void()> callback)
+void schedule(unsigned int ms, std::function<void()> callback)
 {
     std::shared_ptr<boost::asio::deadline_timer>
         timer(new boost::asio::deadline_timer(io_service()));
 
     timer->expires_from_now(boost::posix_time::milliseconds(ms));
 
-    timer->async_wait(boost::bind(timeout_wrapper, timer, callback));
+    timer->async_wait(std::bind(timeout_wrapper, timer, callback));
 }
 
 
@@ -85,23 +85,5 @@ void interval_timer::fire(boost::system::error_code const& error)
     }
 }
 
-
-
-/******************************************************************************
- * Event class signal initialization
- *
- * TODO: might be able to remove all this manual initialization with
- *         some clever templating
- * TODO: move event types stuff to a different file, at any rate
- */
-boost::signals2::signal<void(LoginRequestEvent&)> LoginRequestEvent::signal;
-boost::signals2::signal<void(ChatEvent&)> ChatEvent::signal;
-boost::signals2::signal<void(LogEvent&)> LogEvent::signal;
-boost::signals2::signal<void(PlayerNeedsChunkEvent&)> PlayerNeedsChunkEvent::signal;
-boost::signals2::signal<void(PlayerLookEvent&)> PlayerLookEvent::signal;
-boost::signals2::signal<void(PlayerPositionEvent&)> PlayerPositionEvent::signal;
-boost::signals2::signal<void(PlayerOnGroundEvent&)> PlayerOnGroundEvent::signal;
-boost::signals2::signal<void(PlayerDisconnectEvent&)> PlayerDisconnectEvent::signal;
-
-}
+} // namespace boostcraft
 

@@ -19,8 +19,8 @@
 #pragma once
 
 #include <boost/asio.hpp>
-#include <boost/bind.hpp>
 #include <boost/signals2/signal.hpp>
+#include <functional>
 
 #include "log.h"
 
@@ -85,6 +85,17 @@ struct Event
     Event() : canceled(false) { }
 };
 
+/**
+ * Template for attaching a signal to an event class
+ */
+template<typename EventType>
+struct Signal
+{
+    static boost::signals2::signal<void(EventType&)> signal;
+};
+template<typename EventType>
+    boost::signals2::signal<void(EventType&)> Signal<EventType>::signal;
+
 
 struct PlayerEvent : public Event
 {
@@ -93,9 +104,8 @@ struct PlayerEvent : public Event
     PlayerEvent(std::shared_ptr<Player> player) : player(player) { }
 };
 
-struct LogEvent : public Event
+struct LogEvent : public Event, Signal<LogEvent>
 {
-    static boost::signals2::signal<void(LogEvent&)> signal;
     std::string message;
     LogType type;
 
@@ -103,10 +113,8 @@ struct LogEvent : public Event
     {}
 };
 
-struct LoginRequestEvent : public PlayerEvent
+struct LoginRequestEvent : public PlayerEvent, Signal<LoginRequestEvent>
 {
-    static boost::signals2::signal<void(LoginRequestEvent&)> signal;
-
     int version;
     std::string username;
 
@@ -117,10 +125,8 @@ struct LoginRequestEvent : public PlayerEvent
     }
 };
 
-struct ChatEvent : public PlayerEvent
+struct ChatEvent : public PlayerEvent, Signal<ChatEvent>
 {
-    static boost::signals2::signal<void(ChatEvent&)> signal;
-
     std::string message;
 
     ChatEvent(std::shared_ptr<Player> player, std::string const& msg)
@@ -129,10 +135,8 @@ struct ChatEvent : public PlayerEvent
     }
 };
 
-struct PlayerNeedsChunkEvent : public PlayerEvent
+struct PlayerNeedsChunkEvent : public PlayerEvent, Signal<PlayerNeedsChunkEvent>
 {
-    static boost::signals2::signal<void(PlayerNeedsChunkEvent&)> signal;
-
     int x;
     int z;
 
@@ -142,10 +146,8 @@ struct PlayerNeedsChunkEvent : public PlayerEvent
     }
 };
 
-struct PlayerLookEvent : public PlayerEvent
+struct PlayerLookEvent : public PlayerEvent, Signal<PlayerLookEvent>
 {
-    static boost::signals2::signal<void(PlayerLookEvent&)> signal;
-
     float yaw;
     float pitch;
 
@@ -155,10 +157,8 @@ struct PlayerLookEvent : public PlayerEvent
     }
 };
 
-struct PlayerPositionEvent : public PlayerEvent
+struct PlayerPositionEvent : public PlayerEvent, Signal<PlayerPositionEvent>
 {
-    static boost::signals2::signal<void(PlayerPositionEvent&)> signal;
-
     double x;
     double z;
     double y;
@@ -169,10 +169,8 @@ struct PlayerPositionEvent : public PlayerEvent
     }
 };
 
-struct PlayerOnGroundEvent : public PlayerEvent
+struct PlayerOnGroundEvent : public PlayerEvent, Signal<PlayerOnGroundEvent>
 {
-    static boost::signals2::signal<void(PlayerOnGroundEvent&)> signal;
-
     bool on_ground;
 
     PlayerOnGroundEvent(std::shared_ptr<Player> player, bool on_ground)
@@ -181,10 +179,8 @@ struct PlayerOnGroundEvent : public PlayerEvent
     }
 };
 
-struct PlayerDisconnectEvent : public PlayerEvent
+struct PlayerDisconnectEvent : public PlayerEvent, Signal<PlayerDisconnectEvent>
 {
-    static boost::signals2::signal<void(PlayerDisconnectEvent&)> signal;
-
     std::string reason;
 
     PlayerDisconnectEvent(std::shared_ptr<Player> player,
@@ -197,33 +193,23 @@ struct PlayerDisconnectEvent : public PlayerEvent
 // signal connection stuff
 
 
-/**
- * Internal helper: callIfNotCanceled
- *
- * Calls a callback if the given event is uncanceled. Used by wrapper.
- */
-template<class EventType>
-void callIfNotCanceled(
-        boost::function<void(EventType&)> callback,
-        EventType& event)
-{
-    if(!event.canceled)
-        callback(event);
+namespace detail {
+    /**
+     * Internal helper: wrapper
+     *
+     * Wraps an event signal callback so that it will not be called if the event
+     * that dispatched it was canceled by a prior signal callback.
+     */
+    template<class EventType>
+    std::function<void(EventType&)> wrapper(
+            std::function<void(EventType&)> callback)
+    {
+        return [=](EventType& e) {
+            if (!e.canceled)
+                callback(e);
+        };
+    }
 }
-
-/**
- * Internal helper: wrapper
- *
- * Wraps an event signal callback so that it will not be called if the event
- * that dispatched it was canceled by a prior signal callback.
- */
-template<class EventType>
-boost::function<void(EventType&)> wrapper(
-        boost::function<void(EventType&)> callback)
-{
-    return boost::bind(callIfNotCanceled<EventType>, callback, _1);
-}
-
 
 /******************************************************************************
  * Function: listen( callback )
@@ -243,16 +229,38 @@ boost::function<void(EventType&)> wrapper(
  *       thought to the way in which the results of multiple callbacks are
  *       aggregated.
  */
-template<class EventType>
-void listen(boost::function<void(EventType&)> callback)
+template<typename EventType>
+void listen(std::function<void(EventType&)> callback)
 {
-    EventType::signal.connect(wrapper<EventType>(callback));
+    EventType::signal.connect(detail::wrapper<EventType>(callback));
 }
 
-template<class EventType>
+namespace detail {
+    template<typename F, typename R, typename EventType>
+    void listen_helper(F& callback, R(F::*)(EventType&))
+    {
+        EventType::signal.connect(detail::wrapper<EventType>(callback));
+    }
+}
+
+/// This version of listen will work for any functor type with a non-overloaded
+/// operator(). In particular this supports lambda expressions.
+template<typename CallbackType>
+void listen(CallbackType callback)
+{
+    detail::listen_helper(callback, &CallbackType::operator());
+}
+
+template<typename EventType>
 void listen(void (*callback)(EventType&))
 {
-    EventType::signal.connect(wrapper<EventType>(callback));
+    EventType::signal.connect(detail::wrapper<EventType>(callback));
+}
+
+template<typename EventType, typename CallbackType>
+void listen(CallbackType callback)
+{
+    EventType::signal.connect(detail::wrapper<EventType>(callback));
 }
 
 
@@ -264,7 +272,7 @@ void listen(void (*callback)(EventType&))
  * raised, even if the event gets canceled.
  */
 template<class EventType>
-void listen_always(boost::function<void(EventType&)> callback)
+void listen_always(std::function<void(EventType&)> callback)
 {
     EventType::signal.connect(callback);
 }
@@ -297,9 +305,12 @@ void fire(EventType& e)
  *       to deliver the result.
  */
 template<class EventType>
-void async_fire(EventType& e)
+void async_fire(EventType const& e)
 {
-    io_service().post(boost::bind(boost::ref(EventType::signal), e));
+    io_service().post([=] {
+            EventType copy(e);
+            EventType::signal(copy);
+        });
 }
 
 /******************************************************************************
@@ -312,7 +323,7 @@ void async_fire(EventType& e)
  *  destroyed before the interval expires. TODO: provide some way to cancel
  *  a pending timeout.
  */
-void schedule(unsigned int ms, boost::function<void()> callback);
+void schedule(unsigned int ms, std::function<void()> callback);
 
 /******************************************************************************
  * Class: interval_timer
