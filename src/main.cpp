@@ -26,7 +26,7 @@
 
 #include "events.h"
 #include "extras/pdl.h"
-#include "handlers.h"
+#include "handlers/handlers.h"
 #include "log.h"
 #include "server.h"
 
@@ -64,6 +64,7 @@ int main(int argc, char** argv)
     // Initialize in-game packet debugging module
     boostcraft::pdl::init();
 
+    using namespace handlers;
     listen(loginHandler);
     listen(logHandler);
     listen(lookHandler);

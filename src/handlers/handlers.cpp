@@ -30,6 +30,7 @@
 
 namespace boostcraft {
 
+namespace handlers {
 /*
  * Log event handler
  */
@@ -135,5 +136,5 @@ void ongroundHandler(PlayerOnGroundEvent& event)
 }
 
 
-} //end namespace boostcraft
+}} //end namespace boostcraft::handlers
 

@@ -27,8 +27,10 @@ namespace boostcraft {
     struct PlayerOnGroundEvent;
 }
 
-namespace boostcraft
-{
+namespace boostcraft {
+
+namespace handlers {
+
     static int newEntityID()
     {
         static int id = 0;
@@ -40,4 +42,4 @@ namespace boostcraft
     void lookHandler(PlayerLookEvent& event);
     void positionHandler(PlayerPositionEvent& event);
     void ongroundHandler(PlayerOnGroundEvent& event);
-} // namespace boostcraft
+}} // namespace boostcraft::handlers
