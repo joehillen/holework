@@ -27,6 +27,7 @@
 #include "events.h"
 #include "extras/pdl.h"
 #include "handlers/handlers.h"
+#include "handlers/commands.h"
 #include "log.h"
 #include "server.h"
 
@@ -70,6 +71,7 @@ int main(int argc, char** argv)
     listen(lookHandler);
     listen(positionHandler);
     listen(ongroundHandler);
+    listen(commands);
 
     tcp::endpoint endpoint(tcp::v4(), 25565);
     Server server(io_service(), endpoint);
