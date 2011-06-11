@@ -12,20 +12,8 @@
 namespace boostcraft {
 namespace stupidmusic {
 
-enum duration {
-    E = 250,
-    Q = 500,
-    H = 1000,
-    W = 2000
-};
 
-enum pitches {
-                               Fs3,  G3,  Gs3,  A3,  As3,  B3,
-    C4,  Cs4, D4, Ds4, E4, F4, Fs4,  G4,  Gs4,  A4,  As4,  B4,
-    C5,  Cs5, D5, Ds5, E5, F5, Fs5
-};
-
-static void send_note(Player& p, int instrument, int pitch)
+void send_note(Player& p, int instrument, int pitch)
 {
     network::Response r;
     r << (int8_t)0x36;
@@ -34,7 +22,7 @@ static void send_note(Player& p, int instrument, int pitch)
     p.deliver(r);
 }
 
-static void playSequence(std::weak_ptr<Player> weakp,
+void playSequence(std::weak_ptr<Player> weakp,
         std::list<int> notes, std::list<int> times)
 {
     //

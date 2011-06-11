@@ -29,7 +29,7 @@
 #include "player.h"
 
 namespace boostcraft {
-namespace testhandlers {
+namespace handlers {
 
 using namespace boostcraft::event;
 
@@ -157,5 +157,5 @@ void init()
     listen(ongroundHandler);
 }
 
-}} // namespace boostcraft::testhandlers
+}} //end namespace boostcraft::handlers
 

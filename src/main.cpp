@@ -30,7 +30,8 @@
 // Add-on modules
 #include "extras/pdl.h"
 #include "extras/music.h"
-#include "handlers.h"
+#include "handlers/handlers.h"
+#include "handlers/commands.h"
 
 
 /////////////////////////////////////////
@@ -76,7 +77,8 @@ int main(int argc, char** argv)
     // Initialize add-on modules
     boostcraft::pdl::init();
     boostcraft::stupidmusic::init();
-    boostcraft::testhandlers::init();
+    boostcraft::handlers::init();
+    boostcraft::commands::init();
 
     // Start server
     tcp::endpoint endpoint(tcp::v4(), 25565);

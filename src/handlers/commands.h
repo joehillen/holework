@@ -1,4 +1,4 @@
-// handlers.h
+// handlers.cpp
 
 /***********************************************************************
 * Copyright (C) 2011 Holework Project
@@ -16,11 +16,17 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *************************************************************************/
 
-#pragma once
-
+/**
+ *
+ * Commands is a ChatEvent listener for responsing to commands entered by users
+ *
+ *  TODO: A permission system for checking priveleges before running commands
+ *
+ **/
 namespace boostcraft {
-namespace testhandlers {
+namespace commands {
 
     void init();
 
-}} // namespace boostcraft::testhandlers
+}} //end namespace boostcraft::commands
+
