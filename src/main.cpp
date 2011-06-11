@@ -33,6 +33,7 @@
 /////////////////////////////////////////
 // Add-on modules
 #include "extras/pdl.h"
+#include "extras/music.h"
 
 
 /////////////////////////////////////////
@@ -77,6 +78,7 @@ int main(int argc, char** argv)
 
     // Initialize add-on modules
     boostcraft::pdl::init();
+    boostcraft::stupidmusic::init();
 
     listen(loginHandler);
     listen(logHandler);
