@@ -18,27 +18,9 @@
 
 #pragma once
 
-// Forward declarations
 namespace boostcraft {
-namespace event {
-    struct LogEvent;
-    struct LoginRequestEvent;
-    struct PlayerLookEvent;
-    struct PlayerPositionEvent;
-    struct PlayerOnGroundEvent;
-}}
+namespace testhandlers {
 
-namespace boostcraft
-{
-    static int newEntityID()
-    {
-        static int id = 0;
-        return id++;
-    }
+    void init();
 
-    void logHandler(event::LogEvent& event);
-    void loginHandler(event::LoginRequestEvent& e);
-    void lookHandler(event::PlayerLookEvent& event);
-    void positionHandler(event::PlayerPositionEvent& event);
-    void ongroundHandler(event::PlayerOnGroundEvent& event);
-} // namespace boostcraft
+}} // namespace boostcraft::testhandlers

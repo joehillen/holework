@@ -16,16 +16,12 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *************************************************************************/
 
-
 #include <iostream>
 #include <string>
-
 #include <boost/asio.hpp>
-
 #include <gtest/gtest.h>
 
 #include "event/types.h"
-#include "handlers.h"
 #include "ioservice.h"
 #include "log.h"
 #include "server.h"
@@ -34,6 +30,7 @@
 // Add-on modules
 #include "extras/pdl.h"
 #include "extras/music.h"
+#include "handlers.h"
 
 
 /////////////////////////////////////////
@@ -79,12 +76,7 @@ int main(int argc, char** argv)
     // Initialize add-on modules
     boostcraft::pdl::init();
     boostcraft::stupidmusic::init();
-
-    listen(loginHandler);
-    listen(logHandler);
-    listen(lookHandler);
-    listen(positionHandler);
-    listen(ongroundHandler);
+    boostcraft::testhandlers::init();
 
     // Start server
     tcp::endpoint endpoint(tcp::v4(), 25565);

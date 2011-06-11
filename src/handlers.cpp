@@ -29,8 +29,19 @@
 #include "player.h"
 
 namespace boostcraft {
+namespace testhandlers {
 
-    using namespace event;
+using namespace boostcraft::event;
+
+/*
+ * Temporary solution for assigning unique EIDs
+ */
+int newEntityID()
+{
+    static int id = 0;
+    return id++;
+}
+
 
 /*
  * Log event handler
@@ -137,5 +148,14 @@ void ongroundHandler(PlayerOnGroundEvent& event)
 }
 
 
-} //end namespace boostcraft
+void init()
+{
+    listen(logHandler);
+    listen(loginHandler);
+    listen(lookHandler);
+    listen(positionHandler);
+    listen(ongroundHandler);
+}
+
+}} // namespace boostcraft::testhandlers
 
