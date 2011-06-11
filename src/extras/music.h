@@ -4,14 +4,15 @@
 //
 #pragma once
 
-#include "events.h"
+#include "event/types.h"
 #include "player.h"
 #include "network/response.h"
 
 #include <list>
 #include <memory>
 
-namespace boostcraft { namespace stupidmusic {
+namespace boostcraft {
+namespace stupidmusic {
 
 enum duration {
     E = 250,
@@ -53,7 +54,7 @@ static void playSequence(std::weak_ptr<Player> weakp,
         send_note(*player, 0, pitch);
         notes.pop_front();
         times.pop_front();
-        schedule(duration, std::bind(&playSequence, weakp, notes, times));
+        event::schedule(duration, std::bind(&playSequence, weakp, notes, times));
     }
 }
 

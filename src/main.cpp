@@ -24,27 +24,41 @@
 
 #include <gtest/gtest.h>
 
-#include "events.h"
-#include "extras/pdl.h"
+#include "event/types.h"
 #include "handlers.h"
+#include "ioservice.h"
 #include "log.h"
 #include "server.h"
 
-void test()
-{
-    using namespace boostcraft;
-    log(INFO, "Timer","Timer expired!");
+/////////////////////////////////////////
+// Add-on modules
+#include "extras/pdl.h"
+
+
+/////////////////////////////////////////
+// io_service() implemented here
+
+namespace boostcraft {
+    boost::asio::io_service& io_service()
+    {
+        static boost::asio::io_service the_service;
+        return the_service;
+    }
 }
 
 bool boostcraft::debug_mode = false;
+
+
+/////////////////////////////////////////
+// The buck starts here
 
 int main(int argc, char** argv)
 {
     using namespace boost::asio::ip;
     using namespace boostcraft;
+    using namespace boostcraft::event;
 
-    schedule(3000, test);
-
+    // Process command line args
     for (int i = 1; i < argc; ++i)
     {
         std::string s(argv[i]);
@@ -61,7 +75,7 @@ int main(int argc, char** argv)
         }
     }
 
-    // Initialize in-game packet debugging module
+    // Initialize add-on modules
     boostcraft::pdl::init();
 
     listen(loginHandler);
@@ -70,6 +84,7 @@ int main(int argc, char** argv)
     listen(positionHandler);
     listen(ongroundHandler);
 
+    // Start server
     tcp::endpoint endpoint(tcp::v4(), 25565);
     Server server(io_service(), endpoint);
 
@@ -86,6 +101,7 @@ int main(int argc, char** argv)
     return 0;
 }
 
+// If this unit test fails, destroy universe
 TEST(maintestcase, test1)
 {
     ASSERT_TRUE(true);

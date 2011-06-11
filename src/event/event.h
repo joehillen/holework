@@ -1,4 +1,4 @@
-// events.h
+// event/event.h
 
 /***********************************************************************
 * Copyright (C) 2011 Holework Project
@@ -18,38 +18,12 @@
 
 #pragma once
 
-#include <boost/asio.hpp>
 #include <boost/signals2/signal.hpp>
 #include <functional>
+#include "ioservice.h"
 
-#include "log.h"
-
-namespace boostcraft
-{
-
-// Forward declarations
-class Player;
-
-
-/**
- * Function: io_service()
- *
- * Returns a reference to the io_service object for the boostcraft system.
- *
- * Various parts of the boostcraft system can use this object to schedule
- * tasks, create timers, or perform other asynchronous activities.
- *
- * Boostcraft is run by executing io_service::run in (potentially) several
- * threads; all tasks are done asynchronously through the io_service, which
- * means that tasks might be picked up by any thread that is executing
- * io_service::run. This means: minimize shared mutable state if you can, and
- * use boost::asio::strand for any callbacks that access state that must be
- * synchronized (or else do your own locking of entire objects with mutexes,
- * but beware the vile deadlock beast!).
- */
-boost::asio::io_service& io_service();
-
-
+namespace boostcraft {
+namespace event {
 
 /**
  * Events in boostcraft are exposed through a set of public classes, one for
@@ -86,7 +60,7 @@ struct Event
 };
 
 /**
- * Template for attaching a signal to an event class
+ * Base class template for attaching a signal to an event class
  */
 template<typename EventType>
 struct Signal
@@ -97,101 +71,8 @@ template<typename EventType>
     boost::signals2::signal<void(EventType&)> Signal<EventType>::signal;
 
 
-struct PlayerEvent : public Event
-{
-    std::shared_ptr<Player> player;
-
-    PlayerEvent(std::shared_ptr<Player> player) : player(player) { }
-};
-
-struct LogEvent : public Event, Signal<LogEvent>
-{
-    std::string message;
-    LogType type;
-
-    LogEvent(boostcraft::LogType type, std::string const& msg) : message(msg), type(type)
-    {}
-};
-
-struct LoginRequestEvent : public PlayerEvent, Signal<LoginRequestEvent>
-{
-    int version;
-    std::string username;
-
-    LoginRequestEvent(std::shared_ptr<Player> player,
-            std::string const& username, int version)
-        : PlayerEvent(player), version(version), username(username)
-    {
-    }
-};
-
-struct ChatEvent : public PlayerEvent, Signal<ChatEvent>
-{
-    std::string message;
-
-    ChatEvent(std::shared_ptr<Player> player, std::string const& msg)
-        : PlayerEvent(player), message(msg)
-    {
-    }
-};
-
-struct PlayerNeedsChunkEvent : public PlayerEvent, Signal<PlayerNeedsChunkEvent>
-{
-    int x;
-    int z;
-
-    PlayerNeedsChunkEvent(std::shared_ptr<Player> player, int x, int z)
-        : PlayerEvent(player), x(x), z(z)
-    {
-    }
-};
-
-struct PlayerLookEvent : public PlayerEvent, Signal<PlayerLookEvent>
-{
-    float yaw;
-    float pitch;
-
-    PlayerLookEvent(std::shared_ptr<Player> player, float yaw, float pitch)
-        : PlayerEvent(player), yaw(yaw), pitch(pitch)
-    {
-    }
-};
-
-struct PlayerPositionEvent : public PlayerEvent, Signal<PlayerPositionEvent>
-{
-    double x;
-    double z;
-    double y;
-
-    PlayerPositionEvent(std::shared_ptr<Player> player, double x, double z, double y)
-        : PlayerEvent(player), x(x), z(z), y(y)
-    {
-    }
-};
-
-struct PlayerOnGroundEvent : public PlayerEvent, Signal<PlayerOnGroundEvent>
-{
-    bool on_ground;
-
-    PlayerOnGroundEvent(std::shared_ptr<Player> player, bool on_ground)
-        : PlayerEvent(player), on_ground(on_ground)
-    {
-    }
-};
-
-struct PlayerDisconnectEvent : public PlayerEvent, Signal<PlayerDisconnectEvent>
-{
-    std::string reason;
-
-    PlayerDisconnectEvent(std::shared_ptr<Player> player,
-            std::string const& reason)
-        : PlayerEvent(player), reason(reason)
-    {
-    }
-};
-
-// signal connection stuff
-
+/////////////////////////////////////////
+// Signal connection API
 
 namespace detail {
     /**
@@ -359,5 +240,5 @@ private:
     void fire(boost::system::error_code const&);
 };
 
-} // end namespace boostcraft
+}} // namespace boostcraft::event
 

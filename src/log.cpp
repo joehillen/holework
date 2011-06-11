@@ -17,7 +17,7 @@
 *************************************************************************/
 
 #include "log.h"
-#include "events.h"
+#include "event/types.h"
 #include <string>
 
 namespace boostcraft {
@@ -26,7 +26,7 @@ void log(LogType type, std::string source, std::string message)
 {
     if (debug_mode == true || type != DEBUG)
     {
-        LogEvent logevent(type, message);
+        event::LogEvent logevent(type, message);
         logevent.source_name = source;
         async_fire(logevent);
     }

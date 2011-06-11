@@ -2,7 +2,7 @@
 //
 #include "server.h"
 #include "player.h"
-#include "events.h"
+#include "event/types.h"
 #include "network/response.h"
 
 #include <boost/foreach.hpp>
@@ -12,6 +12,7 @@
 
 namespace boostcraft {
 
+using namespace boostcraft::event;
 using boost::asio::ip::tcp;
 
 Server::Server(boost::asio::io_service& io, tcp::endpoint& endpoint)

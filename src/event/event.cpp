@@ -1,4 +1,4 @@
-// events.cpp
+// event/event.cpp
 
 /***********************************************************************
 * Copyright (C) 2011 Holework Project
@@ -16,20 +16,13 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *************************************************************************/
 
-#include "events.h"
+#include "event/event.h"
 
 #include <functional>
 #include <memory>
 
 namespace boostcraft {
-
-boost::asio::io_service the_service;
-
-boost::asio::io_service& io_service()
-{
-    return the_service;
-}
-
+namespace event {
 
 /**
  * Function: timeout_wrapper
@@ -85,5 +78,5 @@ void interval_timer::fire(boost::system::error_code const& error)
     }
 }
 
-} // namespace boostcraft
+}} // namespace boostcraft::event
 

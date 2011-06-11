@@ -18,13 +18,15 @@
 
 #include "player.h"
 
-#include "events.h"
+#include "event/types.h"
 #include "log.h"
 #include "network/connection.h"
 #include "network/request.h"
 #include "network/response.h"
 
 #include <sstream>
+
+using namespace boostcraft::event;
 
 namespace boostcraft
 {

@@ -20,12 +20,13 @@
 
 // Forward declarations
 namespace boostcraft {
+namespace event {
     struct LogEvent;
     struct LoginRequestEvent;
     struct PlayerLookEvent;
     struct PlayerPositionEvent;
     struct PlayerOnGroundEvent;
-}
+}}
 
 namespace boostcraft
 {
@@ -35,9 +36,9 @@ namespace boostcraft
         return id++;
     }
 
-    void logHandler(LogEvent& event);
-    void loginHandler(LoginRequestEvent& e);
-    void lookHandler(PlayerLookEvent& event);
-    void positionHandler(PlayerPositionEvent& event);
-    void ongroundHandler(PlayerOnGroundEvent& event);
+    void logHandler(event::LogEvent& event);
+    void loginHandler(event::LoginRequestEvent& e);
+    void lookHandler(event::PlayerLookEvent& event);
+    void positionHandler(event::PlayerPositionEvent& event);
+    void ongroundHandler(event::PlayerOnGroundEvent& event);
 } // namespace boostcraft

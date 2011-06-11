@@ -23,12 +23,14 @@
 #include <sstream>
 #include <string>
 #include "chunk.h"
-#include "events.h"
+#include "event/types.h"
 #include "log.h"
 #include "network/response.h"
 #include "player.h"
 
 namespace boostcraft {
+
+    using namespace event;
 
 /*
  * Log event handler

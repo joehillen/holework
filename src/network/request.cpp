@@ -4,13 +4,16 @@
 #include "requestfields.h"
 
 #include "player.h"
-#include "events.h"
+#include "event/types.h"
 #include "extras/music.h"
 #include "network/response.h"
 
 #include <string>
 
-namespace boostcraft { namespace network {
+namespace boostcraft {
+namespace network {
+
+using namespace boostcraft::event;
 
 /*
  * Excerpt from the Official Unwrittten Boostcraft Style Guide:

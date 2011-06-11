@@ -28,7 +28,9 @@ namespace boostcraft {
         class Request;
         class Response;
     }
-    class interval_timer;
+    namespace event {
+        class interval_timer;
+    }
 }
 
 namespace boostcraft {
@@ -83,7 +85,7 @@ private:
     double spawn_z_;
     double spawn_y_;
 
-    std::unique_ptr<interval_timer> timer_;
+    std::unique_ptr<event::interval_timer> timer_;
 
     void log(std::string message);
 };

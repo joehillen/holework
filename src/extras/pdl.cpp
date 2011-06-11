@@ -7,11 +7,13 @@
 #include <boost/spirit/home/phoenix/object/static_cast.hpp>
 #include <memory>
 
-#include "events.h"
+#include "event/types.h"
 #include "log.h"
 #include "network/response.h"
 #include "player.h"
 #include <sstream>
+
+using namespace boostcraft::event;
 
 namespace boostcraft {
 namespace pdl {
