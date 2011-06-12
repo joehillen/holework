@@ -25,6 +25,9 @@
 namespace boostcraft {
 namespace event {
 
+// Types
+typedef boost::signals2::connection connection;
+
 /**
  * Events in boostcraft are exposed through a set of public classes, one for
  * each type of event that can occur in the system. Each event class includes
@@ -81,27 +84,80 @@ namespace detail {
      * Wraps an event signal callback so that it will not be called if the event
      * that dispatched it was canceled by a prior signal callback.
      */
-    template<class EventType>
-    std::function<void(EventType&)> wrapper(
-            std::function<void(EventType&)> callback)
+    template<typename EventType, typename F>
+    std::function<void(EventType&)> wrapper(F callback)
     {
         return [=](EventType& e) {
             if (!e.canceled)
                 callback(e);
         };
     }
+
+
+    /**
+     * Internal helper: connect
+     *
+     * 
+     */
+    template<typename EventType, typename CallbackType>
+    connection connect(CallbackType callback)
+    {
+        return EventType::signal.connect(callback);
+    }
 }
+
+
+/******************************************************************************
+ * Function: listen_always
+ *
+ * Registers an event listener function, to be called whenever the appropriate
+ * event is raised in the system.
+ *
+ * Which type of event to listen for can usually be deduced from the callback
+ * signature; this is true for plain function pointers, appropriately typed
+ * std::function and boost::function objects, and any functor object with a
+ * non-overloaded operator(); this includes lambda expressions (§5.1.2).
+ *
+ * For a functor type with an overloaded operator(), you must specify the
+ * event type explicitly, e.g., 
+ *      listen<SomeEvent>( callback );
+ */
+template<typename EventType, typename CallbackType>
+connection listen_always(CallbackType callback) {
+    return detail::connect<EventType>(callback);
+}
+
+template<typename EventType>
+connection listen_always(void (*callback)(EventType&)) {
+    return detail::connect<EventType>(callback);
+}
+
+// If neither of the above templates match a given use (i.e. no explicit
+// specialization on EventType and the callback is not a plain function
+// pointer) this funky helper will allow us to perform type deduction on
+// the functor's operator() through a member function pointer argument.
+namespace detail {
+    template<typename Func, typename Result, typename EventType>
+    void listen_always_helper(Func& callback, Result(Func::*)(EventType&)) {
+        return detail::connect<EventType>(callback);
+    }
+}
+
+template<typename CallbackType>
+connection listen_always(CallbackType callback) {
+    return detail::listen_always_helper(callback, &CallbackType::operator());
+}
+
 
 /******************************************************************************
  * Function: listen( callback )
  *
  * Registers an event listener function, to be called whenever the appropriate
- * event is raised (and not canceled). Which event to listen for is inferred
- * from the callback's signature.
+ * event is raised, as long as the event has not been canceled by a previously
+ * invoked handler.
  * 
- * The specified callback will NOT be called in response to an event if that
- * event is canceled by a prior handler. To register a listener that will be
- * called even for canceled events, use listen_always.
+ * To register a listener that will be called even for canceled events, use
+ * listen_always.
  *
  * TODO: add handler priority classes.
  *
@@ -110,59 +166,28 @@ namespace detail {
  *       thought to the way in which the results of multiple callbacks are
  *       aggregated.
  */
+template<typename EventType, typename CallbackType>
+connection listen(CallbackType callback) {
+    return detail::connect<EventType>(detail::wrapper<EventType>(callback));
+}
+
 template<typename EventType>
-void listen(std::function<void(EventType&)> callback)
-{
-    EventType::signal.connect(detail::wrapper<EventType>(callback));
+connection listen(void (*callback)(EventType&)) {
+    return detail::connect<EventType>(detail::wrapper<EventType>(callback));
 }
 
 namespace detail {
-    template<typename F, typename R, typename EventType>
-    void listen_helper(F& callback, R(F::*)(EventType&))
-    {
-        EventType::signal.connect(detail::wrapper<EventType>(callback));
+    template<typename Func, typename Result, typename EventType>
+    void listen_helper(Func& callback, Result(Func::*)(EventType&)) {
+        return detail::connect<EventType>(detail::wrapper<EventType>(callback));
     }
 }
 
-/// This version of listen will work for any functor type with a non-overloaded
-/// operator(). In particular this supports lambda expressions.
 template<typename CallbackType>
-void listen(CallbackType callback)
-{
-    detail::listen_helper(callback, &CallbackType::operator());
+connection listen(CallbackType callback) {
+    return detail::listen_helper(callback, &CallbackType::operator());
 }
 
-template<typename EventType>
-void listen(void (*callback)(EventType&))
-{
-    EventType::signal.connect(detail::wrapper<EventType>(callback));
-}
-
-template<typename EventType, typename CallbackType>
-void listen(CallbackType callback)
-{
-    EventType::signal.connect(detail::wrapper<EventType>(callback));
-}
-
-
-/******************************************************************************
- * Function: listen_always( callback )
- *
- * Registers an event listener function, as per listen, with the distinction
- * that the function will always be called when the appropriate event is
- * raised, even if the event gets canceled.
- */
-template<class EventType>
-void listen_always(std::function<void(EventType&)> callback)
-{
-    EventType::signal.connect(callback);
-}
-
-template<class EventType>
-void listen_always(void (*callback)(EventType&))
-{
-    EventType::signal.connect(callback);
-}
 
 /******************************************************************************
  * Function: fire
@@ -186,11 +211,10 @@ void fire(EventType& e)
  *       to deliver the result.
  */
 template<class EventType>
-void async_fire(EventType const& e)
+void async_fire(EventType e)
 {
-    io_service().post([=] {
-            EventType copy(e);
-            EventType::signal(copy);
+    io_service().post([e]() mutable {
+            EventType::signal(e);
         });
 }
 
