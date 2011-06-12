@@ -93,6 +93,20 @@ namespace detail {
         };
     }
 
+    /**
+     * Internal helper: world_wrapper
+     *
+     * Wraps an event signal callback to perform target matching so it will
+     * only be called on a target that matches the one specified at registry
+     */
+    template<typename EventType, typename F, typename WorldType>
+    std::function<void(EventType&)> world_wrapper(F callback, WorldType* world)
+    {
+        return [=](EventType& e) {
+            if (e.world == world)
+                callback(e);
+        };
+    }
 
     /**
      * Internal helper: connect
@@ -171,6 +185,7 @@ connection listen(CallbackType callback) {
     return detail::connect<EventType>(detail::wrapper<EventType>(callback));
 }
 
+
 template<typename EventType>
 connection listen(void (*callback)(EventType&)) {
     return detail::connect<EventType>(detail::wrapper<EventType>(callback));
@@ -188,6 +203,41 @@ connection listen(CallbackType callback) {
     return detail::listen_helper(callback, &CallbackType::operator());
 }
 
+/******************************************************************************
+ * Function: listen_world
+ *
+ * Registers an event listener function for a specific target world; the
+ * callback will only be invoked when the Event object specifies the same
+ * world the listener was registered with.
+ */
+template<typename EventType, typename CallbackType, typename WorldType>
+connection listen_world(CallbackType callback, WorldType* world) {
+    return detail::connect<EventType>(
+        detail::world_wrapper<EventType>(callback, world));
+}
+
+template<typename EventType, typename WorldType>
+connection listen_world(void (*callback)(EventType&), WorldType* world) {
+    return detail::connect<EventType>(
+        detail::world_wrapper<EventType>(callback, world));
+}
+
+namespace detail {
+    template<typename Func, typename Result,
+             typename EventType, typename WorldType>
+    void listen_world_helper(Func& callback, Result(Func::*)(EventType&),
+        WorldType* world)
+    {
+        return detail::connect<EventType>(
+            detail::world_wrapper<EventType>(callback, world));
+    }
+}
+
+template<typename CallbackType, typename WorldType>
+connection listen(CallbackType callback, WorldType* world) {
+    return detail::listen_world_helper(
+        callback, &CallbackType::operator(), world);
+}
 
 /******************************************************************************
  * Function: fire
