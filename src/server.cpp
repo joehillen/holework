@@ -2,6 +2,7 @@
 //
 #include "server.h"
 #include "player.h"
+#include "world.h"
 #include "event/types.h"
 #include "network/response.h"
 
@@ -62,6 +63,11 @@ void Server::onChat(ChatEvent& e)
     auto msg = network::chatmessage("<" + e.player->name() + "> " + e.message);
     foreach(auto player, players)
         player->deliver(msg);
+}
+
+void Server::addWorld(std::unique_ptr<World> world)
+{
+    world.swap(this->world);
 }
 
 } // namespace boostcraft

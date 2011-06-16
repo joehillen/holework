@@ -67,12 +67,12 @@ struct ChatEvent : public PlayerEvent, Signal<ChatEvent>
     }
 };
 
-struct PlayerNeedsChunkEvent : public PlayerEvent, Signal<PlayerNeedsChunkEvent>
+struct NeedChunkEvent : public PlayerEvent, Signal<NeedChunkEvent>
 {
     int x;
     int z;
 
-    PlayerNeedsChunkEvent(std::shared_ptr<Player> player, int x, int z)
+    NeedChunkEvent(std::shared_ptr<Player> player, int x, int z)
         : PlayerEvent(player), x(x), z(z)
     {
     }

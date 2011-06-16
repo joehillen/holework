@@ -25,6 +25,7 @@
 #include "ioservice.h"
 #include "log.h"
 #include "server.h"
+#include "world.h"
 
 /////////////////////////////////////////
 // Add-on modules
@@ -83,6 +84,10 @@ int main(int argc, char** argv)
     // Start server
     tcp::endpoint endpoint(tcp::v4(), 25565);
     Server server(io_service(), endpoint);
+
+    // Add worlds
+    std::unique_ptr<World> world(new World(generator));
+    server.addWorld(world);
 
     while(true)
     {
