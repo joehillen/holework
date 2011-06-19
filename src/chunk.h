@@ -23,6 +23,24 @@
 
 namespace boostcraft {
 
+struct Block
+{
+    uint8_t type;
+    uint8_t metadata;
+    uint8_t blocklight;
+    uint8_t skylight;
+
+    Block(Block const&) = default;
+    Block& operator=(Block const&) = default;
+
+    bool operator==(Block const& rhs) const {
+        return type == rhs.type &&
+               metadata == rhs.metadata &&
+               blocklight == rhs.blocklight &&
+               skylight == rhs.skylight;
+    }
+};
+
 class Chunk
 {
 public:
@@ -36,6 +54,17 @@ public:
     };
 
     friend std::ostream& operator<<(std::ostream& os, Chunk const& chunk);
+
+    /// Get the block at the specified coordinates
+    Block get(unsigned int x, 
+              unsigned int z,
+              unsigned int y) const;
+
+    /// Set block at specified coordinates
+    void set(unsigned int x,
+             unsigned int z,
+             unsigned int y,
+             Block const& block);
 
 private:
     void allocate();
