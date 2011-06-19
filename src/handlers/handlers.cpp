@@ -79,53 +79,6 @@ void logHandler(LogEvent& event)
     event.canceled = true;
 }
 
-
-void loginHandler(LoginRequestEvent& e)
-{
-    e.player->id = newEntityID();
-    e.player->deliver(boostcraft::network::loginresponse(e.player->id,0,0));
-    log(INFO, "loginhandler:", 
-        boost::str(boost::format("Login request from %1%."
-                    " Given entity id %2%") 
-                    % e.player->name() 
-                    % e.player->id));
-
-    Chunk chunk;
-    for(int x = -8; x < 8; ++x)
-        for(int z = -8; z < 8; ++z)
-            e.player->deliver(network::chunkresponse(x, z, chunk));
-
-    //Send spawn info
-    std::stringstream ss;
-    ss << "Sending spawn to " << e.player->name();
-    log(DEBUG, "loginHandler", ss.str());
-    e.player->deliver(network::spawnresponse(10, 10, 100));
-
-    // HACK: send inventory
-    network::Response r;
-    r << (int8_t)0x68;
-    r << (int8_t)0;
-    r << (int16_t)45;
-
-    for(int i = 0; i < 45; ++i) {
-        r << (int16_t)331;
-        r << (int8_t)2;
-        r << (int16_t)0;
-    }
-    e.player->deliver(r);
-
-    e.player->deliver(network::positionlookresponse(
-        /*x*/0, 
-        /*z*/0, 
-        /*y*/200, 
-        /*stance*/201.6, 
-        /*yaw*/512, 
-        /*pitch*/90, 
-        /*on_ground*/true
-    ));
-}
-
-
 void lookHandler(PlayerLookEvent& event)
 {
 //    std::stringstream str;
@@ -158,7 +111,6 @@ void needChunkHandler(NeedChunkEvent& event)
 void init()
 {
     listen(logHandler);
-    listen(loginHandler);
     listen(lookHandler);
     listen(positionHandler);
     listen(ongroundHandler);

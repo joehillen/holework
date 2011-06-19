@@ -22,6 +22,8 @@ Server::Server(boost::asio::io_service& io, tcp::endpoint& endpoint)
     // Register event handlers
     using std::placeholders::_1;
 
+    listen<LoginRequestEvent>(
+            std::bind(&Server::onLogin, this, _1));
     listen<PlayerDisconnectEvent>(
             std::bind(&Server::onPlayerDisconnect, this, _1));
     listen<ChatEvent>(
@@ -46,6 +48,16 @@ void Server::connect(std::unique_ptr<tcp::socket> socket)
     // TODO: it's not safe to call start() on a player until after a shared_ptr
     // owning the player has been created!!! this should probably be addressed
     // by forcing the use of a static Player::create function.
+}
+
+void Server::onLogin(LoginRequestEvent& e)
+{
+    log(INFO, "server", "Login request from " + e.player->name());
+
+    e.player->id = 3;
+    e.player->deliver(network::loginresponse(e.player->id, 0, 0));
+
+    world->spawnPlayer(e.player);
 }
 
 void Server::onPlayerDisconnect(PlayerDisconnectEvent& e)

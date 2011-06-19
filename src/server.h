@@ -13,6 +13,7 @@ namespace boostcraft
   class Player;
   class World;
   namespace event {
+    class LoginRequestEvent;
     class PlayerDisconnectEvent;
     class ChatEvent;
   }
@@ -30,6 +31,7 @@ namespace boostcraft
 
 
       /* EVENT HANDLERS */
+      void onLogin(event::LoginRequestEvent& e);
       void onPlayerDisconnect(event::PlayerDisconnectEvent& e);
       void onChat(event::ChatEvent& e);
 

@@ -23,6 +23,7 @@ public:
     }
 
 
+    void spawnPlayer(std::shared_ptr<Player> p);
     void addPlayer(std::shared_ptr<Player> p);
     void rmPlayer(std::shared_ptr<Player> p);
 
@@ -30,7 +31,7 @@ public:
 private:
     std::list<std::shared_ptr<Player>> players;
     //ChunkCache cache;
-    void newChunkHandler(event::NewChunkEvent& e) { }
+    void newChunkHandler(event::NewChunkEvent& e); 
 };
 
 } // end namespace boostcraft
