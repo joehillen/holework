@@ -38,21 +38,20 @@ namespace boostcraft {
 class Player : public network::Connection
 {
 public:
-    explicit Player(std::unique_ptr<Connection::socket_t>); 
+    explicit Player(uint32_t id, std::unique_ptr<Connection::socket_t>); 
     ~Player();
 
-    /// Set username and initialize keepalive in response to a client handshake
+    // Set username and initialize keepalive in response to a client handshake
     void handshake(std::string const& username);
 
-    /// Return player nickname
+    uint32_t id();
+    // Return player nickname
     std::string name();
 
     void updatePosition(double x, double y, double z);
     void updateLook(float yaw, float pitch);
     void updateHealth(short health);
 
-    /// TODO: make private
-    int id;
 private:
     /// Initiates dispatch for a client request
     void dispatch(network::Request const&);
@@ -64,6 +63,7 @@ private:
     std::shared_ptr<Player> shared_from_this();
     std::shared_ptr<Player const> shared_from_this() const;
 
+    uint32_t id_;
     std::string name_;
 
     /* Position */

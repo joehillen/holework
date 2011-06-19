@@ -9,36 +9,36 @@
 
 namespace boostcraft
 {
-  // Forward declarations
-  class Player;
-  class World;
-  namespace event {
-    class LoginRequestEvent;
-    class PlayerDisconnectEvent;
-    class ChatEvent;
-  }
+    // Forward declarations
+    class Player;
+    class World;
+    namespace event {
+        class LoginRequestEvent;
+        class PlayerDisconnectEvent;
+        class ChatEvent;
+    }
 
-  class Server : private network::TcpServer
-  {
-  public:
-      Server(boost::asio::io_service& io, 
+    class Server : private network::TcpServer
+    {
+    public:
+        Server(boost::asio::io_service& io, 
               boost::asio::ip::tcp::endpoint& ep);
 
-      void addWorld(std::unique_ptr<World> world);
+        void addWorld(std::unique_ptr<World> world);
 
-  private:
-      void connect(std::unique_ptr<boost::asio::ip::tcp::socket> socket);
+    private:
+        void connect(std::unique_ptr<boost::asio::ip::tcp::socket> socket);
 
+        /* EVENT HANDLERS */
+        void onLogin(event::LoginRequestEvent& e);
+        void onPlayerDisconnect(event::PlayerDisconnectEvent& e);
+        void onChat(event::ChatEvent& e);
 
-      /* EVENT HANDLERS */
-      void onLogin(event::LoginRequestEvent& e);
-      void onPlayerDisconnect(event::PlayerDisconnectEvent& e);
-      void onChat(event::ChatEvent& e);
-
-  private:
-      std::unique_ptr<World> world;
-      std::list<std::shared_ptr<Player>> players;
-  };
+    private:
+        std::unique_ptr<World> world;
+        std::list<std::shared_ptr<Player>> players;
+        uint32_t entity_id;
+    };
 
 } // namespace boostcraft
 

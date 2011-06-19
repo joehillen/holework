@@ -37,8 +37,8 @@ void Player::log(std::string message)
 }
 
 
-Player::Player(std::unique_ptr<Connection::socket_t> sock)
-    : Connection(std::move(sock)),
+Player::Player(uint32_t id, std::unique_ptr<Connection::socket_t> sock)
+    : Connection(std::move(sock)), id_(id), 
       timer_(0)
 {
 }
@@ -59,6 +59,10 @@ std::shared_ptr<Player const> Player::shared_from_this() const
             Connection::shared_from_this());
 }
 
+uint32_t Player::id()
+{
+    return id_;
+}
 
 void Player::disconnected(std::string const& reason)
 {

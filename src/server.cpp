@@ -41,7 +41,7 @@ Server::Server(boost::asio::io_service& io, tcp::endpoint& endpoint)
 void Server::connect(std::unique_ptr<tcp::socket> socket)
 {
     // Create a player from the socket
-    std::shared_ptr<Player> player(new Player(std::move(socket)));
+    std::shared_ptr<Player> player(new Player(entity_id++, std::move(socket)));
     players.push_back(player);
     player->start();
 
@@ -54,8 +54,7 @@ void Server::onLogin(LoginRequestEvent& e)
 {
     log(INFO, "server", "Login request from " + e.player->name());
 
-    e.player->id = 3;
-    e.player->deliver(network::loginresponse(e.player->id, 0, 0));
+    e.player->deliver(network::loginresponse(e.player->id(), 0, 0));
 
     world->spawnPlayer(e.player);
 }
