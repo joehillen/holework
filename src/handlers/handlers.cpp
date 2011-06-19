@@ -147,6 +147,13 @@ void ongroundHandler(PlayerOnGroundEvent& event)
     log(DEBUG, "ongroundHandler", str.str());
 }
 
+void needChunkHandler(NeedChunkEvent& event)
+{
+    std::stringstream ss;
+    ss << "Need chunk at " << event.x << ", " << event.z
+       << " for world " << &event.world;
+    log(INFO, "handlers", ss.str()); 
+}
 
 void init()
 {

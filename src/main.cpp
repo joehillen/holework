@@ -26,6 +26,7 @@
 #include "log.h"
 #include "server.h"
 #include "world.h"
+#include "generators/generators.h"
 
 /////////////////////////////////////////
 // Add-on modules
@@ -76,18 +77,19 @@ int main(int argc, char** argv)
     }
 
     // Initialize add-on modules
-    boostcraft::pdl::init();
-    boostcraft::stupidmusic::init();
-    boostcraft::handlers::init();
-    boostcraft::commands::init();
+    pdl::init();
+    stupidmusic::init();
+    handlers::init();
+    commands::init();
 
     // Start server
     tcp::endpoint endpoint(tcp::v4(), 25565);
     Server server(io_service(), endpoint);
 
     // Add worlds
+    auto generator = &generators::flatland;
     std::unique_ptr<World> world(new World(generator));
-    server.addWorld(world);
+    server.addWorld(std::move(world));
 
     while(true)
     {

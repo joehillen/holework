@@ -24,6 +24,8 @@
 /// Forward declarations
 namespace boostcraft {
     class Player;
+    class World;
+    class Chunk;
 }
 
 namespace boostcraft {
@@ -67,13 +69,27 @@ struct ChatEvent : public PlayerEvent, Signal<ChatEvent>
     }
 };
 
-struct NeedChunkEvent : public PlayerEvent, Signal<NeedChunkEvent>
+struct NeedChunkEvent : public Event, Signal<NeedChunkEvent>
 {
+    World* world;
     int x;
     int z;
 
-    NeedChunkEvent(std::shared_ptr<Player> player, int x, int z)
-        : PlayerEvent(player), x(x), z(z)
+    NeedChunkEvent(World* world, int x, int z)
+        : world(world), x(x), z(z)
+    {
+    }
+};
+
+struct NewChunkEvent : public Event, Signal<NewChunkEvent>
+{
+    World* world;
+    int x;
+    int z;
+    Chunk* chunk;
+
+    NewChunkEvent(World* world, int x, int z, Chunk* chunk)
+        : world(world), x(x), z(z), chunk(chunk)
     {
     }
 };
