@@ -52,13 +52,36 @@ Block Chunk::get(unsigned int x, unsigned int z, unsigned int y) const
     if (x >= size_x || z >= size_z || y >= size_y)
         throw std::out_of_range("block index out of range");
 
-    int index = z * size_y + (x * size_y * size_z);
+    int index = y + z * size_y + (x * size_y * size_z);
 
     uint8_t type = this->blocks[index];
-    uint8_t meta = this->metadata[index/2] & 0xF;
-    uint8_t light = this->blocklight[index/2] & 0xF;
-    uint8_t skylight = this->skylight[index/2] & 0xF;
-    return Block { type, meta, light, skylight };
+    uint8_t metadata;
+    uint8_t blocklight;
+    uint8_t skylight;
+
+    auto get_upper_nibble = [](uint8_t whole)
+    {
+        return (whole & 0xF0) >> 4;
+    };
+
+    auto get_lower_nibble = [](uint8_t whole)
+    {
+        return (whole & 0x0F);
+    };
+
+    if (index % 2 == 0)
+    {
+        metadata = get_upper_nibble(this->metadata[index/2]);
+        blocklight = get_upper_nibble(this->blocklight[index/2]);
+        skylight = get_upper_nibble(this->skylight[index/2]);
+    } 
+    else 
+    {
+        metadata = get_lower_nibble(this->metadata[index/2]);
+        blocklight = get_lower_nibble(this->blocklight[index/2]);
+        skylight = get_lower_nibble(this->skylight[index/2]);
+    }
+    return Block { type, metadata, blocklight, skylight };
 }
 
 void Chunk::set(unsigned int x,
@@ -71,22 +94,30 @@ void Chunk::set(unsigned int x,
         throw std::out_of_range("block index out of range");
     }
 
-    int index = z * size_y + (x * size_y * size_z);
+    int index = y + z * size_y + (x * size_y * size_z);
     this->blocks[index] = block.type;
 
-    if (index % 2 == 1)
+    auto set_upper_nibble = [](uint8_t& whole, uint8_t half)
     {
-        // If the index is odd, delete the high bits and merge in shifted data
-        metadata[index/2] = (metadata[index/2] & 0x0F) | (block.metadata << 4);
-        blocklight[index/2] = (blocklight[index/2] & 0x0F) | (block.blocklight << 4);
-        skylight[index/2] = (skylight[index/2] & 0x0F) | (block.skylight << 4);
+        whole = (whole & 0x0F) | (half << 4);
+    };
+
+    auto set_lower_nibble = [](uint8_t& whole, uint8_t half)
+    {
+        whole = (whole & 0xF0) | half;
+    };
+
+    if (index % 2 == 0)
+    {
+        set_upper_nibble(metadata[index/2], block.metadata);
+        set_upper_nibble(blocklight[index/2], block.blocklight);
+        set_upper_nibble(skylight[index/2], block.skylight);
     } 
     else 
     {
-        // If even, delete low bits and merge data
-        metadata[index/2] = (metadata[index/2] & 0xF0) | (block.metadata);
-        blocklight[index/2] = (blocklight[index/2] & 0xF0) | (block.blocklight);
-        skylight[index/2] = (skylight[index/2] & 0xF0) | (block.skylight);
+        set_lower_nibble(metadata[index/2], block.metadata);
+        set_lower_nibble(blocklight[index/2], block.blocklight);
+        set_lower_nibble(skylight[index/2], block.skylight);
     }
 }
 
@@ -106,10 +137,10 @@ std::ostream& operator<<(std::ostream& os, Chunk const& chunk)
 // UNIT TESTS
 std::ostream& operator<<(std::ostream& os, boostcraft::Block const& block)
 {
-    os << "Block(type=" << block.type
-       << ", meta=" << block.metadata
-       << ", blocklight=" << block.blocklight
-       << ", skylight=" << block.skylight
+    os << "Block(type=" << (int)block.type
+       << ", meta=" << (int)block.metadata
+       << ", blocklight=" << (int)block.blocklight
+       << ", skylight=" << (int)block.skylight
        << ")";
     return os;
 }
@@ -121,7 +152,11 @@ TEST(ChunkTests, SetAndGet)
     Chunk chunk;
     Block b { 42, 11, 12, 13 };
     chunk.set(0, 0, 0, b);
+    chunk.set(1, 1, 1, b);
+    chunk.set(15, 15, 127, b);
+    ASSERT_EQ(b, chunk.get(1, 1, 1));
     ASSERT_EQ(b, chunk.get(0, 0, 0));
+    ASSERT_EQ(b, chunk.get(15, 15, 127));
 }
 
 TEST(ChunkTests, GetOutOfRange)
