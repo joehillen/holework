@@ -16,50 +16,54 @@ namespace boostcraft {
 
 void World::spawnPlayer(std::shared_ptr<Player> player)
 {
-    log(INFO, "World", "Spawning " + player->name());
-    player->deliver(network::spawnresponse(10, 10, 100));
+    using namespace event;
 
-    player->deliver(network::positionlookresponse(
-        /*x,z,y,stance*/ 0, 0, 500, 501.6,
-        /* yaw, pitch */ 512, 90,
-        /* on_ground  */ true));
-
-    // Add player to the world
+    // 0. Add player to the world
     players.push_back(player);
 
-    // Generate needchunk events
-    // NOTE: this is very stupid
-    using namespace event;
+    // 0.5. Mark player waiting for spawn
+    spawning.insert(player);
+
+    // 1. Update needed list for player
     for (int x = -8; x < 8; ++x) {
         for (int z = -8; z < 8; ++z) {
-            async_fire(NeedChunkEvent(this, x, z));
+            //if chunk in cache:
+                //player.deliver(chunk)
+            //else:
+                async_fire(NeedChunkEvent(this, x, z));
+                needs_chunks.add(player, {x, z});
         }
     }
-
-    Chunk chunk;
-    Block block { 1, 0, 15, 15 };
-    for(int x = 0; x < 16; ++x) {
-        for (int z = 0; z < 16; ++z) {
-            chunk.set(x, z, 0, block);
-        }
-    }
-    for(int x = -1; x < 2; ++x) {
-        for (int z = -1; z < 2; ++z) {
-            player->deliver(network::chunkresponse(x, z, chunk));
-        }
-    }
-        
 }
 
 
 void World::newChunkHandler(event::NewChunkEvent& e)
 {
-    log(INFO, "World", "Got a new chunk from the magic chunk hole");
-    log(INFO, "World", "Delivering it to everybody...");
+    log(DEBUG, "World", "Got a new chunk from the magic chunk hole");
 
-    foreach(std::shared_ptr<Player> player, players)
+    ChunkPosition pos { e.x, e.z };
+
+    foreach (player_ptr player, needs_chunks.get(pos))
     {
         player->deliver(network::chunkresponse(e.x, e.z, *e.chunk));
+
+        // player no longer needs the chunk we just gave them
+        needs_chunks.remove(player, pos);
+
+        // If player needs no more chunks and is waiting to spawn...
+        if (needs_chunks.get(player).empty() && 
+                spawning.count(player))
+        {
+            log(INFO, "World", "Spawning " + player->name());
+            player->deliver(network::spawnresponse(10, 10, 100));
+
+            player->deliver(network::positionlookresponse(
+                /*x,z,y,stance*/ 0, 0, 65, 66.6,
+                /* yaw, pitch */ 512, 90,
+                /* on_ground  */ true));
+
+            spawning.erase(player);
+        }
     }
 }
 
