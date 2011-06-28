@@ -86,9 +86,9 @@ struct NewChunkEvent : public Event, Signal<NewChunkEvent>
     World* world;
     int x;
     int z;
-    Chunk* chunk;
+    std::shared_ptr<Chunk> chunk;
 
-    NewChunkEvent(World* world, int x, int z, Chunk* chunk)
+    NewChunkEvent(World* world, int x, int z, std::shared_ptr<Chunk> chunk)
         : world(world), x(x), z(z), chunk(chunk)
     {
     }

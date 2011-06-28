@@ -29,7 +29,7 @@ void flatland(event::NeedChunkEvent& e)
 {
     using namespace event;
 
-    Chunk* chunk = new Chunk;
+    std::shared_ptr<Chunk> chunk(new Chunk);
     
     auto plane = [&](unsigned int y, uint8_t blocktype)
     {
@@ -74,6 +74,6 @@ void flatland(event::NeedChunkEvent& e)
     async_fire(NewChunkEvent(e.world, e.x, e.z, chunk));
 }
 
-}
+} // namespace generators
 } // namespace boostcraft
 
