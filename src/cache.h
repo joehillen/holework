@@ -24,6 +24,7 @@ namespace boostcraft
         void handler(event::NewChunkEvent& e);
     private:
         unsigned int max_size;
+
         // HASH FUNCTION, Y U SO UGLY!?
         template<typename T> struct hash
         {
@@ -33,11 +34,13 @@ namespace boostcraft
                 return 0.5*(p.x + p.z)*(p.x + p.z + 1) + p.z;
             }
         };
-        void move_front(ChunkPosition const& p);
-        std::list<ChunkPosition> list;
-        std::unordered_map< ChunkPosition,
-                            std::shared_ptr<Chunk>,
-                            hash<ChunkPosition>> map;
+
+        typedef std::pair<ChunkPosition, std::shared_ptr<Chunk>> ChunkPair;
+        typedef std::list<ChunkPair> ChunkList;
+        ChunkList list;
+        std::unordered_map<ChunkPosition,
+                           ChunkList::iterator,
+                           hash<ChunkPosition>> map;
     };
 }
 
