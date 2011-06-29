@@ -20,6 +20,7 @@
 #include "chunk.h"
 #include "event/event.h"
 #include "event/types.h"
+#include "log.h"
 
 namespace boostcraft {
 
@@ -27,6 +28,7 @@ namespace generators {
 
 void flatland(event::NeedChunkEvent& e)
 {
+    log(DEBUG,"flatland","Generating Chunk");
     using namespace event;
 
     std::shared_ptr<Chunk> chunk(new Chunk);

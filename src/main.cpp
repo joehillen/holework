@@ -88,7 +88,7 @@ int main(int argc, char** argv)
 
     // Add worlds
     auto generator = &generators::flatland;
-    std::unique_ptr<World> world(new World(generator));
+    std::unique_ptr<World> world(new World(generator, 10000));
     server.addWorld(std::move(world));
 
     while(true)

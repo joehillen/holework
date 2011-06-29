@@ -97,7 +97,7 @@ void ongroundHandler(PlayerOnGroundEvent& event)
 {
     std::stringstream str;
     str << event.player->name() << ": " << "onground: " << event.on_ground;
-    log(DEBUG, "ongroundHandler", str.str());
+    //log(DEBUG, "ongroundHandler", str.str());
 }
 
 void needChunkHandler(NeedChunkEvent& event)

@@ -34,7 +34,7 @@ namespace boostcraft
         map[p] = chunk;
 
         // Remove old chunks
-        while (list.size() > MAX_CACHE)
+        while (list.size() > max_size)
         {
             ChunkPosition removed = list.back();
             remove(removed);

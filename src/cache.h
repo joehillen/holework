@@ -2,6 +2,7 @@
 //
 #pragma once
 
+#include <unordered_map>
 
 namespace boostcraft
 {
@@ -12,16 +13,17 @@ namespace boostcraft
         class NewChunkEvent;
     }
 
-    const unsigned int MAX_CACHE = 10000;
-
     class ChunkCache
     {
     public:
+        ChunkCache(unsigned int max) : max_size(max)
+        { }
         std::shared_ptr<Chunk> get(ChunkPosition const& p);
         void add(ChunkPosition const& p, std::shared_ptr<Chunk> chunk);
         void remove(ChunkPosition const& p);
         void handler(event::NewChunkEvent& e);
     private:
+        unsigned int max_size;
         // HASH FUNCTION, Y U SO UGLY!?
         template<typename T> struct hash
         {
