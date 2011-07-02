@@ -5,7 +5,7 @@
 # TODO: we really should have some way of saying "g++4.5 or higher". For that
 #   matter, Microsoft's C++ compiler should work too, with appropriate flags.
 cxx = 'g++-4.5'
-flags = '-std=c++0x -Wall -Wno-unused-function -O0 -fno-inline -ggdb'
+flags = '-std=c++0x -Wall -Werror -Wno-unused-function -O0 -fno-inline -ggdb'
 paths = '.'
 
 # Set up environment
