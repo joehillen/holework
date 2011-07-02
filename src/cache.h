@@ -26,7 +26,7 @@ namespace boostcraft
         unsigned int max_size;
 
         // HASH FUNCTION, Y U SO UGLY!?
-        template<typename T> struct hash
+        struct hash
         {
             size_t operator()(ChunkPosition const& p) const
             {
@@ -40,7 +40,7 @@ namespace boostcraft
         ChunkList list;
         std::unordered_map<ChunkPosition,
                            ChunkList::iterator,
-                           hash<ChunkPosition>> map;
+                           hash> map;
     };
 }
 
