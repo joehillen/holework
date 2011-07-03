@@ -89,7 +89,10 @@ void lookHandler(PlayerLookEvent& event)
 void positionHandler(PlayerPositionEvent& event)
 {
     std::stringstream str;
-    str << event.player->name() << ": " << "X: " << event.x << " Z: " << event.z << " Y: " << event.y;
+    str << event.player->name() << ": " 
+        << "X: " << event.position.x 
+        << " Z: " << event.position.z 
+        << " Y: " << event.position.y;
     log(DEBUG, "positionHandler", str.str());
 }
 

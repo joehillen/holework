@@ -1,4 +1,5 @@
 // position.h
+#pragma once
 
 #include <sys/types.h>
 
@@ -11,6 +12,8 @@ struct EntityPosition
     double y;
 
     EntityPosition() : x(), z(), y() { }
+    EntityPosition(double x, double z, double y)
+        : x(x), z(z), y(y) { }
     EntityPosition(EntityPosition const& other) = default;
     EntityPosition& operator=(EntityPosition const& rhs) = default;
 };
@@ -22,6 +25,8 @@ struct BlockPosition
     int32_t y;
 
     BlockPosition() : x(), z(), y() { }
+    BlockPosition(int32_t x, int32_t z, int32_t y)
+        : x(x), z(z), y(y) { }
     BlockPosition(BlockPosition const& other) = default;
     BlockPosition& operator=(BlockPosition const& rhs) = default;
 };

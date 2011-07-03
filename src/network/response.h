@@ -23,7 +23,11 @@
 
 namespace boostcraft {
 
+// Forward Declarations
 class Chunk;
+struct ChunkPosition;
+struct EntityPosition;
+struct BlockPosition;
 
 namespace network { 
 
@@ -92,11 +96,11 @@ Response keepalive();
 Response chatmessage(std::string const& msg);
 Response handshake(std::string const& msg);
 Response loginresponse(int32_t eid, int64_t seed, int8_t dim);
-Response spawnresponse(int32_t x, int32_t y, int32_t z);
-Response chunkresponse(int32_t x, int32_t z, Chunk const& chunk);
-Response positionlookresponse(double x, double z, double y,
-                          double stance, float yaw, float pitch,
-                          bool on_ground);
+Response spawnresponse(BlockPosition pos);
+Response chunkresponse(ChunkPosition pos, Chunk const& chunk);
+Response positionlookresponse(EntityPosition position,
+                              double stance, float yaw, float pitch,
+                              bool on_ground);
 
 }} //end namespace boostcraft::network
 

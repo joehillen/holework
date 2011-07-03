@@ -23,6 +23,7 @@
 #include "network/connection.h"
 #include "network/request.h"
 #include "network/response.h"
+#include "position.h"
 
 #include <sstream>
 
@@ -96,11 +97,8 @@ void Player::handshake(std::string const& username)
     }
 }
 
-void Player::updatePosition(double x, double y, double z)
+void Player::updatePosition(EntityPosition pos)
 {
-    x_ = x;
-    x_ = y;
-    x_ = z;
     /* TODO: Something that tells everyone the player position changed. */
 }
 

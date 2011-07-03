@@ -42,28 +42,6 @@ struct Block
     }
 };
 
-/// Represents the position of a chunk in the world
-struct ChunkPosition
-{
-    int x;
-    int z;
-
-    ChunkPosition(ChunkPosition const&) = default;
-    ChunkPosition& operator=(ChunkPosition const&) = default;
-
-    bool operator==(ChunkPosition const& rhs) const {
-        return x == rhs.x && z == rhs.z;
-    }
-
-    bool operator<(ChunkPosition const& rhs) const 
-    {
-        if (rhs.x == this->x) {
-            return rhs.z < this->z;
-        } 
-        return rhs.x < this->x;
-    }
-};
-
 class Chunk
 {
 public:

@@ -22,10 +22,11 @@ void World::sendSpawn(std::shared_ptr<Player> player)
             spawning.count(player))
     {
         log(INFO, "World", "Spawning " + player->name());
-        player->deliver(network::spawnresponse(10, 10, 100));
+        player->deliver(network::spawnresponse({10, 10, 100}));
 
         player->deliver(network::positionlookresponse(
-            /*x,z,y,stance*/ 0, 0, 65, 66.6,
+            /* position */ {0, 0, 65},
+            /* stance */ 66.6,
             /* yaw, pitch */ 512, 90,
             /* on_ground  */ true));
 
@@ -52,7 +53,7 @@ void World::spawnPlayer(std::shared_ptr<Player> player)
             if (chunk) 
             {
                 log(DEBUG, "World", "Sending chunk from cache to " + player->name());
-                player->deliver(network::chunkresponse(x, z, *chunk));
+                player->deliver(network::chunkresponse({x, z}, *chunk));
             }
             else
             {
@@ -75,7 +76,7 @@ void World::newChunkHandler(event::NewChunkEvent& e)
     foreach (player_ptr player, needs_chunks.get(pos))
     {
         log(DEBUG, "World", "Sending new chunk to " + player->name());
-        player->deliver(network::chunkresponse(e.x, e.z, *e.chunk));
+        player->deliver(network::chunkresponse({e.x, e.z}, *e.chunk));
 
         // player no longer needs the chunk we just gave them
         needs_chunks.remove(player, pos);

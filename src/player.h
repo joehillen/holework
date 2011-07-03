@@ -18,6 +18,8 @@
 #pragma once
 
 #include "network/connection.h"
+#include "player.h"
+#include "position.h"
 
 #include <boost/asio.hpp>
 #include <memory>
@@ -48,7 +50,7 @@ public:
     // Return player nickname
     std::string name();
 
-    void updatePosition(double x, double y, double z);
+    void updatePosition(EntityPosition position);
     void updateLook(float yaw, float pitch);
     void updateHealth(short health);
 
@@ -67,9 +69,9 @@ private:
     std::string name_;
 
     /* Position */
-    double x_;
-    double z_;
-    double y_;
+    EntityPosition position_;
+    EntityPosition last_position_;
+    BlockPosition spawn_;
 
     /* Look */
     float yaw_;
@@ -79,11 +81,6 @@ private:
     bool on_ground_;
     bool digging_;
     short health_;
-
-    /* Spawn */
-    double spawn_x_;
-    double spawn_z_;
-    double spawn_y_;
 
     std::unique_ptr<event::interval_timer> timer_;
 

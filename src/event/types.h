@@ -20,6 +20,7 @@
 
 #include "event/event.h"
 #include "log.h"
+#include "position.h"
 
 /// Forward declarations
 namespace boostcraft {
@@ -107,12 +108,10 @@ struct PlayerLookEvent : public PlayerEvent, Signal<PlayerLookEvent>
 
 struct PlayerPositionEvent : public PlayerEvent, Signal<PlayerPositionEvent>
 {
-    double x;
-    double z;
-    double y;
+    EntityPosition position;
 
-    PlayerPositionEvent(std::shared_ptr<Player> player, double x, double z, double y)
-        : PlayerEvent(player), x(x), z(z), y(y)
+    PlayerPositionEvent(std::shared_ptr<Player> player, EntityPosition position)
+        : PlayerEvent(player), position(position)
     {
     }
 };

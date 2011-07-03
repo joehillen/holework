@@ -17,6 +17,7 @@
 *************************************************************************/
 
 #include "response.h"
+#include "position.h"
 #include "uniconv.h"
 #include "inetconv.h"
 
@@ -149,18 +150,18 @@ Response loginresponse(int32_t entityId, int64_t seed, int8_t dimension)
 }
 
 
-Response chunkresponse(int32_t x, int32_t z, Chunk const& chunk)
+Response chunkresponse(ChunkPosition pos, Chunk const& chunk)
 {
     Response r;
 
     // Always include a pre-chunk "packet" as a header
-    r << (int8_t)RESPONSE_PRECHUNK << x << z << (int8_t) 1; //1 for initialize mode
+    r << (int8_t)RESPONSE_PRECHUNK << pos.x << pos.z << (int8_t) 1; //1 for initialize mode
     // Send chunk
     // TODO: refactor this coordinate stuff
     r << (int8_t)RESPONSE_CHUNK;
-    r << (int32_t)(x * 16);
+    r << (int32_t)(pos.x * 16);
     r << (int16_t)0;
-    r << (int32_t)(z * 16);
+    r << (int32_t)(pos.z * 16);
     r << (int8_t)Chunk::size_x;
     r << (int8_t)Chunk::size_y;
     r << (int8_t)Chunk::size_z;
@@ -184,22 +185,22 @@ Response chunkresponse(int32_t x, int32_t z, Chunk const& chunk)
     return r;
 }
 
-Response spawnresponse(int32_t x, int32_t y, int32_t z)
+Response spawnresponse(BlockPosition pos)
 {
     Response r;
     r << (int8_t)RESPONSE_SPAWN_POS;
-    r << x << y << z;
+    r << pos.x << pos.y << pos.z;
     return r;
 }
 
-Response positionlookresponse(double x, double z, double y,
-                          double stance, float yaw, float pitch,
-                          bool on_ground)
+Response positionlookresponse(EntityPosition pos,
+                              double stance, float yaw, float pitch,
+                              bool on_ground)
 {
     Response r;
 
     r << (int8_t)RESPONSE_POSITION_LOOK;
-    r << x << y << stance << z;
+    r << pos.x << pos.y << stance << pos.z;
     r << yaw << pitch;
     r << (int8_t)on_ground;
 
