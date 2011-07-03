@@ -109,6 +109,21 @@ namespace detail {
     }
 
     /**
+     * Internal helper: player_wrapper
+     *
+     * Wraps an event signal callback to perform target matching so it will
+     * only be called on a target that matches the one specified at registry
+     */
+    template<typename EventType, typename F, typename PlayerType>
+    std::function<void(EventType&)> player_wrapper(F callback, PlayerType* player)
+    {
+        return [=](EventType& e) {
+            if (e.player == player)
+                callback(e);
+        };
+    }
+
+    /**
      * Internal helper: connect
      *
      * 
@@ -204,6 +219,42 @@ connection listen(CallbackType callback) {
 }
 
 /******************************************************************************
+ * Function: listen_player
+ *
+ * Registers an event listener function for a specific target player; the
+ * callback will only be invoked when the Event object specifies the same
+ * player the listener was registered with.
+ */
+template<typename EventType, typename CallbackType, typename PlayerType>
+connection listen_player(CallbackType callback, PlayerType* player) {
+    return detail::connect<EventType>(
+        detail::player_wrapper<EventType>(callback, player));
+}
+
+template<typename EventType, typename PlayerType>
+connection listen_player(void (*callback)(EventType&), PlayerType* player) {
+    return detail::connect<EventType>(
+        detail::player_wrapper<EventType>(callback, player));
+}
+
+namespace detail {
+    template<typename Func, typename Result,
+             typename EventType, typename PlayerType>
+    void listen_player_helper(Func& callback, Result(Func::*)(EventType&),
+        PlayerType* player)
+    {
+        return detail::connect<EventType>(
+            detail::player_wrapper<EventType>(callback, player));
+    }
+}
+
+template<typename CallbackType, typename PlayerType>
+connection listen_player(CallbackType callback, PlayerType* player) {
+    return detail::listen_player_helper(
+        callback, &CallbackType::operator(), player);
+}
+
+/******************************************************************************
  * Function: listen_world
  *
  * Registers an event listener function for a specific target world; the
@@ -234,7 +285,7 @@ namespace detail {
 }
 
 template<typename CallbackType, typename WorldType>
-connection listen(CallbackType callback, WorldType* world) {
+connection listen_world(CallbackType callback, WorldType* world) {
     return detail::listen_world_helper(
         callback, &CallbackType::operator(), world);
 }
