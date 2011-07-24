@@ -24,6 +24,7 @@
 #include "network/request.h"
 #include "network/response.h"
 #include "position.h"
+#include "world.h"
 
 #include <sstream>
 
@@ -99,7 +100,8 @@ void Player::handshake(std::string const& username)
 
 void Player::updatePosition(EntityPosition pos)
 {
-    /* TODO: Something that tells everyone the player position changed. */
+    last_position_ = position_;
+    position_ = pos;
 }
 
 void Player::updateLook(float yaw, float pitch)
@@ -128,6 +130,11 @@ void Player::updateHealth(short health)
 std::string Player::name()
 {
     return this->name_;
+}
+
+std::weak_ptr<World> Player::world() const
+{
+    return this->world_;    
 }
 
 } // end namespace boostcraft

@@ -10,35 +10,45 @@
 #include "player.h"
 #include <functional>
 #include <set>
+#include <memory>
 
 namespace boostcraft {
 
-class World
+class World : public std::enable_shared_from_this<World>
 {
 public:
+    World(unsigned int max) : cache(max)
+    { }
+
+    /* TODO: Don't let init() be called more than once */
     template<typename G>
-    World(G generator, unsigned int max) : cache(max)
+    void init(G generator)
     {
         using namespace boostcraft::event;
         using std::placeholders::_1;
-        listen_world<NeedChunkEvent>(generator, this);
+        listen_world<NeedChunkEvent>(generator, shared_from_this());
         listen_world<NewChunkEvent>(
             std::bind(&World::newChunkHandler, this, _1),
-            this
+            shared_from_this()
         );
         listen_world<NewChunkEvent>(
             std::bind(&ChunkCache::handler, &cache, _1),
-            this
+            shared_from_this()
+        );
+        listen_world<PlayerPositionEvent>(
+            std::bind(&World::moveHandler, this, _1),
+            shared_from_this()
         );
     }
 
-    void spawnPlayer(std::shared_ptr<Player> p);
-    void addPlayer(std::shared_ptr<Player> p);
-    void rmPlayer(std::shared_ptr<Player> p);
+    void spawnPlayer(player_ptr p);
+    
+    std::set<player_ptr> players() const;
 
 private:
-    
-    std::list<std::shared_ptr<Player>> players;
+    // Player list 
+    std::set<player_ptr> players_;
+
     ChunkCache cache;
 
     // Who needs what chunks
@@ -48,11 +58,12 @@ private:
     std::set<player_ptr> spawning;
 
     // Send spawn to player when they are ready.
-    void sendSpawn(std::shared_ptr<Player> player);
+    void sendSpawn(player_ptr player);
 
     /// Event handlers
     void newChunkHandler(event::NewChunkEvent& e); 
-    void movePlayer(event::PlayerPositionEvent& e);
+    void moveHandler(event::PlayerPositionEvent& e);
+    void onPlayerDisconnect(event::PlayerDisconnectEvent& e);
 };
 
 } // end namespace boostcraft

@@ -100,10 +100,15 @@ namespace detail {
      * only be called on a target that matches the one specified at registry
      */
     template<typename EventType, typename F, typename WorldType>
-    std::function<void(EventType&)> world_wrapper(F callback, WorldType* world)
+    std::function<void(EventType&)> world_wrapper(F callback,
+        std::shared_ptr<WorldType> world)
     {
-        return [=](EventType& e) {
-            if (e.world == world)
+        std::weak_ptr<WorldType> ptr(world);
+
+        return [ptr,callback](EventType& e) 
+        {
+            std::shared_ptr<WorldType> world = ptr.lock();
+            if (world && e.world == world)
                 callback(e);
         };
     }
@@ -115,10 +120,15 @@ namespace detail {
      * only be called on a target that matches the one specified at registry
      */
     template<typename EventType, typename F, typename PlayerType>
-    std::function<void(EventType&)> player_wrapper(F callback, PlayerType* player)
+    std::function<void(EventType&)> player_wrapper(F callback,
+        std::shared_ptr<PlayerType> player)
     {
-        return [=](EventType& e) {
-            if (e.player == player)
+        std::weak_ptr<PlayerType> ptr(player);
+
+        return [ptr,callback](EventType& e) 
+        {
+            std::shared_ptr<PlayerType> player = ptr.lock();
+            if (player && e.player == player)
                 callback(e);
         };
     }
@@ -226,13 +236,13 @@ connection listen(CallbackType callback) {
  * player the listener was registered with.
  */
 template<typename EventType, typename CallbackType, typename PlayerType>
-connection listen_player(CallbackType callback, PlayerType* player) {
+connection listen_player(CallbackType callback, std::shared_ptr<PlayerType> player) {
     return detail::connect<EventType>(
         detail::player_wrapper<EventType>(callback, player));
 }
 
 template<typename EventType, typename PlayerType>
-connection listen_player(void (*callback)(EventType&), PlayerType* player) {
+connection listen_player(void (*callback)(EventType&), std::shared_ptr<PlayerType> player) {
     return detail::connect<EventType>(
         detail::player_wrapper<EventType>(callback, player));
 }
@@ -241,7 +251,7 @@ namespace detail {
     template<typename Func, typename Result,
              typename EventType, typename PlayerType>
     void listen_player_helper(Func& callback, Result(Func::*)(EventType&),
-        PlayerType* player)
+        std::shared_ptr<PlayerType> player)
     {
         return detail::connect<EventType>(
             detail::player_wrapper<EventType>(callback, player));
@@ -249,7 +259,7 @@ namespace detail {
 }
 
 template<typename CallbackType, typename PlayerType>
-connection listen_player(CallbackType callback, PlayerType* player) {
+connection listen_player(CallbackType callback, std::shared_ptr<PlayerType> player) {
     return detail::listen_player_helper(
         callback, &CallbackType::operator(), player);
 }
@@ -262,13 +272,13 @@ connection listen_player(CallbackType callback, PlayerType* player) {
  * world the listener was registered with.
  */
 template<typename EventType, typename CallbackType, typename WorldType>
-connection listen_world(CallbackType callback, WorldType* world) {
+connection listen_world(CallbackType callback, std::shared_ptr<WorldType> world) {
     return detail::connect<EventType>(
         detail::world_wrapper<EventType>(callback, world));
 }
 
 template<typename EventType, typename WorldType>
-connection listen_world(void (*callback)(EventType&), WorldType* world) {
+connection listen_world(void (*callback)(EventType&), std::shared_ptr<WorldType> world) {
     return detail::connect<EventType>(
         detail::world_wrapper<EventType>(callback, world));
 }
@@ -277,7 +287,7 @@ namespace detail {
     template<typename Func, typename Result,
              typename EventType, typename WorldType>
     void listen_world_helper(Func& callback, Result(Func::*)(EventType&),
-        WorldType* world)
+        std::shared_ptr<WorldType> world)
     {
         return detail::connect<EventType>(
             detail::world_wrapper<EventType>(callback, world));
@@ -285,7 +295,7 @@ namespace detail {
 }
 
 template<typename CallbackType, typename WorldType>
-connection listen_world(CallbackType callback, WorldType* world) {
+connection listen_world(CallbackType callback, std::shared_ptr<WorldType> world) {
     return detail::listen_world_helper(
         callback, &CallbackType::operator(), world);
 }

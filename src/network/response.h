@@ -101,6 +101,7 @@ Response chunkresponse(ChunkPosition pos, Chunk const& chunk);
 Response positionlookresponse(EntityPosition position,
                               double stance, float yaw, float pitch,
                               bool on_ground);
+Response entitymoveresponse(int eid, uint8_t dx, uint8_t dz, uint8_t dy);
 
 }} //end namespace boostcraft::network
 

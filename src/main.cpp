@@ -87,9 +87,12 @@ int main(int argc, char** argv)
     Server server(io_service(), endpoint);
 
     // Add worlds
+    std::shared_ptr<World> world(new World(10000));
+
     auto generator = &generators::flatland;
-    std::unique_ptr<World> world(new World(generator, 10000));
-    server.addWorld(std::move(world));
+    world->init(generator);
+
+    server.addWorld(world);
 
     while(true)
     {

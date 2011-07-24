@@ -24,7 +24,7 @@ namespace boostcraft
         Server(boost::asio::io_service& io, 
               boost::asio::ip::tcp::endpoint& ep);
 
-        void addWorld(std::unique_ptr<World> world);
+        void addWorld(std::shared_ptr<World> world);
 
     private:
         void connect(std::unique_ptr<boost::asio::ip::tcp::socket> socket);
@@ -35,8 +35,7 @@ namespace boostcraft
         void onChat(event::ChatEvent& e);
 
     private:
-        std::unique_ptr<World> world;
-        std::list<std::shared_ptr<Player>> players;
+        std::shared_ptr<World> world;
         uint32_t entity_id;
     };
 

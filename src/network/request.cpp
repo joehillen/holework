@@ -293,6 +293,8 @@ struct PlayerPositionAndLook : public Request
 
     void dispatch(std::shared_ptr<Player> p) const
     {
+        p->updatePosition({x, z, y});
+
         PlayerOnGroundEvent g(p, onground);
         async_fire(g);
 

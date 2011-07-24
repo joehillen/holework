@@ -15,7 +15,7 @@
 
 namespace boostcraft {
 
-void World::sendSpawn(std::shared_ptr<Player> player)
+void World::sendSpawn(player_ptr player)
 {
     // If player needs no more chunks and is waiting to spawn...
     if (needs_chunks.get(player).empty() && 
@@ -34,12 +34,14 @@ void World::sendSpawn(std::shared_ptr<Player> player)
     }
 }
 
-void World::spawnPlayer(std::shared_ptr<Player> player)
+void World::spawnPlayer(player_ptr player)
 {
     using namespace event;
 
     // 0. Add player to the world
-    players.push_back(player);
+    players_.insert(player);
+
+    player->world_ = std::weak_ptr<World>(shared_from_this());
 
     // 0.5. Mark player waiting for spawn
     spawning.insert(player);
@@ -57,7 +59,7 @@ void World::spawnPlayer(std::shared_ptr<Player> player)
             }
             else
             {
-                async_fire(NeedChunkEvent(this, x, z));
+                async_fire(NeedChunkEvent(shared_from_this(), x, z));
                 needs_chunks.add(player, {x, z});
             }
         }
@@ -65,7 +67,6 @@ void World::spawnPlayer(std::shared_ptr<Player> player)
 
     sendSpawn(player);
 }
-
 
 void World::newChunkHandler(event::NewChunkEvent& e)
 {
@@ -83,6 +84,20 @@ void World::newChunkHandler(event::NewChunkEvent& e)
 
         sendSpawn(player);
     }
+}
+
+void World::moveHandler(event::PlayerPositionEvent& e)
+{
+}
+
+void World::onPlayerDisconnect(event::PlayerDisconnectEvent& e)
+{
+    players_.erase(e.player);
+}
+
+std::set<player_ptr> World::players() const
+{
+    return this->players_;
 }
 
 } // namespace boostcraft

@@ -21,10 +21,10 @@
 #include "event/event.h"
 #include "log.h"
 #include "position.h"
+#include "player.h"
 
 /// Forward declarations
 namespace boostcraft {
-    class Player;
     class World;
     class Chunk;
 }
@@ -34,9 +34,12 @@ namespace event {
 
 struct PlayerEvent : public Event
 {
-    std::shared_ptr<Player> player;
+    player_ptr player;
+    std::shared_ptr<World> world;
 
-    PlayerEvent(std::shared_ptr<Player> player) : player(player) { }
+    PlayerEvent(std::shared_ptr<Player> player) 
+        : player(player), world(player->world().lock()) 
+    { }
 };
 
 struct LogEvent : public Event, Signal<LogEvent>
@@ -72,11 +75,11 @@ struct ChatEvent : public PlayerEvent, Signal<ChatEvent>
 
 struct NeedChunkEvent : public Event, Signal<NeedChunkEvent>
 {
-    World* world;
+    std::shared_ptr<World> world;
     int x;
     int z;
 
-    NeedChunkEvent(World* world, int x, int z)
+    NeedChunkEvent(std::shared_ptr<World> world, int x, int z)
         : world(world), x(x), z(z)
     {
     }
@@ -84,12 +87,12 @@ struct NeedChunkEvent : public Event, Signal<NeedChunkEvent>
 
 struct NewChunkEvent : public Event, Signal<NewChunkEvent>
 {
-    World* world;
+    std::shared_ptr<World> world;
     int x;
     int z;
     std::shared_ptr<Chunk> chunk;
 
-    NewChunkEvent(World* world, int x, int z, std::shared_ptr<Chunk> chunk)
+    NewChunkEvent(std::shared_ptr<World> world, int x, int z, std::shared_ptr<Chunk> chunk)
         : world(world), x(x), z(z), chunk(chunk)
     {
     }

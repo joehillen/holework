@@ -42,7 +42,6 @@ void Server::connect(std::unique_ptr<tcp::socket> socket)
 {
     // Create a player from the socket
     std::shared_ptr<Player> player(new Player(entity_id++, std::move(socket)));
-    players.push_back(player);
     player->start();
 
     // TODO: it's not safe to call start() on a player until after a shared_ptr
@@ -61,10 +60,8 @@ void Server::onLogin(LoginRequestEvent& e)
 
 void Server::onPlayerDisconnect(PlayerDisconnectEvent& e)
 {
-    players.remove(e.player);
-
     auto qmsg = network::chatmessage("§5* " + e.player->name() + " has left the server.");
-    foreach(auto player, players)
+    foreach(auto player, world->players())
         player->deliver(qmsg);
 }
 
@@ -72,13 +69,13 @@ void Server::onChat(ChatEvent& e)
 {
     // Relay the event to all players
     auto msg = network::chatmessage("<" + e.player->name() + "> " + e.message);
-    foreach(auto player, players)
+    foreach(auto player, world->players())
         player->deliver(msg);
 }
 
-void Server::addWorld(std::unique_ptr<World> world)
+void Server::addWorld(std::shared_ptr<World> world)
 {
-    world.swap(this->world);
+    this->world = world;
 }
 
 } // namespace boostcraft

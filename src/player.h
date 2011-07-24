@@ -26,6 +26,7 @@
 
 // Forward declarations
 namespace boostcraft {
+    class World;
     namespace network {
         class Request;
         class Response;
@@ -40,6 +41,9 @@ namespace boostcraft {
 class Player : public network::Connection
 {
 public:
+    friend class Server;
+    friend class World;
+
     explicit Player(uint32_t id, std::unique_ptr<Connection::socket_t>); 
     ~Player();
 
@@ -50,28 +54,25 @@ public:
     // Return player nickname
     std::string name();
 
+    /* Position Accessors and Modifiers */
     void updatePosition(EntityPosition position);
+    void updateCheckedPosition(EntityPosition position);
+    EntityPosition checkedPosition();
+
     void updateLook(float yaw, float pitch);
     void updateHealth(short health);
 
+
+    std::weak_ptr<World> world() const;
 private:
-    /// Initiates dispatch for a client request
-    void dispatch(network::Request const&);
-
-    /// Responds to disconnection by raising event
-    void disconnected(std::string const& reason);
-
-    /// Conversions for base class's enable_shared_from_this
-    std::shared_ptr<Player> shared_from_this();
-    std::shared_ptr<Player const> shared_from_this() const;
-
     uint32_t id_;
     std::string name_;
 
     /* Position */
     EntityPosition position_;
     EntityPosition last_position_;
-    BlockPosition spawn_;
+    EntityPosition checked_position_;
+    BlockPosition  spawn_;
 
     /* Look */
     float yaw_;
@@ -82,9 +83,21 @@ private:
     bool digging_;
     short health_;
 
+    /// Initiates dispatch for a client request
+    void dispatch(network::Request const&);
+
+    /// Responds to disconnection by raising event
+    void disconnected(std::string const& reason);
+
+    /// Conversions for base class's enable_shared_from_this
+    std::shared_ptr<Player> shared_from_this();
+    std::shared_ptr<Player const> shared_from_this() const;
+
     std::unique_ptr<event::interval_timer> timer_;
 
     void log(std::string message);
+
+    std::weak_ptr<World> world_;
 };
 
 typedef std::shared_ptr<Player> player_ptr;
