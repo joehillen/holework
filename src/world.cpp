@@ -10,10 +10,20 @@
 #include "network/response.h"
 #include "event/types.h"
 
+#include <sstream>
+#include <cmath>
 #include <boost/foreach.hpp>
 #define foreach BOOST_FOREACH
 
 namespace xim {
+
+World::World(unsigned int max) 
+    : cache(max)
+{
+    position_timer_.reset(new event::interval_timer(50, 
+        std::bind(&World::checkPositions, this))
+    );
+}
 
 void World::sendSpawn(player_ptr player)
 {
@@ -86,20 +96,6 @@ void World::newChunkHandler(event::NewChunkEvent& e)
     }
 }
 
-void World::moveHandler(event::PlayerPositionEvent& e)
-{
-    // All players must be at y-level 100
-    if (e.position.y < 100)
-    {
-        EntityPosition pos = {e.position.x,e.position.z,100};
-        e.player->deliver(network::positionlookresponse(
-            pos,
-            1.6, e.player->yaw(),
-            e.player->pitch(), 1));
-        e.player->updatePosition(pos);
-    }
-}
-
 void World::onPlayerDisconnect(event::PlayerDisconnectEvent& e)
 {
     players_.erase(e.player);
@@ -108,6 +104,28 @@ void World::onPlayerDisconnect(event::PlayerDisconnectEvent& e)
 std::set<player_ptr> World::players() const
 {
     return this->players_;
+}
+
+void World::checkPositions()
+{
+
+    foreach(player_ptr player_p, players_)
+    {
+        Player& player = *player_p;
+
+        double dx = player.position_.x - player.last_position_.x;
+        double dz = player.position_.z - player.last_position_.z;
+        double dy = player.position_.y - player.last_position_.y;
+
+        double delta = std::sqrt(dx*dx + dz*dz + dy*dy);
+
+        if (delta > 0.5d)
+        {
+            log(INFO, "World", player.name() + " moved illegally!");
+        }
+
+        player.last_position_ = player.position_;
+    }
 }
 
 } // namespace xim

@@ -47,7 +47,7 @@ void schedule(unsigned int ms, std::function<void()> callback)
 }
 
 
-/******************************************************************************
+/**
  * interval_timer implementation
  */
 

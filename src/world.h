@@ -17,8 +17,7 @@ namespace xim {
 class World : public std::enable_shared_from_this<World>
 {
 public:
-    World(unsigned int max) : cache(max)
-    { }
+    World(unsigned int max);
 
     /* TODO: Don't let init() be called more than once */
     template<typename G>
@@ -33,10 +32,6 @@ public:
         );
         listen_world<NewChunkEvent>(
             std::bind(&ChunkCache::handler, &cache, _1),
-            shared_from_this()
-        );
-        listen_world<PlayerPositionEvent>(
-            std::bind(&World::moveHandler, this, _1),
             shared_from_this()
         );
     }
@@ -62,8 +57,10 @@ private:
 
     /// Event handlers
     void newChunkHandler(event::NewChunkEvent& e); 
-    void moveHandler(event::PlayerPositionEvent& e);
     void onPlayerDisconnect(event::PlayerDisconnectEvent& e);
+
+    void checkPositions();
+    std::unique_ptr<event::interval_timer> position_timer_;
 };
 
 } // end namespace xim

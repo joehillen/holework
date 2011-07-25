@@ -55,9 +55,8 @@ public:
     std::string name();
 
     /* Position Accessors and Modifiers */
-    void updatePosition(EntityPosition position);
-    void updateCheckedPosition(EntityPosition position);
-    EntityPosition checkedPosition();
+    EntityPosition position();
+    void updatePosition(EntityPosition pos);
 
     void updateLook(float yaw, float pitch);
     void updateHealth(short health);
@@ -74,7 +73,6 @@ private:
     /* Position */
     EntityPosition position_;
     EntityPosition last_position_;
-    EntityPosition checked_position_;
     BlockPosition  spawn_;
 
     /* Look */

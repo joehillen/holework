@@ -98,9 +98,13 @@ void Player::handshake(std::string const& username)
     }
 }
 
+EntityPosition Player::position()
+{
+    return position_;
+}
+
 void Player::updatePosition(EntityPosition pos)
 {
-    last_position_ = position_;
     position_ = pos;
 }
 
