@@ -8,7 +8,7 @@
 #include <memory>
 #include <list>
 
-namespace boostcraft
+namespace xim
 {
     // Forward declarations
     class Player;
@@ -40,5 +40,5 @@ namespace boostcraft
         uint32_t entity_id;
     };
 
-} // namespace boostcraft
+} // namespace xim
 

@@ -6,7 +6,7 @@
 
 #include <unordered_map>
 
-namespace boostcraft
+namespace xim
 {
     // Forward Declarations
     class Chunk;

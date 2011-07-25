@@ -18,10 +18,10 @@
 
 #pragma once
 
-namespace boostcraft {
+namespace xim {
 namespace handlers {
 
     void init();
 
-}} // namespace boostcraft::handlers
+}} // namespace xim::handlers
 

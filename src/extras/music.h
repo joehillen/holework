@@ -8,11 +8,11 @@
 #include <memory>
 
 // Forward declarations
-namespace boostcraft {
+namespace xim {
     class Player;
 }
 
-namespace boostcraft {
+namespace xim {
 namespace stupidmusic {
 
     void init();
@@ -33,5 +33,5 @@ namespace stupidmusic {
     void playSequence(std::weak_ptr<Player> weakp,
             std::list<int> notes, std::list<int> times);
 
-}} // namespace boostcraft::stupidmusic
+}} // namespace xim::stupidmusic
 

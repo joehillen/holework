@@ -9,7 +9,7 @@
 
 #include "inetconv.h"
 
-namespace boostcraft { namespace network {
+namespace xim { namespace network {
 
 /**
  * Function: readNumber
@@ -98,4 +98,4 @@ size_t readStringUtf8(boost::asio::streambuf&, std::string&);
  */
 size_t readStringUcs2(boost::asio::streambuf&, std::string&);
 
-}} // namespace boostcraft::network
+}} // namespace xim::network

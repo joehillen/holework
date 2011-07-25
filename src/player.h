@@ -25,7 +25,7 @@
 #include <memory>
 
 // Forward declarations
-namespace boostcraft {
+namespace xim {
     class World;
     namespace network {
         class Request;
@@ -36,7 +36,7 @@ namespace boostcraft {
     }
 }
 
-namespace boostcraft {
+namespace xim {
 
 class Player : public network::Connection
 {

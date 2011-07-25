@@ -24,7 +24,7 @@
 
 #include "log.h"
 
-namespace boostcraft { namespace network {
+namespace xim { namespace network {
 
 using boost::asio::ip::tcp;
 
@@ -95,4 +95,4 @@ private:
     tcp::acceptor acceptor_;
 };
 
-}} //end namespace boostcraft::network
+}} //end namespace xim::network

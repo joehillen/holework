@@ -8,7 +8,7 @@
 #include <set>
 
 
-namespace boostcraft
+namespace xim
 {
     ////
     // A two-way associative container which allows the representation of a
@@ -98,5 +98,5 @@ namespace boostcraft
         std::map<B, std::set<A>> index_b;
     };
 
-} // namespace boostcraft
+} // namespace xim
 

@@ -19,18 +19,18 @@
 #pragma once
 
 // Forward declaration
-namespace boostcraft {
+namespace xim {
     namespace event {
         struct NeedChunkEvent;
     }
 }
 
-namespace boostcraft {
+namespace xim {
 
 namespace generators {
 
 void flatland(event::NeedChunkEvent& e);
 
 }
-} // namespace boostcraft
+} // namespace xim
 

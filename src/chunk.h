@@ -21,7 +21,7 @@
 #include <iosfwd>
 #include <stdint.h>
 
-namespace boostcraft {
+namespace xim {
 
 /// Represents the value of a block
 struct Block
@@ -79,5 +79,5 @@ private:
 
 std::ostream& operator<<(std::ostream& os, Chunk const& chunk);
 
-} // namespace boostcraft
+} // namespace xim
 

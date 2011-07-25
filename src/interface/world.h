@@ -4,10 +4,10 @@
 #pragma once
 
 // Forward declarations
-namespace boostcraft {
+namespace xim {
 }
 
-namespace boostcraft { namespace interface
+namespace xim { namespace interface
 {
     class World
     {
@@ -15,5 +15,5 @@ namespace boostcraft { namespace interface
         virtual int8_t blockTypeAt(int x, int y, int z) = 0; 
     };
 
-}} // namespace boostcraft::interface
+}} // namespace xim::interface
 

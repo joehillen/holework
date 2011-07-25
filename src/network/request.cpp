@@ -9,10 +9,10 @@
 
 #include <string>
 
-namespace boostcraft {
+namespace xim {
 namespace network {
 
-using namespace boostcraft::event;
+using namespace xim::event;
 
 /*
  * Excerpt from the Official Unwrittten Boostcraft Style Guide:
@@ -534,4 +534,4 @@ std::unique_ptr<Request> makerequest(int type)
     }
 }
 
-}} // namespace boostcraft::network
+}} // namespace xim::network

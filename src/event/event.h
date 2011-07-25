@@ -22,14 +22,14 @@
 #include <functional>
 #include "ioservice.h"
 
-namespace boostcraft {
+namespace xim {
 namespace event {
 
 // Types
 typedef boost::signals2::connection connection;
 
 /**
- * Events in boostcraft are exposed through a set of public classes, one for
+ * Events in xim are exposed through a set of public classes, one for
  * each type of event that can occur in the system. Each event class includes
  * a static boost::signals2::signal which is used for all instances of that
  * event.
@@ -375,5 +375,5 @@ private:
     void fire(boost::system::error_code const&);
 };
 
-}} // namespace boostcraft::event
+}} // namespace xim::event
 

@@ -10,7 +10,7 @@
 #include "position.h"
 #include "cache.h"
 
-namespace boostcraft {
+namespace xim {
 
 void ChunkCache::remove(ChunkPosition const& p)
 {
@@ -99,5 +99,5 @@ TEST(CacheTests, Get)
     ASSERT_EQ(chunk, cache.get({0,0}));
 }
 
-} // end namespace boostcraft
+} // end namespace xim
 

@@ -23,10 +23,10 @@
  *  TODO: A permission system for checking priveleges before running commands
  *
  **/
-namespace boostcraft {
+namespace xim {
 namespace commands {
 
     void init();
 
-}} //end namespace boostcraft::commands
+}} //end namespace xim::commands
 

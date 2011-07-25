@@ -4,7 +4,7 @@
 #include "uniconv.h"
 #include <gtest/gtest.h>
 
-namespace boostcraft { namespace network {
+namespace xim { namespace network {
 
 /*
  * Specialized number readers
@@ -54,14 +54,14 @@ size_t readStringUcs2(boost::asio::streambuf& buf, std::string& out)
     return readString<char16_t, ucs2toutf8>(buf, out);
 }
 
-}} // namespace boostcraft::network
+}} // namespace xim::network
 
 
 /*
  * UNIT TESTS
  */
 
-using namespace boostcraft::network;
+using namespace xim::network;
 
 TEST(RequestFieldTests, ByteField)
 {

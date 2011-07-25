@@ -26,7 +26,7 @@
 
 #include "log.h"
 
-namespace boostcraft { namespace network {
+namespace xim { namespace network {
 
 Connection::Connection(std::unique_ptr<socket_t> sock)
     : sock(std::move(sock)), buffer(), started(false)
@@ -162,5 +162,5 @@ void Connection::deliver(Response const& packet)
     }
 }
 
-}} // end namespace boostcraft
+}} // end namespace xim
 

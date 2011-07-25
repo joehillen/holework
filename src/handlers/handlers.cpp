@@ -28,10 +28,10 @@
 #include "network/response.h"
 #include "player.h"
 
-namespace boostcraft {
+namespace xim {
 namespace handlers {
 
-using namespace boostcraft::event;
+using namespace xim::event;
 
 /*
  * Temporary solution for assigning unique EIDs
@@ -119,5 +119,5 @@ void init()
     listen(ongroundHandler);
 }
 
-}} //end namespace boostcraft::handlers
+}} //end namespace xim::handlers
 

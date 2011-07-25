@@ -30,7 +30,7 @@
 
 #include "chunk.h" 
 
-namespace boostcraft {
+namespace xim {
 namespace network { 
 
 std::ostream& operator<<(std::ostream& os, Response const& r)
@@ -207,5 +207,5 @@ Response positionlookresponse(EntityPosition pos,
     return r;
 }
 
-}} //end namespace boostcraft::network
+}} //end namespace xim::network
 

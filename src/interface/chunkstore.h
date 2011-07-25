@@ -6,11 +6,11 @@
 #include <memory>
 
 // Forward declarations
-namespace boostcraft {
+namespace xim {
     class Chunk;
 }
 
-namespace boostcraft { namespace interface
+namespace xim { namespace interface
 {
     class ChunkStore
     {
@@ -40,5 +40,5 @@ namespace boostcraft { namespace interface
         virtual void store(int32_t x, int32_t z, Chunk const& chunk) = 0;
     };
 
-}} // namespace boostcraft::interface
+}} // namespace xim::interface
 

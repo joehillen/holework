@@ -23,7 +23,7 @@
 #include <gtest/gtest.h>
 #include <stdexcept>
 
-namespace boostcraft {
+namespace xim {
 
 Chunk::Chunk()
 {
@@ -132,10 +132,10 @@ std::ostream& operator<<(std::ostream& os, Chunk const& chunk)
     return os;
 }
 
-} // namespace boostcraft
+} // namespace xim
 
 // UNIT TESTS
-std::ostream& operator<<(std::ostream& os, boostcraft::Block const& block)
+std::ostream& operator<<(std::ostream& os, xim::Block const& block)
 {
     os << "Block(type=" << (int)block.type
        << ", meta=" << (int)block.metadata
@@ -147,7 +147,7 @@ std::ostream& operator<<(std::ostream& os, boostcraft::Block const& block)
 
 TEST(ChunkTests, SetAndGet)
 {
-    using namespace boostcraft;
+    using namespace xim;
 
     Chunk chunk;
     Block b { 42, 11, 12, 13 };
@@ -161,7 +161,7 @@ TEST(ChunkTests, SetAndGet)
 
 TEST(ChunkTests, GetOutOfRange)
 {
-    using namespace boostcraft;
+    using namespace xim;
     Chunk chunk;
     ASSERT_THROW(chunk.get(0,0,128), std::out_of_range);
     ASSERT_THROW(chunk.get(-12,0,50), std::out_of_range);
@@ -174,7 +174,7 @@ TEST(ChunkTests, GetOutOfRange)
 
 TEST(ChunkTests, SetOutOfRange)
 {
-    using namespace boostcraft;
+    using namespace xim;
     Chunk chunk;
     Block b { 119, 7, 1, 0 };
     ASSERT_THROW(chunk.set(0,0,128,b), std::out_of_range);

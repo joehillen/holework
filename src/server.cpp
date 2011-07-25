@@ -12,9 +12,9 @@
 
 #include <iostream>
 
-namespace boostcraft {
+namespace xim {
 
-using namespace boostcraft::event;
+using namespace xim::event;
 using boost::asio::ip::tcp;
 
 Server::Server(boost::asio::io_service& io, tcp::endpoint& endpoint)
@@ -79,5 +79,5 @@ void Server::addWorld(world_ptr world)
     this->world = world;
 }
 
-} // namespace boostcraft
+} // namespace xim
 

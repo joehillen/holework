@@ -4,7 +4,7 @@
 
 #include <memory>
 
-namespace boostcraft {
+namespace xim {
     class World;
     class Player;
     class Chunk;

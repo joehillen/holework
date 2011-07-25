@@ -25,12 +25,12 @@
 #include "player.h"
 
 /// Forward declarations
-namespace boostcraft {
+namespace xim {
     class World;
     class Chunk;
 }
 
-namespace boostcraft {
+namespace xim {
 namespace event {
 
 struct PlayerEvent : public Event
@@ -48,7 +48,7 @@ struct LogEvent : public Event, Signal<LogEvent>
     std::string message;
     LogType type;
 
-    LogEvent(boostcraft::LogType type, std::string const& msg) 
+    LogEvent(xim::LogType type, std::string const& msg) 
         : message(msg), type(type)
     {}
 };
@@ -142,5 +142,5 @@ struct PlayerDisconnectEvent : public PlayerEvent, Signal<PlayerDisconnectEvent>
     }
 };
 
-}} // namespace boostcraft::event
+}} // namespace xim::event
 

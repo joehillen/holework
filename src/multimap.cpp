@@ -11,7 +11,7 @@
 
 TEST(MultimapTests, Count)
 {
-    using namespace boostcraft;
+    using namespace xim;
 
     Multimap<std::string, int> map;
 
@@ -65,7 +65,7 @@ std::ostream& operator<<(std::ostream& os, std::set<T> set)
 
 TEST(MultimapTests, Get)
 {
-    using namespace boostcraft;
+    using namespace xim;
 
     Multimap<std::string, int> map;
 
@@ -86,7 +86,7 @@ TEST(MultimapTests, Get)
 
 TEST(MultimapTests, RemoveAll)
 {
-    using namespace boostcraft;
+    using namespace xim;
 
     Multimap<std::string, int> map;
 

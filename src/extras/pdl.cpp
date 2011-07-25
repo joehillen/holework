@@ -13,9 +13,9 @@
 #include "player.h"
 #include <sstream>
 
-using namespace boostcraft::event;
+using namespace xim::event;
 
-namespace boostcraft {
+namespace xim {
 namespace pdl {
 
     void chat_handler(ChatEvent&);
@@ -81,4 +81,4 @@ namespace pdl {
         e.canceled = true;
     }
 
-}} // namespace boostcraft::pdl
+}} // namespace xim::pdl

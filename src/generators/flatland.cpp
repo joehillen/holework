@@ -23,7 +23,7 @@
 #include "event/types.h"
 #include "log.h"
 
-namespace boostcraft {
+namespace xim {
 
 namespace generators {
 
@@ -78,5 +78,5 @@ void flatland(event::NeedChunkEvent& e)
 }
 
 } // namespace generators
-} // namespace boostcraft
+} // namespace xim
 

@@ -3,14 +3,14 @@
 #pragma once
 #include <boost/asio.hpp>
 
-namespace boostcraft
+namespace xim
 {
     /**
      * Function: io_service()
      *
-     * Returns a reference to the io_service object for the boostcraft system.
+     * Returns a reference to the io_service object for the xim system.
      *
-     * Various parts of the boostcraft system can use this object to schedule
+     * Various parts of the xim system can use this object to schedule
      * tasks, create timers, or perform other asynchronous activities.
      *
      * Boostcraft is run by executing io_service::run in (potentially) several

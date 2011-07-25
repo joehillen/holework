@@ -21,7 +21,7 @@
 #include <boost/asio.hpp>
 #include <iosfwd>
 
-namespace boostcraft {
+namespace xim {
 
 // Forward Declarations
 class Chunk;
@@ -103,5 +103,5 @@ Response positionlookresponse(EntityPosition position,
                               bool on_ground);
 Response entitymoveresponse(int eid, uint8_t dx, uint8_t dz, uint8_t dy);
 
-}} //end namespace boostcraft::network
+}} //end namespace xim::network
 

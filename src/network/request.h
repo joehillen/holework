@@ -7,7 +7,7 @@
 #include <memory>
 #include <boost/asio.hpp>
 
-namespace boostcraft { 
+namespace xim { 
     // Forward declaration
     class Player;
     namespace network {
@@ -68,5 +68,5 @@ protected:
 std::unique_ptr<Request> makerequest(int type);
 
 
-}} // namespace boostcraft::network
+}} // namespace xim::network
 

@@ -28,14 +28,14 @@
 
 #include <sstream>
 
-using namespace boostcraft::event;
+using namespace xim::event;
 
-namespace boostcraft
+namespace xim
 {
 
 void Player::log(std::string message)
 {
-    boostcraft::log(INFO, "Player: " + name(), message);
+    xim::log(INFO, "Player: " + name(), message);
 }
 
 
@@ -147,4 +147,4 @@ float Player::pitch() const
     return this->pitch_;
 }
 
-} // end namespace boostcraft
+} // end namespace xim

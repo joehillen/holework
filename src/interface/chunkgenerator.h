@@ -6,11 +6,11 @@
 #include <memory>
 
 // Forward declarations
-namespace boostcraft {
+namespace xim {
     class Chunk;
 }
 
-namespace boostcraft {
+namespace xim {
     namespace interface
 {
     class ChunkGenerator
@@ -24,5 +24,5 @@ namespace boostcraft {
          */
         virtual std::unique_ptr<Chunk> generate(int32_t x, int32_t z) = 0;
     };
-}} // namespace boostcraft::interface
+}} // namespace xim::interface
 

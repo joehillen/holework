@@ -12,7 +12,7 @@
 #include <set>
 #include <memory>
 
-namespace boostcraft {
+namespace xim {
 
 class World : public std::enable_shared_from_this<World>
 {
@@ -24,7 +24,7 @@ public:
     template<typename G>
     void init(G generator)
     {
-        using namespace boostcraft::event;
+        using namespace xim::event;
         using std::placeholders::_1;
         listen_world<NeedChunkEvent>(generator, shared_from_this());
         listen_world<NewChunkEvent>(
@@ -66,4 +66,4 @@ private:
     void onPlayerDisconnect(event::PlayerDisconnectEvent& e);
 };
 
-} // end namespace boostcraft
+} // end namespace xim

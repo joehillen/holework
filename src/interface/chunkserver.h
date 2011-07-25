@@ -4,14 +4,14 @@
 #pragma once
 
 // Forward declarations
-namespace boostcraft {
+namespace xim {
     namespace map {
         class Chunk;    // TODO: Chunk to be moved to map namespace
         class Block;
     }
 }
 
-namespace boostcraft { namespace interface
+namespace xim { namespace interface
 {
     /**
      * A ChunkServer is where the World goes to get its chunk fix. It provides
@@ -68,4 +68,4 @@ namespace boostcraft { namespace interface
         virtual void commitAll() = 0;
     };
 
-}} // namespace boostcraft::interface
+}} // namespace xim::interface

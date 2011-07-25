@@ -20,7 +20,7 @@
 
 #include <string>
 
-namespace boostcraft {
+namespace xim {
 
 enum LogType {
     INFO,

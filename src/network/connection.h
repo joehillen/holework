@@ -26,7 +26,7 @@
 #include "response.h"
 #include "request.h"
 
-namespace boostcraft {
+namespace xim {
 namespace network {
 
 class Connection
@@ -73,5 +73,5 @@ private:
     bool started;
 };
 
-}} //end namespace boostcraft::network
+}} //end namespace xim::network
 

@@ -21,7 +21,7 @@
 #include <functional>
 #include <memory>
 
-namespace boostcraft {
+namespace xim {
 namespace event {
 
 /**
@@ -78,5 +78,5 @@ void interval_timer::fire(boost::system::error_code const& error)
     }
 }
 
-}} // namespace boostcraft::event
+}} // namespace xim::event
 

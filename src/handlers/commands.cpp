@@ -15,11 +15,11 @@
 
 #define foreach BOOST_FOREACH
 
-namespace boostcraft {
+namespace xim {
 namespace commands {
 
-using namespace boostcraft::event;
-using namespace boostcraft::network;
+using namespace xim::event;
+using namespace xim::network;
 
 void commands(ChatEvent& e)
 {
@@ -128,5 +128,5 @@ void init()
     event::listen(commands);
 }
 
-}} // namespace boostcraft::commands
+}} // namespace xim::commands
 

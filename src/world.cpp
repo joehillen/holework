@@ -13,7 +13,7 @@
 #include <boost/foreach.hpp>
 #define foreach BOOST_FOREACH
 
-namespace boostcraft {
+namespace xim {
 
 void World::sendSpawn(player_ptr player)
 {
@@ -110,5 +110,5 @@ std::set<player_ptr> World::players() const
     return this->players_;
 }
 
-} // namespace boostcraft
+} // namespace xim
 

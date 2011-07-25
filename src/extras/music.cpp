@@ -9,7 +9,7 @@
 #include <list>
 #include <memory>
 
-namespace boostcraft {
+namespace xim {
 namespace stupidmusic {
 
 
@@ -65,4 +65,4 @@ void init()
     event::listen(chatHandler);
 }
 
-}} // namespace boostcraft::stupidmusic
+}} // namespace xim::stupidmusic

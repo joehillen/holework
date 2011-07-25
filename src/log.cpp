@@ -20,7 +20,7 @@
 #include "event/types.h"
 #include <string>
 
-namespace boostcraft {
+namespace xim {
 
 void log(LogType type, std::string source, std::string message)
 {

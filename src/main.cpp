@@ -40,7 +40,7 @@
 /////////////////////////////////////////
 // io_service() implemented here
 
-namespace boostcraft {
+namespace xim {
     boost::asio::io_service& io_service()
     {
         static boost::asio::io_service the_service;
@@ -48,7 +48,7 @@ namespace boostcraft {
     }
 }
 
-bool boostcraft::debug_mode = false;
+bool xim::debug_mode = false;
 
 
 /////////////////////////////////////////
@@ -57,8 +57,8 @@ bool boostcraft::debug_mode = false;
 int main(int argc, char** argv)
 {
     using namespace boost::asio::ip;
-    using namespace boostcraft;
-    using namespace boostcraft::event;
+    using namespace xim;
+    using namespace xim::event;
 
     // Process command line args
     for (int i = 1; i < argc; ++i)

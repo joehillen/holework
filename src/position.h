@@ -3,7 +3,7 @@
 
 #include <sys/types.h>
 
-namespace boostcraft {
+namespace xim {
 
 struct EntityPosition
 {
@@ -55,5 +55,5 @@ struct ChunkPosition
 };
 
 
-} // end namespace boostcraft
+} // end namespace xim
 
