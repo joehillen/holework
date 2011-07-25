@@ -3,6 +3,7 @@
 #pragma once
 
 #include "network/tcpserver.h"
+#include "typedefs.h"
 
 #include <memory>
 #include <list>
@@ -24,7 +25,7 @@ namespace boostcraft
         Server(boost::asio::io_service& io, 
               boost::asio::ip::tcp::endpoint& ep);
 
-        void addWorld(std::shared_ptr<World> world);
+        void addWorld(world_ptr world);
 
     private:
         void connect(std::unique_ptr<boost::asio::ip::tcp::socket> socket);
@@ -35,7 +36,7 @@ namespace boostcraft
         void onChat(event::ChatEvent& e);
 
     private:
-        std::shared_ptr<World> world;
+        world_ptr world;
         uint32_t entity_id;
     };
 

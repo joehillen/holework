@@ -23,7 +23,7 @@ using namespace boostcraft::network;
 
 void commands(ChatEvent& e)
 {
-    std::shared_ptr<Player> p(e.player);
+    player_ptr p(e.player);
 
     if (e.message.length() < 1 or e.message[0] != '/')
     {

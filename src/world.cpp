@@ -50,7 +50,7 @@ void World::spawnPlayer(player_ptr player)
     for (int x = -8; x < 8; ++x) {
         for (int z = -8; z < 8; ++z) {
 
-            std::shared_ptr<Chunk> chunk = cache.get({x, z});
+            chunk_ptr chunk = cache.get({x, z});
 
             if (chunk) 
             {

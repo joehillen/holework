@@ -18,7 +18,7 @@
 #pragma once
 
 #include "network/connection.h"
-#include "player.h"
+#include "typedefs.h"
 #include "position.h"
 
 #include <boost/asio.hpp>
@@ -93,7 +93,7 @@ private:
     void disconnected(std::string const& reason);
 
     /// Conversions for base class's enable_shared_from_this
-    std::shared_ptr<Player> shared_from_this();
+    player_ptr shared_from_this();
     std::shared_ptr<Player const> shared_from_this() const;
 
     std::unique_ptr<event::interval_timer> timer_;
@@ -103,7 +103,6 @@ private:
     std::weak_ptr<World> world_;
 };
 
-typedef std::shared_ptr<Player> player_ptr;
 typedef std::list<player_ptr> player_list;
 
 } // end namespace

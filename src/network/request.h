@@ -3,6 +3,7 @@
 //
 #pragma once
 
+#include "typedefs.h"
 #include <memory>
 #include <boost/asio.hpp>
 
@@ -43,7 +44,7 @@ public:
      * TODO: if we eliminate global event handling (which may be a good idea),
      *       this will need to take a reference to an event target of some kind
      */
-    virtual void dispatch(std::shared_ptr<Player>) const = 0;
+    virtual void dispatch(player_ptr) const = 0;
 
 /*
     Some thoughts:

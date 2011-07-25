@@ -21,6 +21,7 @@
 #include <boost/asio.hpp>
 #include <gtest/gtest.h>
 
+#include "typedefs.h"
 #include "event/types.h"
 #include "ioservice.h"
 #include "log.h"
@@ -87,7 +88,7 @@ int main(int argc, char** argv)
     Server server(io_service(), endpoint);
 
     // Add worlds
-    std::shared_ptr<World> world(new World(10000));
+    world_ptr world(new World(10000));
 
     auto generator = &generators::flatland;
     world->init(generator);

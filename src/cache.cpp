@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <gtest/gtest.h>
 
+#include "typedefs.h"
 #include "event/types.h"
 #include "chunk.h"
 #include "position.h"
@@ -21,7 +22,7 @@ void ChunkCache::remove(ChunkPosition const& p)
 }
 
 void ChunkCache::add(ChunkPosition const& p,
-                     std::shared_ptr<Chunk> const chunk)
+                     chunk_ptr const chunk)
 {
     ChunkPair pair = std::make_pair(p, chunk);
     if (map.count(p) > 0)
@@ -39,13 +40,13 @@ void ChunkCache::add(ChunkPosition const& p,
     }
 }
 
-std::shared_ptr<Chunk> ChunkCache::get(ChunkPosition const& p)
+chunk_ptr ChunkCache::get(ChunkPosition const& p)
 {
     if (map.count(p) > 0)
     {
         ChunkList::iterator iter = map[p];
         ChunkPair pair = *iter;
-        std::shared_ptr<Chunk> chunk = pair.second;
+        chunk_ptr chunk = pair.second;
 
         // Moved used chunk to the front of the cache
         remove(p);
@@ -53,7 +54,7 @@ std::shared_ptr<Chunk> ChunkCache::get(ChunkPosition const& p)
 
         return chunk;
     }
-    return std::shared_ptr<Chunk>();
+    return chunk_ptr();
 }
 
 void ChunkCache::handler(event::NewChunkEvent& e)
@@ -67,7 +68,7 @@ void ChunkCache::handler(event::NewChunkEvent& e)
 TEST(CacheTests, Add)
 {
     ChunkCache cache(3);
-    std::shared_ptr<Chunk> chunk;
+    chunk_ptr chunk;
     cache.add({0,0}, chunk); 
     cache.add({0,0}, chunk); 
     cache.add({0,0}, chunk); 
@@ -76,7 +77,7 @@ TEST(CacheTests, Add)
 TEST(CacheTests, Remove)
 {
     ChunkCache cache(3);
-    std::shared_ptr<Chunk> chunk;
+    chunk_ptr chunk;
     cache.remove({0,0});
     cache.add({0,0}, chunk); 
     cache.add({0,0}, chunk); 
@@ -93,7 +94,7 @@ TEST(CacheTests, Remove)
 TEST(CacheTests, Get)
 {
     ChunkCache cache(3);
-    std::shared_ptr<Chunk> chunk;
+    chunk_ptr chunk;
     cache.add({0,0}, chunk); 
     ASSERT_EQ(chunk, cache.get({0,0}));
 }

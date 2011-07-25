@@ -18,6 +18,7 @@
 
 #include "generators.h"
 #include "chunk.h"
+#include "typedefs.h"
 #include "event/event.h"
 #include "event/types.h"
 #include "log.h"
@@ -31,7 +32,7 @@ void flatland(event::NeedChunkEvent& e)
     log(DEBUG,"flatland","Generating Chunk");
     using namespace event;
 
-    std::shared_ptr<Chunk> chunk(new Chunk);
+    chunk_ptr chunk(new Chunk);
     
     auto plane = [&](unsigned int y, uint8_t blocktype)
     {

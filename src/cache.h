@@ -2,6 +2,8 @@
 //
 #pragma once
 
+#include "typedefs.h"
+
 #include <unordered_map>
 
 namespace boostcraft
@@ -18,8 +20,8 @@ namespace boostcraft
     public:
         ChunkCache(unsigned int max) : max_size(max)
         { }
-        std::shared_ptr<Chunk> get(ChunkPosition const& p);
-        void add(ChunkPosition const& p, std::shared_ptr<Chunk> chunk);
+        chunk_ptr get(ChunkPosition const& p);
+        void add(ChunkPosition const& p, chunk_ptr chunk);
         void remove(ChunkPosition const& p);
         void handler(event::NewChunkEvent& e);
     private:
@@ -35,7 +37,7 @@ namespace boostcraft
             }
         };
 
-        typedef std::pair<ChunkPosition, std::shared_ptr<Chunk>> ChunkPair;
+        typedef std::pair<ChunkPosition, chunk_ptr> ChunkPair;
         typedef std::list<ChunkPair> ChunkList;
         ChunkList list;
         std::unordered_map<ChunkPosition,

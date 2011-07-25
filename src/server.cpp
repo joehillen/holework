@@ -3,6 +3,7 @@
 #include "server.h"
 #include "player.h"
 #include "world.h"
+#include "typedefs.h"
 #include "event/types.h"
 #include "network/response.h"
 
@@ -41,7 +42,7 @@ Server::Server(boost::asio::io_service& io, tcp::endpoint& endpoint)
 void Server::connect(std::unique_ptr<tcp::socket> socket)
 {
     // Create a player from the socket
-    std::shared_ptr<Player> player(new Player(entity_id++, std::move(socket)));
+    player_ptr player(new Player(entity_id++, std::move(socket)));
     player->start();
 
     // TODO: it's not safe to call start() on a player until after a shared_ptr
@@ -73,7 +74,7 @@ void Server::onChat(ChatEvent& e)
         player->deliver(msg);
 }
 
-void Server::addWorld(std::shared_ptr<World> world)
+void Server::addWorld(world_ptr world)
 {
     this->world = world;
 }

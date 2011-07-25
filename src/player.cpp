@@ -49,7 +49,7 @@ Player::~Player()
 {
 }
 
-std::shared_ptr<Player> Player::shared_from_this() 
+player_ptr Player::shared_from_this() 
 {
     return std::static_pointer_cast<Player>(
             Connection::shared_from_this());

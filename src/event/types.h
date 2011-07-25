@@ -21,6 +21,7 @@
 #include "event/event.h"
 #include "log.h"
 #include "position.h"
+#include "typedefs.h"
 #include "player.h"
 
 /// Forward declarations
@@ -35,9 +36,9 @@ namespace event {
 struct PlayerEvent : public Event
 {
     player_ptr player;
-    std::shared_ptr<World> world;
+    world_ptr world;
 
-    PlayerEvent(std::shared_ptr<Player> player) 
+    PlayerEvent(player_ptr player) 
         : player(player), world(player->world().lock()) 
     { }
 };
@@ -57,7 +58,7 @@ struct LoginRequestEvent : public PlayerEvent, Signal<LoginRequestEvent>
     int version;
     std::string username;
 
-    LoginRequestEvent(std::shared_ptr<Player> player,
+    LoginRequestEvent(player_ptr player,
             std::string const& username, int version)
         : PlayerEvent(player), version(version), username(username)
     {
@@ -68,7 +69,7 @@ struct ChatEvent : public PlayerEvent, Signal<ChatEvent>
 {
     std::string message;
 
-    ChatEvent(std::shared_ptr<Player> player, std::string const& msg)
+    ChatEvent(player_ptr player, std::string const& msg)
         : PlayerEvent(player), message(msg)
     {
     }
@@ -76,11 +77,11 @@ struct ChatEvent : public PlayerEvent, Signal<ChatEvent>
 
 struct NeedChunkEvent : public Event, Signal<NeedChunkEvent>
 {
-    std::shared_ptr<World> world;
+    world_ptr world;
     int x;
     int z;
 
-    NeedChunkEvent(std::shared_ptr<World> world, int x, int z)
+    NeedChunkEvent(world_ptr world, int x, int z)
         : world(world), x(x), z(z)
     {
     }
@@ -88,12 +89,12 @@ struct NeedChunkEvent : public Event, Signal<NeedChunkEvent>
 
 struct NewChunkEvent : public Event, Signal<NewChunkEvent>
 {
-    std::shared_ptr<World> world;
+    world_ptr world;
     int x;
     int z;
-    std::shared_ptr<Chunk> chunk;
+    chunk_ptr chunk;
 
-    NewChunkEvent(std::shared_ptr<World> world, int x, int z, std::shared_ptr<Chunk> chunk)
+    NewChunkEvent(world_ptr world, int x, int z, chunk_ptr chunk)
         : world(world), x(x), z(z), chunk(chunk)
     {
     }
@@ -104,7 +105,7 @@ struct PlayerLookEvent : public PlayerEvent, Signal<PlayerLookEvent>
     float yaw;
     float pitch;
 
-    PlayerLookEvent(std::shared_ptr<Player> player, float yaw, float pitch)
+    PlayerLookEvent(player_ptr player, float yaw, float pitch)
         : PlayerEvent(player), yaw(yaw), pitch(pitch)
     {
     }
@@ -114,7 +115,7 @@ struct PlayerPositionEvent : public PlayerEvent, Signal<PlayerPositionEvent>
 {
     EntityPosition position;
 
-    PlayerPositionEvent(std::shared_ptr<Player> player, EntityPosition position)
+    PlayerPositionEvent(player_ptr player, EntityPosition position)
         : PlayerEvent(player), position(position)
     {
     }
@@ -124,7 +125,7 @@ struct PlayerOnGroundEvent : public PlayerEvent, Signal<PlayerOnGroundEvent>
 {
     bool on_ground;
 
-    PlayerOnGroundEvent(std::shared_ptr<Player> player, bool on_ground)
+    PlayerOnGroundEvent(player_ptr player, bool on_ground)
         : PlayerEvent(player), on_ground(on_ground)
     {
     }
@@ -134,7 +135,7 @@ struct PlayerDisconnectEvent : public PlayerEvent, Signal<PlayerDisconnectEvent>
 {
     std::string reason;
 
-    PlayerDisconnectEvent(std::shared_ptr<Player> player,
+    PlayerDisconnectEvent(player_ptr player,
             std::string const& reason)
         : PlayerEvent(player), reason(reason)
     {
