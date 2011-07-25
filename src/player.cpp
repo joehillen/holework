@@ -137,4 +137,14 @@ std::weak_ptr<World> Player::world() const
     return this->world_;    
 }
 
+float Player::yaw() const
+{
+    return this->yaw_;
+}
+
+float Player::pitch() const
+{
+    return this->pitch_;
+}
+
 } // end namespace boostcraft

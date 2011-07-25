@@ -47,7 +47,8 @@ struct LogEvent : public Event, Signal<LogEvent>
     std::string message;
     LogType type;
 
-    LogEvent(boostcraft::LogType type, std::string const& msg) : message(msg), type(type)
+    LogEvent(boostcraft::LogType type, std::string const& msg) 
+        : message(msg), type(type)
     {}
 };
 

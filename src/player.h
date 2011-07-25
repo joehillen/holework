@@ -64,6 +64,9 @@ public:
 
 
     std::weak_ptr<World> world() const;
+
+    float yaw() const;
+    float pitch() const;
 private:
     uint32_t id_;
     std::string name_;

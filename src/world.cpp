@@ -88,6 +88,16 @@ void World::newChunkHandler(event::NewChunkEvent& e)
 
 void World::moveHandler(event::PlayerPositionEvent& e)
 {
+    // All players must be at y-level 100
+    if (e.position.y < 100)
+    {
+        EntityPosition pos = {e.position.x,e.position.z,100};
+        e.player->deliver(network::positionlookresponse(
+            pos,
+            1.6, e.player->yaw(),
+            e.player->pitch(), 1));
+        e.player->updatePosition(pos);
+    }
 }
 
 void World::onPlayerDisconnect(event::PlayerDisconnectEvent& e)
