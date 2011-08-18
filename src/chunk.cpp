@@ -59,27 +59,27 @@ Block Chunk::get(unsigned int x, unsigned int z, unsigned int y) const
     uint8_t blocklight;
     uint8_t skylight;
 
-    auto get_upper_nibble = [](uint8_t whole)
+    auto upper_nibble = [](uint8_t whole)
     {
         return (whole & 0xF0) >> 4;
     };
 
-    auto get_lower_nibble = [](uint8_t whole)
+    auto lower_nibble = [](uint8_t whole)
     {
         return (whole & 0x0F);
     };
 
     if (index % 2 == 0)
     {
-        metadata = get_upper_nibble(this->metadata[index/2]);
-        blocklight = get_upper_nibble(this->blocklight[index/2]);
-        skylight = get_upper_nibble(this->skylight[index/2]);
+        metadata = upper_nibble(this->metadata[index/2]);
+        blocklight = upper_nibble(this->blocklight[index/2]);
+        skylight = upper_nibble(this->skylight[index/2]);
     } 
     else 
     {
-        metadata = get_lower_nibble(this->metadata[index/2]);
-        blocklight = get_lower_nibble(this->blocklight[index/2]);
-        skylight = get_lower_nibble(this->skylight[index/2]);
+        metadata = lower_nibble(this->metadata[index/2]);
+        blocklight = lower_nibble(this->blocklight[index/2]);
+        skylight = lower_nibble(this->skylight[index/2]);
     }
     return Block { type, metadata, blocklight, skylight };
 }
