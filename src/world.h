@@ -60,6 +60,7 @@ private:
     void onPlayerDisconnect(event::PlayerDisconnectEvent& e);
 
     void checkPositions();
+    Block getBlock(BlockPosition const&);
     std::unique_ptr<event::interval_timer> position_timer_;
 };
 

@@ -36,7 +36,7 @@ void World::sendSpawn(player_ptr player)
 
         player->deliver(network::positionlookresponse(
             /* position */ {0, 0, 65},
-            /* stance */ 66.6,
+            /* stance */ 1.6,
             /* yaw, pitch */ 512, 90,
             /* on_ground  */ true));
 
@@ -75,6 +75,7 @@ void World::spawnPlayer(player_ptr player)
         }
     }
 
+    player->last_position_ = {0, 0, 65};
     sendSpawn(player);
 }
 
@@ -106,6 +107,9 @@ std::set<player_ptr> World::players() const
     return this->players_;
 }
 
+/**
+ * Perodic check of all the player positions
+ */
 void World::checkPositions()
 {
 
@@ -121,11 +125,49 @@ void World::checkPositions()
 
         if (delta > 0.5d)
         {
-            log(INFO, "World", player.name() + " moved illegally!");
+            log(DEBUG, "World::checkPosition", player.name() + " moved illegally!");
         }
 
+
+        BlockPosition pos(player.position_);
+        Block b = getBlock(pos);
+
+        if (b.type != 0)
+        {
+            std::stringstream ss;
+            ss << player.name() << " collided with terrain at "
+               << pos.x << " " << pos.z << " " << pos.y;
+
+            log(DEBUG, "World", ss.str());
+            player.updatePosition(player.last_position_);
+            player.deliver(network::positionlookresponse(player.last_position_,
+                                          1.6,
+                                          player.yaw_,
+                                          player.pitch_,
+                                          player.on_ground_));
+        }
         player.last_position_ = player.position_;
     }
+}
+
+Block World::getBlock(BlockPosition const& pos)
+{
+    ChunkPosition chunk_pos(pos);
+
+    chunk_ptr chunk = cache.get(chunk_pos);
+
+//    if (!chunk)
+//    {
+//        chunk = store_(chunk_pos);
+//    }
+//    if (!chunk)
+//    {
+//        chunk = generator_(chunk_pos);
+//    }
+
+    return chunk->get(pos.x % Chunk::size_x, 
+                      pos.z % Chunk::size_z,
+                      pos.y);
 }
 
 } // namespace xim
