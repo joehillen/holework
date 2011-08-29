@@ -35,6 +35,7 @@
 #include "extras/music.h"
 #include "handlers/handlers.h"
 #include "handlers/commands.h"
+#include "python/python.h"
 
 
 /////////////////////////////////////////
@@ -82,6 +83,7 @@ int main(int argc, char** argv)
     stupidmusic::init();
     handlers::init();
     commands::init();
+    python::init();
 
     // Start server
     tcp::endpoint endpoint(tcp::v4(), 25565);

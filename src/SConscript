@@ -2,7 +2,8 @@
 # scons script specifying just the sources and target for the project
 #
 sources = Glob('*.cpp') + Glob('*/*.cpp')
-libs    = ['boost_system', 'boost_iostreams', 'gtest', 'pthread']
+libs    = ['boost_system', 'boost_iostreams', 'boost_python', 'python2.7',
+            'gtest', 'pthread']
 
 Import('env')
 env.Append(LIBS=libs)

@@ -6,7 +6,7 @@
 #   matter, Microsoft's C++ compiler should work too, with appropriate flags.
 cxx = 'g++-4.5'
 flags = '-std=c++0x -Wall -Werror -Wno-unused-function -O0 -fno-inline -ggdb'
-paths = '.'
+paths = ['.', '/usr/include/python2.7']
 
 # Set up environment
 import os
