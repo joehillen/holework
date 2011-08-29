@@ -19,7 +19,7 @@ void init()
 
     try
     {
-        py::object val = exec("1 + 3");
+        py::object val = eval("1 + 3");
         int result = py::extract<int>(val);
         std::cout << "The value of 4 is: " << result << "\n";
     }
@@ -29,10 +29,10 @@ void init()
     }
 }
 
-py::object exec(std::string const& code)
+py::object eval(std::string const& code)
 {
     try {
-        return py::eval(code.c_str(), main_namespace);
+        return py::exec(code.c_str(), main_namespace);
     }
     catch (py::error_already_set& e)
     {

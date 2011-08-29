@@ -9,7 +9,7 @@ namespace python {
 
     void init();
 
-    boost::python::object exec(std::string const& code);
+    boost::python::object eval(std::string const& code);
 
 }} // namespace xim::python
 

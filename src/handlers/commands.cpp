@@ -12,6 +12,7 @@
 #include "event/types.h"
 #include "network/response.h"
 #include "extras/music.h"
+#include "python/python.h"
 
 #define foreach BOOST_FOREACH
 
@@ -115,6 +116,11 @@ void commands(ChatEvent& e)
         {
             p->deliver(chatmessage(str));
         }
+    }
+    else if (command == "py")
+    {
+        boost::python::str result(python::eval(e.message.substr(4)));
+        p->deliver(chatmessage(boost::python::extract<std::string>(result)));
     }
     else
     {
