@@ -25,6 +25,7 @@ struct BlockPosition
     int32_t y;
 
     BlockPosition() : x(), z(), y() { }
+    explicit BlockPosition(EntityPosition const&);
     BlockPosition(int32_t x, int32_t z, int32_t y)
         : x(x), z(z), y(y) { }
     BlockPosition(BlockPosition const& other) = default;
@@ -38,6 +39,8 @@ struct ChunkPosition
     int z;
 
     ChunkPosition(ChunkPosition const&) = default;
+    ChunkPosition(int x, int z);
+    explicit ChunkPosition(BlockPosition const&);
     ChunkPosition& operator=(ChunkPosition const&) = default;
 
     bool operator==(ChunkPosition const& rhs) const {
