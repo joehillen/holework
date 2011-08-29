@@ -57,7 +57,6 @@ public:
     /* Position Accessors and Modifiers */
     EntityPosition position();
     void updatePosition(EntityPosition pos);
-
     void updateLook(float yaw, float pitch);
     void updateHealth(short health);
 
@@ -83,6 +82,7 @@ private:
     bool on_ground_;
     bool digging_;
     short health_;
+    bool spawned_;
 
     /// Initiates dispatch for a client request
     void dispatch(network::Request const&);

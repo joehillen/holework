@@ -41,7 +41,7 @@ void Player::log(std::string message)
 
 Player::Player(uint32_t id, std::unique_ptr<Connection::socket_t> sock)
     : Connection(std::move(sock)), id_(id), 
-      timer_(0)
+       spawned_(false), timer_(0)
 {
 }
 

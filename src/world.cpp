@@ -20,7 +20,7 @@ namespace xim {
 World::World(unsigned int max) 
     : cache(max)
 {
-    position_timer_.reset(new event::interval_timer(50, 
+    position_timer_.reset(new event::interval_timer(1000, 
         std::bind(&World::checkPositions, this))
     );
 }
@@ -35,12 +35,13 @@ void World::sendSpawn(player_ptr player)
         player->deliver(network::spawnresponse({10, 10, 100}));
 
         player->deliver(network::positionlookresponse(
-            /* position */ {0, 0, 65},
+            /* position */ {0, 0, 66},
             /* stance */ 1.6,
             /* yaw, pitch */ 512, 90,
             /* on_ground  */ true));
 
         spawning.erase(player);
+        player->spawned_ = true;
     }
 }
 
@@ -75,7 +76,7 @@ void World::spawnPlayer(player_ptr player)
         }
     }
 
-    player->last_position_ = {0, 0, 65};
+    player->last_position_ = {0, 0, 66};
     sendSpawn(player);
 }
 
@@ -114,28 +115,49 @@ void World::checkPositions()
     {
         Player& player = *player_p;
 
-        double dx = player.position_.x - player.last_position_.x;
-        double dz = player.position_.z - player.last_position_.z;
-        double dy = player.position_.y - player.last_position_.y;
+        if (!player.spawned_) 
+        {
+            continue;
+        }
+
+        EntityPosition pos = player.position_;
+
+        std::stringstream ss;
+        ss << player.name() << " pos = x: " << pos.x 
+            << " z: " << pos.z
+            << " y: " << pos.y;
+        log(DEBUG, "World::checkPosition", ss.str());
+
+        double dx = pos.x - player.last_position_.x;
+        double dz = pos.z - player.last_position_.z;
+        double dy = pos.y - player.last_position_.y;
 
         double delta = std::sqrt(dx*dx + dz*dz + dy*dy);
 
         if (delta > 0.5d)
         {
-            log(DEBUG, "World::checkPosition", player.name() + " moved illegally!");
+            log(ERROR, "World::checkPosition", player.name() + " moved illegally!");
         }
 
-
-        BlockPosition pos(player.position_);
-        Block b = getBlock(pos);
+        
+        BlockPosition block_pos(pos);
+        Block b;
+        try 
+        {
+            b = getBlock(block_pos);
+        }
+        catch (std::exception&)
+        {
+            continue;
+        }
 
         if (b.type != 0)
         {
             std::stringstream ss;
             ss << player.name() << " collided with terrain at "
                << pos.x << " " << pos.z << " " << pos.y;
+            log(ERROR, "World", ss.str());
 
-            log(DEBUG, "World", ss.str());
             player.updatePosition(player.last_position_);
             player.deliver(network::positionlookresponse(player.last_position_,
                                           1.6,
@@ -143,7 +165,7 @@ void World::checkPositions()
                                           player.pitch_,
                                           player.on_ground_));
         }
-        player.last_position_ = player.position_;
+        player.last_position_ = pos;
     }
 }
 
