@@ -25,6 +25,16 @@
 
 namespace xim {
 
+std::ostream& operator<<(std::ostream& os, xim::Block const& block)
+{
+    os << "Block(type=" << (int)block.type
+       << ", meta=" << (int)block.metadata
+       << ", blocklight=" << (int)block.blocklight
+       << ", skylight=" << (int)block.skylight
+       << ")";
+    return os;
+}
+
 Chunk::Chunk()
 {
     int size = size_x * size_z * size_y;
@@ -135,15 +145,6 @@ std::ostream& operator<<(std::ostream& os, Chunk const& chunk)
 } // namespace xim
 
 // UNIT TESTS
-std::ostream& operator<<(std::ostream& os, xim::Block const& block)
-{
-    os << "Block(type=" << (int)block.type
-       << ", meta=" << (int)block.metadata
-       << ", blocklight=" << (int)block.blocklight
-       << ", skylight=" << (int)block.skylight
-       << ")";
-    return os;
-}
 
 TEST(ChunkTests, SetAndGet)
 {

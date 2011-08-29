@@ -14,6 +14,7 @@
 #include <cmath>
 #include <boost/foreach.hpp>
 #define foreach BOOST_FOREACH
+#include <gtest/gtest.h>
 
 namespace xim {
 
@@ -189,5 +190,21 @@ Block World::getBlock(BlockPosition const& pos)
                       pos.y);
 }
 
-} // namespace xim
 
+TEST(WorldTests, GetBlock)
+{
+    World w(1);
+    chunk_ptr c(new Chunk());
+    Block block_a { 12, 4, 9, 12 };
+    Block block_b { 11, 9, 0, 10 };
+    Block block_c { 1, 0, 6, 15 };
+    c->set(0, 1, 2, block_a);
+    c->set(6, 11, 99, block_b);
+    c->set(4, 9, 127, block_c);
+    w.cache.add({0,0}, c);
+    ASSERT_EQ(block_a, w.getBlock({0, 1, 2}));
+    ASSERT_EQ(block_b, w.getBlock({6, 11, 99}));
+    ASSERT_EQ(block_c, w.getBlock({4, 9, 127}));
+}
+
+} // namespace xim

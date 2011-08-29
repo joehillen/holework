@@ -42,6 +42,8 @@ struct Block
     }
 };
 
+std::ostream& operator<<(std::ostream& os, Block const& b);
+
 class Chunk
 {
 public:

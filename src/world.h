@@ -40,11 +40,14 @@ public:
     
     std::set<player_ptr> players() const;
 
+    ChunkCache cache;
+
+    Block getBlock(BlockPosition const&);
+
 private:
     // Player list 
     std::set<player_ptr> players_;
 
-    ChunkCache cache;
 
     // Who needs what chunks
     Multimap<player_ptr, ChunkPosition> needs_chunks;
@@ -60,7 +63,6 @@ private:
     void onPlayerDisconnect(event::PlayerDisconnectEvent& e);
 
     void checkPositions();
-    Block getBlock(BlockPosition const&);
     std::unique_ptr<event::interval_timer> position_timer_;
 };
 
