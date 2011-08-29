@@ -70,11 +70,11 @@ void interval_timer::fire(boost::system::error_code const& error)
 {
     if(!error)
     {
-        cb_();
         timer_.expires_from_now(boost::posix_time::milliseconds(ms_));
         timer_.async_wait(boost::bind(
                     &interval_timer::fire, this,
                     boost::asio::placeholders::error));
+        cb_();
     }
 }
 
