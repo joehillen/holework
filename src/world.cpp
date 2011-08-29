@@ -81,13 +81,10 @@ void World::spawnPlayer(player_ptr player)
 
 void World::newChunkHandler(event::NewChunkEvent& e)
 {
-    log(DEBUG, "World", "Got a new chunk from the magic chunk hole");
-
     ChunkPosition pos { e.x, e.z };
 
     foreach (player_ptr player, needs_chunks.get(pos))
     {
-        log(DEBUG, "World", "Sending new chunk to " + player->name());
         player->deliver(network::chunkresponse({e.x, e.z}, *e.chunk));
 
         // player no longer needs the chunk we just gave them

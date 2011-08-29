@@ -29,7 +29,6 @@ namespace generators {
 
 void flatland(event::NeedChunkEvent& e)
 {
-    log(DEBUG,"flatland","Generating Chunk");
     using namespace event;
 
     chunk_ptr chunk(new Chunk);
