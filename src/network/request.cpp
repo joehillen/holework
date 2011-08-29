@@ -264,6 +264,7 @@ struct PlayerLook : public Request
 
     void dispatch(player_ptr p) const
     {
+        p->updateLook(yaw, pitch);
         PlayerOnGroundEvent g(p, onground);
         async_fire(g);
 
@@ -294,6 +295,7 @@ struct PlayerPositionAndLook : public Request
     void dispatch(player_ptr p) const
     {
         p->updatePosition({x, z, y});
+        p->updateLook(yaw, pitch);
 
         PlayerOnGroundEvent g(p, onground);
         async_fire(g);
