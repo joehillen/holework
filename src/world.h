@@ -34,6 +34,8 @@ public:
             std::bind(&ChunkCache::handler, &cache, _1),
             shared_from_this()
         );
+        listen<PlayerDisconnectEvent>(
+            std::bind(&World::onPlayerDisconnect, this, _1));
     }
 
     void spawnPlayer(player_ptr p);
