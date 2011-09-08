@@ -66,7 +66,7 @@ void World::spawnPlayer(player_ptr player)
 
             if (chunk) 
             {
-                log(DEBUG, "World", "Sending chunk from cache to " + player->name());
+                //log(DEBUG, "World", "Sending chunk from cache to " + player->name());
                 player->deliver(network::chunkresponse({x, z}, *chunk));
             }
             else
