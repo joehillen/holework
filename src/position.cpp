@@ -7,6 +7,20 @@
 
 namespace xim {
 
+EntityPosition operator+(EntityPosition const& a, EntityPosition const& b)
+{
+    return EntityPosition(a.x + b.x, a.z + b.z, a.y + b.y);
+}
+
+std::ostream& operator<<(std::ostream& os, xim::EntityPosition const& pos)
+{
+    os << "EntityPosition(x=" << pos.x
+        << ", z=" << pos.z
+        << ", y=" << pos.y
+        << ")";
+    return os;
+}
+
 BlockPosition::BlockPosition(EntityPosition const& epos)
     : x(floor(epos.x)), z(floor(epos.z)), y(floor(epos.y))
 {
@@ -47,6 +61,51 @@ std::ostream& operator<<(std::ostream& os, xim::ChunkPosition const& pos)
         << ", z=" << pos.z
         << ")";
     return os;
+}
+
+TEST(PositionTests, EntityPosAddZero)
+{
+    EntityPosition a(0, 0, 0);
+    EntityPosition b(0, 0, 0);
+    EntityPosition sum = a + b;
+    EntityPosition result(0,0,0);
+    ASSERT_EQ(result, sum);
+}
+
+TEST(PositionTests, EntityPosAddOne)
+{
+    EntityPosition a(0, 0, 0);
+    EntityPosition b(1, 1, 1);
+    EntityPosition sum = a + b;
+    EntityPosition result(1,1,1);
+    ASSERT_EQ(result, sum);
+}
+
+TEST(PositionTests, EntityPosAddRand)
+{
+    EntityPosition a(19.12, 12813.0183, 100);
+    EntityPosition b(7, 9.12, 0.00123);
+    EntityPosition sum = a + b;
+    EntityPosition result(26.12, 12822.1383, 100.00123);
+    ASSERT_EQ(result, sum);
+}
+
+TEST(PositionTests, EntityPosAddNegOne)
+{
+    EntityPosition a(1, 1, 1);
+    EntityPosition b(-1, -1, -1);
+    EntityPosition sum = a + b;
+    EntityPosition result(0,0,0);
+    ASSERT_EQ(result, sum);
+}
+
+TEST(PositionTests, EntityPosAddNegRand)
+{
+    EntityPosition a(13, 19, 45);
+    EntityPosition b(-100.1, -1, -5.5);
+    EntityPosition sum = a + b;
+    EntityPosition result(-87.1,18,39.5);
+    ASSERT_EQ(result, sum);
 }
 
 TEST(PositionTests, BlockPosition)

@@ -16,8 +16,14 @@ struct EntityPosition
     EntityPosition(double x, double z, double y)
         : x(x), z(z), y(y) { }
     EntityPosition(EntityPosition const& other) = default;
-    EntityPosition& operator=(EntityPosition const& rhs) = default;
+    friend EntityPosition operator+(EntityPosition const& a,
+                                    EntityPosition const& b);
+    bool operator==(EntityPosition const& rhs) const {
+        return x == rhs.x && z == rhs.z && y == rhs.y;
+    }
 };
+
+std::ostream& operator<<(std::ostream& os, EntityPosition const& b);
 
 struct BlockPosition
 {

@@ -157,16 +157,16 @@ void World::checkPositions()
         if (b.type != 0)
         {
             std::stringstream ss;
-            ss << player.name() << " collided with terrain at "
-               << pos.x << " " << pos.z << " " << pos.y;
-            log(ERROR, "World", ss.str());
+            ss << player.name() << " collided with terrain at " << pos;
+            log(ERROR, "World::checkPosition", ss.str());
 
             player.updatePosition(player.last_position_);
-            player.deliver(network::positionlookresponse(player.last_position_,
-                                          1.6,
-                                          player.yaw_,
-                                          player.pitch_,
-                                          player.on_ground_));
+            player.deliver(network::positionlookresponse(
+                      player.last_position_ + EntityPosition(0,0,2),
+                      1.6,
+                      player.yaw_,
+                      player.pitch_,
+                      player.on_ground_));
         }
         else
         {
