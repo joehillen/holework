@@ -145,12 +145,14 @@ void World::checkPositions()
         Block b;
         try 
         {
-            b = getBlock(block_pos);
+            b = this->getBlock(block_pos);
         }
-        catch (std::exception&)
+        catch (std::exception& e)
         {
+            std::cerr << "World::checkPosition: " << e.what() << std::endl;
             continue;
         }
+
 
         if (b.type != 0)
         {
@@ -166,15 +168,17 @@ void World::checkPositions()
                                           player.pitch_,
                                           player.on_ground_));
         }
-        player.last_position_ = pos;
+        else
+        {
+            player.last_position_ = pos;
+        }
     }
 }
 
 Block World::getBlock(BlockPosition const& pos)
 {
     ChunkPosition chunk_pos(pos);
-
-    chunk_ptr chunk = cache.get(chunk_pos);
+    chunk_ptr chunk = this->cache.get(chunk_pos);
 
 //    if (!chunk)
 //    {
@@ -185,9 +189,25 @@ Block World::getBlock(BlockPosition const& pos)
 //        chunk = generator_(chunk_pos);
 //    }
 
-    return chunk->get(pos.x % Chunk::size_x, 
-                      pos.z % Chunk::size_z,
-                      pos.y);
+    /* Convert a block position to a position inside a chunk*/
+    auto algo = [](int p, int size)
+    {
+        if (p < 0)
+        {
+            p = (p % size) + size;
+        }
+        else
+        {
+            p = p % size;
+        }
+        return p;
+    };
+
+    int x = algo(pos.x, Chunk::size_x);
+    int z = algo(pos.z, Chunk::size_z);
+    int y = pos.y;
+
+    return chunk->get(x, z, y);
 }
 
 
@@ -205,6 +225,22 @@ TEST(WorldTests, GetBlock)
     ASSERT_EQ(block_a, w.getBlock({0, 1, 2}));
     ASSERT_EQ(block_b, w.getBlock({6, 11, 99}));
     ASSERT_EQ(block_c, w.getBlock({4, 9, 127}));
+}
+
+TEST(WorldTests, GetBlockNegative)
+{
+    World w(1);
+    chunk_ptr c(new Chunk());
+    Block block_a { 12, 4, 9, 12 };
+    Block block_b { 11, 9, 0, 10 };
+    Block block_c { 1, 0, 6, 15 };
+    c->set(15, 14, 2, block_a);
+    c->set(6, 11, 99, block_b);
+    c->set(4, 9, 127, block_c);
+    w.cache.add({-1,-1}, c);
+    ASSERT_EQ(block_a, w.getBlock({-1, -2, 2}));
+    ASSERT_EQ(block_b, w.getBlock({-10, -5, 99}));
+    ASSERT_EQ(block_c, w.getBlock({-12, -7, 127}));
 }
 
 } // namespace xim

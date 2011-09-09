@@ -2,6 +2,7 @@
 #pragma once
 
 #include <sys/types.h>
+#include <ostream>
 
 namespace xim {
 
@@ -30,7 +31,13 @@ struct BlockPosition
         : x(x), z(z), y(y) { }
     BlockPosition(BlockPosition const& other) = default;
     BlockPosition& operator=(BlockPosition const& rhs) = default;
+
+    bool operator==(BlockPosition const& rhs) const {
+        return x == rhs.x && z == rhs.z && y == rhs.y;
+    }
 };
+
+std::ostream& operator<<(std::ostream& os, BlockPosition const& b);
 
 /// Represents the position of a chunk in the world
 struct ChunkPosition
@@ -56,6 +63,8 @@ struct ChunkPosition
         return rhs.x < this->x;
     }
 };
+
+std::ostream& operator<<(std::ostream& os, ChunkPosition const& b);
 
 
 } // end namespace xim
