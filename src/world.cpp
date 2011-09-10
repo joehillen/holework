@@ -190,23 +190,19 @@ Block World::getBlock(BlockPosition const& pos)
 //    }
 
     /* Convert a block position to a position inside a chunk*/
-    auto algo = [](int p, int size)
+    auto mod = [&](int const& p, int const& size)
     {
-        if (p < 0)
-        {
-            p = (p % size) + size;
-        }
-        else
-        {
-            p = p % size;
-        }
-        return p;
+        return (p % size + size) % size;
     };
 
-    int x = algo(pos.x, Chunk::size_x);
-    int z = algo(pos.z, Chunk::size_z);
+    int x = mod(pos.x, Chunk::size_x);
+    int z = mod(pos.z, Chunk::size_z);
     int y = pos.y;
 
+    std::stringstream ss;
+    ss << " getting block, x: " << x 
+        << " z: " << z << " y: " << y;
+    log(DEBUG, "World::getBlock", ss.str());
     return chunk->get(x, z, y);
 }
 
@@ -219,11 +215,11 @@ TEST(WorldTests, GetBlock)
     Block block_b { 11, 9, 0, 10 };
     Block block_c { 1, 0, 6, 15 };
     c->set(0, 1, 2, block_a);
-    c->set(6, 11, 99, block_b);
+    c->set(6, 15, 99, block_b);
     c->set(4, 9, 127, block_c);
     w.cache.add({0,0}, c);
     ASSERT_EQ(block_a, w.getBlock({0, 1, 2}));
-    ASSERT_EQ(block_b, w.getBlock({6, 11, 99}));
+    ASSERT_EQ(block_b, w.getBlock({6, 15, 99}));
     ASSERT_EQ(block_c, w.getBlock({4, 9, 127}));
 }
 
@@ -236,11 +232,11 @@ TEST(WorldTests, GetBlockNegative)
     Block block_c { 1, 0, 6, 15 };
     c->set(15, 14, 2, block_a);
     c->set(6, 11, 99, block_b);
-    c->set(4, 9, 127, block_c);
+    c->set(0, 1, 122, block_c);
     w.cache.add({-1,-1}, c);
     ASSERT_EQ(block_a, w.getBlock({-1, -2, 2}));
     ASSERT_EQ(block_b, w.getBlock({-10, -5, 99}));
-    ASSERT_EQ(block_c, w.getBlock({-12, -7, 127}));
+    ASSERT_EQ(block_c, w.getBlock({-16, -15, 122}));
 }
 
 } // namespace xim

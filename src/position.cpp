@@ -37,17 +37,21 @@ std::ostream& operator<<(std::ostream& os, xim::BlockPosition const& pos)
 
 ChunkPosition::ChunkPosition(BlockPosition const& pos) 
 {
-    x = pos.x / Chunk::size_x;
-    if (pos.x < 0)
+    auto algo = [&](int const& p, int const& size)
     {
-        x -= 1;
-    }
+        int r = p / size;
+        if (p < 0)
+        {
+            if (p % size != 0)
+            {
+                r -= 1;
+            }
+        }
+        return r;
+    };
 
-    z = pos.z / Chunk::size_z;
-    if (pos.z < 0)
-    {
-        z -= 1;
-    }
+    x = algo(pos.x, Chunk::size_x);
+    z = algo(pos.z, Chunk::size_z);
 }
 
 ChunkPosition::ChunkPosition(int x, int z) 
@@ -141,7 +145,15 @@ TEST(PositionTests, ChunkPosRand)
 
 TEST(PositionTests, ChunkPosNeg)
 {
-    BlockPosition bp(-1, -12, 103);
+    BlockPosition bp(0, -1, 103);
+    ChunkPosition cp(bp);
+    ChunkPosition cp_r(0,-1);
+    ASSERT_EQ(cp_r, cp);
+}
+
+TEST(PositionTests, ChunkPosNegOne)
+{
+    BlockPosition bp(-16, -15, 63);
     ChunkPosition cp(bp);
     ChunkPosition cp_r(-1,-1);
     ASSERT_EQ(cp_r, cp);
@@ -149,9 +161,9 @@ TEST(PositionTests, ChunkPosNeg)
 
 TEST(PositionTests, ChunkPosNegTwo)
 {
-    BlockPosition bp(-16, -32, 63);
+    BlockPosition bp(-17, -32, 63);
     ChunkPosition cp(bp);
-    ChunkPosition cp_r(-2,-3);
+    ChunkPosition cp_r(-2,-2);
     ASSERT_EQ(cp_r, cp);
 }
 
