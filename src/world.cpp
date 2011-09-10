@@ -36,7 +36,7 @@ void World::sendSpawn(player_ptr player)
         player->deliver(network::spawnresponse({10, 10, 100}));
 
         player->deliver(network::positionlookresponse(
-            /* position */ {0, 0, 66},
+            /* position */ {0, 0, 65},
             /* stance */ 1.6,
             /* yaw, pitch */ 512, 90,
             /* on_ground  */ true));
@@ -77,7 +77,7 @@ void World::spawnPlayer(player_ptr player)
         }
     }
 
-    player->last_position_ = {0, 0, 66};
+    player->last_position_ = {0, 0, 65};
     sendSpawn(player);
 }
 
@@ -162,11 +162,14 @@ void World::checkPositions()
 
             player.updatePosition(player.last_position_);
             player.deliver(network::positionlookresponse(
-                      player.last_position_ + EntityPosition(0,0,2),
-                      1.6,
-                      player.yaw_,
-                      player.pitch_,
-                      player.on_ground_));
+                        /* When sending a player a new position,
+                        *  put them a little above a block so that
+                        *  they don't fall through it. */
+                        player.last_position_ + EntityPosition(0,0,0.1),
+                        1.6,
+                        player.yaw_,
+                        player.pitch_,
+                        player.on_ground_));
         }
         else
         {

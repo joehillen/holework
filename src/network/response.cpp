@@ -200,7 +200,7 @@ Response positionlookresponse(EntityPosition pos,
     Response r;
 
     r << (int8_t)RESPONSE_POSITION_LOOK;
-    r << pos.x << pos.y << pos.y + stance << pos.z;
+    r << pos.x << pos.y + stance << pos.y << pos.z;
     r << yaw << pitch;
     r << (int8_t)on_ground;
 
